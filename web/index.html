@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AQUA HORIZON | AI Flood Prediction & Severity Mapping</title>
+  
+  <!-- Leaflet CDN -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Fullscreen Map Canvas ("Big Map of India & Nothing Else") -->
+  <div id="map"></div>
+
+  <!-- Opening Screen (Only Clean Project Title) -->
+  <div id="cinematic-intro">
+    <div class="intro-content">
+      <h1 class="intro-title">AQUA HORIZON</h1>
+      <p class="intro-subtitle">AI-Driven 7-Day Inundation Forecasting & Disaster Intelligence</p>
+    </div>
+  </div>
+
+  <!-- Unified Top Bar (Clean, No Jargon) -->
+  <div class="unified-top-bar glass-panel">
+    <div class="brand-item">
+      <div class="pulse-dot"></div>
+      <span class="brand-text">AQUA HORIZON</span>
+    </div>
+    <div class="bar-divider"></div>
+    <button class="nav-btn" id="toggle-satellite-btn" title="Toggle Satellite View">
+      <span id="satellite-btn-text">🛰️ Satellite</span>
+    </button>
+    <button class="nav-btn" id="open-benchmark-btn" title="View Model Data">
+      <span>📊 Model Data</span>
+    </button>
+    <button class="nav-btn" id="replay-intro-btn" title="Replay Intro">
+      <span>🚀 Replay</span>
+    </button>
+  </div>
+
+  <!-- Sleek Floating District Telemetry Card (Line-Wise Organized) -->
+  <div class="district-floating-pill glass-panel" id="district-hud">
+    <!-- Line 1: District Name & Risk Score -->
+    <div class="pill-header">
+      <div class="title-group">
+        <h2 class="dist-title" id="hud-district-name">Select District</h2>
+        <span class="dist-subtitle" id="hud-district-state">Click any district on map</span>
+      </div>
+      <div class="prob-chip" id="hud-prob-chip" style="background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.4);">
+        <span class="prob-num" id="hud-prob-score" style="color: #38bdf8;">Live</span>
+        <span class="prob-tag" id="hud-prob-badge" style="color: #93c5fd;">Active</span>
+      </div>
+    </div>
+
+    <div class="pill-divider"></div>
+
+    <!-- Line 2: Simple Plain-English Metrics Row 1 -->
+    <div class="metric-row">
+      <div class="metric-item">
+        <span class="metric-label">🌧️ Expected Rain</span>
+        <span class="metric-value" id="hud-live-rain">Real-Time</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">💧 Ground Wetness</span>
+        <span class="metric-value" id="hud-soil-moisture">Radar Sync</span>
+      </div>
+    </div>
+
+    <!-- Line 3: Simple Plain-English Metrics Row 2 -->
+    <div class="metric-row">
+      <div class="metric-item">
+        <span class="metric-label">⚠️ Flood Danger Rank</span>
+        <span class="metric-value" id="hud-dfsi">Top Flood Zone</span>
+      </div>
+      <div class="metric-item">
+        <span class="metric-label">📜 Past 5 Years</span>
+        <span class="metric-value" id="hud-past-floods">1967-2023</span>
+      </div>
+    </div>
+
+    <div class="pill-divider"></div>
+
+    <!-- Line 4: Explainability Line -->
+    <div class="quick-reason" id="hud-quick-reason">
+      Click any district on the map to inspect its real-time hydrological risk and telemetry.
+    </div>
+
+    <!-- Line 5: Action Button -->
+    <button class="quick-advisory-btn" id="open-advisory-btn">
+      📢 Generate Advisory Alert
+    </button>
+  </div>
+
+  <!-- Unified Bottom Dock (7-Day Forecast + Inline Legend) -->
+  <div class="unified-bottom-dock glass-panel">
+    <div class="dock-label">7-DAY OUTLOOK:</div>
+    <div class="dock-chips" id="day-chips-container">
+      <!-- Populated dynamically -->
+    </div>
+    <div class="dock-divider"></div>
+    <!-- Clean Color Indicator Dots -->
+    <div class="mini-legend">
+      <span class="legend-dot" style="background:#10b981;" title="Low (&lt;25%)"></span>
+      <span class="legend-dot" style="background:#eab308;" title="Moderate (25-45%)"></span>
+      <span class="legend-dot" style="background:#f97316;" title="High (45-70%)"></span>
+      <span class="legend-dot" style="background:#ef4444;" title="Severe (&gt;70%)"></span>
+      <span class="legend-hint">Risk Scale</span>
+    </div>
+  </div>
+
+  <!-- Modal: Scientific Benchmarks Drawer for Judges -->
+  <div class="modal-backdrop" id="benchmark-modal">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h3 style="font-size: 15px; font-weight: 700; color: #38bdf8;">Scientific ML Benchmarks (IFI-Impacts 1967–2023)</h3>
+        <button class="close-btn" id="close-benchmark-btn">&times;</button>
+      </div>
+      <p style="font-size: 12px; color: #cbd5e1; line-height: 1.5;">
+        Trained strictly on the national <strong>IFI-Impacts</strong> database with an <strong>80:20 chronological ratio split</strong> (<strong>Training: 1967–2012</strong>, 33,350 records | <strong>Testing: 2013–2023</strong>, 7,975 records). Resampling strictly on training data:
+      </p>
+      
+      <table class="benchmark-table">
+        <thead>
+          <tr>
+            <th>Model Configuration</th>
+            <th>Recall</th>
+            <th>Precision</th>
+            <th>F1-Score</th>
+            <th>PR-AUC</th>
+            <th>ROC-AUC</th>
+          </tr>
+        </thead>
+        <tbody id="benchmark-tbody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+
+      <div style="margin-top: 14px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-left: 3px solid #38bdf8; border-radius: 4px; font-size: 11px; color: #93c5fd;">
+        💡 <strong>Scientific Justification:</strong> ADASYN improved minority flood recall on the untouched 20% test partition from <strong>45.3%</strong> to <strong>58.2%</strong> (and <strong>66.9%</strong> on tuned thresholds), cutting false negatives in disaster prediction.
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Operational Emergency Advisory & Public Alert Dispatch -->
+  <div class="modal-backdrop" id="advisory-modal">
+    <div class="modal-card glass-panel advisory-card-container">
+      <div class="modal-header">
+        <div class="advisory-title-group">
+          <span class="advisory-badge" id="adv-badge">⚠️ HIGH RISK ADVISORY</span>
+          <h3 class="advisory-heading" id="adv-district-title">District Flood Advisory</h3>
+        </div>
+        <button class="close-btn" id="close-advisory-btn">&times;</button>
+      </div>
+
+      <!-- Quick Metrics Ribbon -->
+      <div class="advisory-metrics-grid">
+        <div class="adv-metric-box">
+          <span class="adv-m-lbl">🌧️ Expected Rain</span>
+          <span class="adv-m-val" id="adv-rain">-- mm</span>
+        </div>
+        <div class="adv-metric-box">
+          <span class="adv-m-lbl">⚠️ Inundation Risk</span>
+          <span class="adv-m-val" id="adv-risk">--%</span>
+        </div>
+        <div class="adv-metric-box">
+          <span class="adv-m-lbl">💧 Ground Wetness</span>
+          <span class="adv-m-val" id="adv-soil">--%</span>
+        </div>
+        <div class="adv-metric-box">
+          <span class="adv-m-lbl">📅 Forecast Window</span>
+          <span class="adv-m-val" id="adv-window">Today</span>
+        </div>
+      </div>
+
+      <!-- Public Alert Message Card (WhatsApp / SMS Format) -->
+      <div class="public-alert-card">
+        <div class="alert-card-top">
+          <span class="card-label">📢 Instant Citizen Warning (SMS & WhatsApp Ready):</span>
+          <span class="char-count" id="adv-char-count">160 chars</span>
+        </div>
+        <div class="citizen-message-content" id="adv-citizen-msg">
+          <!-- Populated by JS -->
+        </div>
+        <div class="alert-actions-row">
+          <button class="copy-pill-btn" id="copy-advisory-btn">📋 Copy Message</button>
+          <button class="whatsapp-pill-btn" id="whatsapp-share-btn">💬 Open in WhatsApp</button>
+        </div>
+      </div>
+
+      <!-- Official Emergency Directives (Clean Bullet Points) -->
+      <div class="official-directives-box">
+        <h4 class="directives-title">🛡️ Recommended Field Directives (NDRF / DM):</h4>
+        <ul class="directives-list" id="adv-directives-list">
+          <li><strong>Riverine Caution:</strong> Deploy police barriers near low bridges, causeways, and riverbanks.</li>
+          <li><strong>Disaster Response:</strong> Place SDRF / NDRF quick response boats on stand-by at district depots.</li>
+          <li><strong>Emergency Helpline:</strong> Keep District Emergency Operations Center (DEOC) Helpline 1077 active 24x7.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application JS -->
+  <script src="js/app.js"></script>
+</body>
+</html>
