@@ -1,0 +1,15 @@
+{
+  "model_name": "U-Net + ConvLSTM",
+  "architecture": "UNetConvLSTM",
+  "parameters": 85729,
+  "epochs_trained": 2,
+  "optimal_threshold": 0.55,
+  "recall": 81.86,
+  "precision": 52.28,
+  "f1_score": 0.6381,
+  "roc_auc": 0.7996,
+  "pr_auc": 0.6717,
+  "accuracy": 68.8,
+  "training_time_sec": 44.48,
+  "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\unet_convlstm.pt"
+}

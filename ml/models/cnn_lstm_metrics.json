@@ -1,0 +1,15 @@
+{
+  "model_name": "CNN + LSTM",
+  "architecture": "CNNLSTM",
+  "parameters": 67889,
+  "epochs_trained": 1,
+  "optimal_threshold": 0.5,
+  "recall": 80.63,
+  "precision": 53.2,
+  "f1_score": 0.641,
+  "roc_auc": 0.8058,
+  "pr_auc": 0.6766,
+  "accuracy": 69.67,
+  "training_time_sec": 3.47,
+  "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\cnn_lstm.pt"
+}

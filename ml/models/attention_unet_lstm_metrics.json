@@ -1,0 +1,15 @@
+{
+  "model_name": "Attention U-Net + LSTM",
+  "architecture": "AttentionUNetLSTM",
+  "parameters": 26196,
+  "epochs_trained": 2,
+  "optimal_threshold": 0.55,
+  "recall": 82.08,
+  "precision": 52.56,
+  "f1_score": 0.6408,
+  "roc_auc": 0.8017,
+  "pr_auc": 0.6713,
+  "accuracy": 69.09,
+  "training_time_sec": 29.6,
+  "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\attention_unet_lstm.pt"
+}

@@ -1,0 +1,15 @@
+{
+  "model_name": "CNN + Transformer",
+  "architecture": "CNNTransformer",
+  "parameters": 70849,
+  "epochs_trained": 1,
+  "optimal_threshold": 0.5,
+  "recall": 81.15,
+  "precision": 52.39,
+  "f1_score": 0.6367,
+  "roc_auc": 0.7946,
+  "pr_auc": 0.6537,
+  "accuracy": 68.89,
+  "training_time_sec": 9.98,
+  "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\cnn_transformer.pt"
+}
