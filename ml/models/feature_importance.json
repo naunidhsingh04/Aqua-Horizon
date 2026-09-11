@@ -1,0 +1,17 @@
+{
+  "prior_cum_events": 0.0265,
+  "prior_3yr_events": 0.5544,
+  "prior_5yr_events": 0.1614,
+  "prior_10yr_events": 0.07,
+  "flood_acceleration_rate": 0.0449,
+  "dfsi_score": 0.0242,
+  "dfsi_rank": 0.0217,
+  "Corrected_Percent_Flooded_Area": 0.0101,
+  "Parmanent_Water": 0.0111,
+  "Mean_Flood_Duration": 0.0198,
+  "Population": 0.014,
+  "drainage_stress_ratio": 0.0122,
+  "exposure_severity_index": 0.0158,
+  "hydro_rain_stress": 0.0073,
+  "rainfall_anomaly_pct": 0.0066
+}
