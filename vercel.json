@@ -1,5 +1,20 @@
 {
-  "buildCommand": null,
-  "outputDirectory": "web",
-  "cleanUrls": true
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/web/index.html"
+    },
+    {
+      "source": "/css/(.*)",
+      "destination": "/web/css/"
+    },
+    {
+      "source": "/js/(.*)",
+      "destination": "/web/js/"
+    },
+    {
+      "source": "/data/(.*)",
+      "destination": "/web/data/"
+    }
+  ]
 }
