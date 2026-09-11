@@ -4,6 +4,7 @@ import joblib
 import json
 import numpy as np
 import pandas as pd
+from ml.ensemble import KFoldEnsembleClassifier
 
 if hasattr(sys.stdout, 'reconfigure'):
     sys.stdout.reconfigure(encoding='utf-8')

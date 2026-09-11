@@ -1,23 +1,30 @@
 {
   "Baseline (Control - Raw)": {
-    "Precision": 0.6437,
-    "Recall": 0.4532,
-    "F1-Score": 0.5319,
-    "PR-AUC": 0.6566,
-    "ROC-AUC": 0.7889
+    "Precision": 0.6516,
+    "Recall": 0.4636,
+    "F1-Score": 0.5418,
+    "PR-AUC": 0.666,
+    "ROC-AUC": 0.7957
   },
   "SMOTE Balanced": {
-    "Precision": 0.6133,
-    "Recall": 0.5748,
-    "F1-Score": 0.5934,
-    "PR-AUC": 0.6645,
-    "ROC-AUC": 0.7934
+    "Precision": 0.606,
+    "Recall": 0.6125,
+    "F1-Score": 0.6092,
+    "PR-AUC": 0.669,
+    "ROC-AUC": 0.7959
   },
   "ADASYN Balanced": {
-    "Precision": 0.6158,
-    "Recall": 0.5816,
-    "F1-Score": 0.5982,
-    "PR-AUC": 0.667,
-    "ROC-AUC": 0.7957
+    "Precision": 0.6052,
+    "Recall": 0.6013,
+    "F1-Score": 0.6033,
+    "PR-AUC": 0.6674,
+    "ROC-AUC": 0.7961
+  },
+  "5-Fold Stratified CV (ADASYN + XGBoost)": {
+    "Precision": 0.5489,
+    "Recall": 0.6665,
+    "F1-Score": 0.602,
+    "PR-AUC": 0.633,
+    "ROC-AUC": 0.8079
   }
 }
