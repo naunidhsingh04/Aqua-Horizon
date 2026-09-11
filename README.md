@@ -1,10 +1,13 @@
 # 🌊 AQUA HORIZON
 ### AI-Driven 7-Day Inundation Forecasting & Disaster Intelligence Platform for India
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-aqua--horizon.vercel.app-00dfa2?style=for-the-badge&logo=vercel&logoColor=white)](https://aqua-horizon.vercel.app/)
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://www.python.org/)
 [![XGBoost](https://img.shields.io/badge/ML-ADASYN%20%2B%20XGBoost-orange.svg)](https://xgboost.readthedocs.io/)
 [![Leaflet](https://img.shields.io/badge/GIS-Leaflet.js-green.svg)](https://leafletjs.com/)
 [![License](https://img.shields.io/badge/License-MIT-purple.svg)](LICENSE)
+
+> 🚀 **Live Production Deployment:** [**https://aqua-horizon.vercel.app/**](https://aqua-horizon.vercel.app/)
 
 ---
 
@@ -76,12 +79,16 @@
 pip install numpy pandas scikit-learn xgboost imbalanced-learn joblib requests
 ```
 
-### 2. Launch the Web Application
-```bash
-python run_app.py
-```
-Open your browser and navigate to:
-👉 **`http://localhost:8000`**
+### 2. Access the Web Application
+
+* **Live Production Deployment (Instant Access):**  
+  👉 [**https://aqua-horizon.vercel.app/**](https://aqua-horizon.vercel.app/)
+
+* **Or Run Locally:**  
+  ```bash
+  python run_app.py
+  ```
+  Open your browser at: `http://localhost:8000`
 
 ### 3. CLI Prediction Tool
 Predict live or hypothetical scenario flood risk for any district:
