@@ -32,6 +32,17 @@
       <span class="brand-text">AQUA HORIZON</span>
     </div>
     <div class="bar-divider"></div>
+    <div class="model-picker-wrap" title="Switch Live Hybrid AI Architecture">
+      <span class="model-picker-icon">🧠</span>
+      <select id="model-architecture-select" class="model-dropdown">
+        <option value="cnn_transformer" selected>CNN + Transformer (Self-Attention)</option>
+        <option value="unet_convlstm">U-Net + ConvLSTM (Spatial-Temporal)</option>
+        <option value="cnn_lstm">CNN + LSTM (Sequence)</option>
+        <option value="resnet_bilstm">ResNet + BiLSTM (Deep Residual)</option>
+        <option value="attention_unet_lstm">Attention U-Net + LSTM (Additive Gate)</option>
+        <option value="ensemble">Soft-Voting Ensemble (ADASYN + XGB)</option>
+      </select>
+    </div>
     <button class="nav-btn" id="toggle-satellite-btn" title="Toggle Satellite View">
       <span id="satellite-btn-text">🛰️ Satellite</span>
     </button>
@@ -115,35 +126,138 @@
 
   <!-- Modal: Scientific Benchmarks Drawer for Judges -->
   <div class="modal-backdrop" id="benchmark-modal">
-    <div class="modal-card glass-panel">
+    <div class="modal-card glass-panel" style="max-width: 780px;">
       <div class="modal-header">
         <h3 style="font-size: 15px; font-weight: 700; color: #38bdf8;">Scientific ML Benchmarks (IFI-Impacts 1967–2023)</h3>
         <button class="close-btn" id="close-benchmark-btn">&times;</button>
       </div>
-      <p style="font-size: 12px; color: #cbd5e1; line-height: 1.5;">
-        Trained strictly on the national <strong>IFI-Impacts</strong> database with an <strong>80:20 chronological ratio split</strong> (<strong>Training: 1967–2012</strong>, 33,350 records | <strong>Testing: 2013–2023</strong>, 7,975 records). Resampling strictly on training data:
-      </p>
-      
-      <table class="benchmark-table">
-        <thead>
-          <tr>
-            <th>Model Configuration</th>
-            <th>Recall</th>
-            <th>Precision</th>
-            <th>F1-Score</th>
-            <th>PR-AUC</th>
-            <th>ROC-AUC</th>
-          </tr>
-        </thead>
-        <tbody id="benchmark-tbody">
-          <!-- Populated by JS -->
-        </tbody>
-      </table>
 
-      <div style="margin-top: 14px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-left: 3px solid #38bdf8; border-radius: 4px; font-size: 11px; color: #93c5fd; line-height: 1.5;">
-        💡 <strong>Scientific Justification:</strong> Incorporates <strong>5-Fold Stratified Cross-Validation</strong> across 41,325 district-year observations. The <strong>ADASYN + XGBoost 5-Fold Soft-Voting Ensemble</strong> achieves a statistically verified <strong>66.7% Recall (±0.82%)</strong> and <strong>0.808 ROC-AUC</strong>, reducing variance and cutting false negatives in flood disaster detection.
+      <!-- Tab Navigation -->
+      <div class="modal-tabs">
+        <button class="modal-tab-btn active" id="tab-hybrid-btn">⚡ 5 Hybrid DL Architectures (Hackathon Mandate)</button>
+        <button class="modal-tab-btn" id="tab-kfold-btn">🔬 5-Fold Stratified Cross-Validation</button>
+      </div>
+
+      <!-- Tab 1: 5 Hybrid Deep Learning Models -->
+      <div id="tab-hybrid-content">
+        <p style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5; margin-bottom: 10px;">
+          Trained on <strong>38,425 multi-year temporal sequences (T=5)</strong> across <strong>725 districts</strong> using an <strong>80:20 chronological ratio split (1967–2012 Train vs 2013–2023 Test)</strong>:
+        </p>
+        
+        <table class="benchmark-table">
+          <thead>
+            <tr>
+              <th>Hybrid Architecture</th>
+              <th>Params</th>
+              <th>Test Recall</th>
+              <th>Test Precision</th>
+              <th>F1-Score</th>
+              <th>ROC-AUC</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="hybrid-benchmark-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+
+        <!-- Architecture Cards Grid -->
+        <div class="arch-grid">
+          <div class="arch-card" onclick="selectModel('cnn_transformer')">
+            <div class="arch-card-title">
+              <span>CNN + Transformer</span>
+              <span class="arch-pill pill-attention">Self-Attention</span>
+            </div>
+            <div class="arch-card-desc">1D-CNN temporal feature projection fused with Multi-Head Self-Attention encoder.</div>
+            <div class="arch-card-metrics">
+              <span>Recall: 81.15%</span>
+              <span>ROC-AUC: 0.7946</span>
+            </div>
+          </div>
+
+          <div class="arch-card" onclick="selectModel('unet_convlstm')">
+            <div class="arch-card-title">
+              <span>U-Net + ConvLSTM</span>
+              <span class="arch-pill pill-spatial">Spatial-Temporal</span>
+            </div>
+            <div class="arch-card-desc">U-Net spatial encoder-decoder with ConvLSTM recurrent bottleneck for spatial inundation propagation.</div>
+            <div class="arch-card-metrics">
+              <span>Recall: 81.86%</span>
+              <span>ROC-AUC: 0.7996</span>
+            </div>
+          </div>
+
+          <div class="arch-card" onclick="selectModel('cnn_lstm')">
+            <div class="arch-card-title">
+              <span>CNN + LSTM</span>
+              <span class="arch-pill pill-temporal">Sequence</span>
+            </div>
+            <div class="arch-card-desc">1D convolutional rainfall anomaly filter + 2-layer LSTM sequential memory cells.</div>
+            <div class="arch-card-metrics">
+              <span>Recall: 80.63%</span>
+              <span>ROC-AUC: 0.8058</span>
+            </div>
+          </div>
+
+          <div class="arch-card" onclick="selectModel('resnet_bilstm')">
+            <div class="arch-card-title">
+              <span>ResNet + BiLSTM</span>
+              <span class="arch-pill pill-temporal">Residual</span>
+            </div>
+            <div class="arch-card-desc">Deep 1D residual skip connections combined with bidirectional LSTM sequence processing.</div>
+            <div class="arch-card-metrics">
+              <span>Recall: 75.33%</span>
+              <span>ROC-AUC: 0.7985</span>
+            </div>
+          </div>
+
+          <div class="arch-card" onclick="selectModel('attention_unet_lstm')">
+            <div class="arch-card-title">
+              <span>Attention U-Net + LSTM</span>
+              <span class="arch-pill pill-attention">Attention Gate</span>
+            </div>
+            <div class="arch-card-desc">Additive spatial attention gates to focus on low-lying drainage basins before LSTM recurrent prediction.</div>
+            <div class="arch-card-metrics">
+              <span>Recall: 82.08%</span>
+              <span>ROC-AUC: 0.8017</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: 5-Fold Stratified Cross-Validation & Ensemble -->
+      <div id="tab-kfold-content" style="display: none;">
+        <p style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5; margin-bottom: 10px;">
+          Statistical verification across 41,325 district-year observations comparing class-balancing resampling strategies:
+        </p>
+        
+        <table class="benchmark-table">
+          <thead>
+            <tr>
+              <th>Model Configuration</th>
+              <th>Recall</th>
+              <th>Precision</th>
+              <th>F1-Score</th>
+              <th>PR-AUC</th>
+              <th>ROC-AUC</th>
+            </tr>
+          </thead>
+          <tbody id="benchmark-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+
+        <div style="margin-top: 12px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-left: 3px solid #38bdf8; border-radius: 4px; font-size: 11px; color: #93c5fd; line-height: 1.5;">
+          💡 <strong>Statistical Rigor:</strong> The <strong>ADASYN + XGBoost 5-Fold Soft-Voting Ensemble</strong> achieves a statistically verified <strong>66.7% Recall (&plusmn;0.82%)</strong> and <strong>0.808 ROC-AUC</strong>, eliminating single-split bias and drastically curtailing missed flood alerts.
+        </div>
       </div>
     </div>
+  </div>
+
+  <!-- Interactive Toast Notification -->
+  <div id="toast-banner" class="toast-banner">
+    <span>🧠</span>
+    <span id="toast-text">AI Architecture Selected</span>
   </div>
 
   <!-- Modal: Operational Emergency Advisory & Public Alert Dispatch -->
