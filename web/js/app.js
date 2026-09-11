@@ -10,6 +10,7 @@ let satelliteLayer;
 let isSatellite = false;
 let currentModel = 'cnn_transformer';
 let hybridBenchmarksData = null;
+let kfoldHybridBenchmarksData = null;
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
@@ -74,10 +75,11 @@ function startCinematicDescent() {
 // 3. Load Datasets (Enriched GeoJSON, Intelligence, & Hybrid Benchmarks)
 async function loadData() {
     try {
-        const [geoRes, dataRes, hybridRes] = await Promise.all([
+        const [geoRes, dataRes, hybridRes, kfoldRes] = await Promise.all([
             fetch('data/india_districts.geojson'),
             fetch('data/flood_intelligence_data.json'),
-            fetch('data/hybrid_benchmarks.json').catch(() => null)
+            fetch('data/hybrid_benchmarks.json').catch(() => null),
+            fetch('data/kfold_hybrid_benchmarks.json').catch(() => null)
         ]);
 
         const geoData = await geoRes.json();
@@ -85,10 +87,14 @@ async function loadData() {
         if (hybridRes && hybridRes.ok) {
             hybridBenchmarksData = await hybridRes.json();
         }
+        if (kfoldRes && kfoldRes.ok) {
+            kfoldHybridBenchmarksData = await kfoldRes.json();
+        }
 
         renderChoropleth(geoData);
         populateBenchmarkModal();
         populateHybridBenchmarkModal();
+        populateKfoldHybridBenchmarkModal();
         populateTicker();
         setupDayChips();
 
@@ -703,4 +709,151 @@ function populateHybridBenchmarkModal() {
         tbody.appendChild(tr);
     });
 }
+
+// 12. 5-Fold Stratified Cross-Validation Modal Population
+function populateKfoldHybridBenchmarkModal() {
+    const tbody = document.getElementById('kfold-hybrid-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    const models = kfoldHybridBenchmarksData?.models || [
+        {
+            model_name: "CNN + Transformer",
+            architecture: "CNNTransformer",
+            mean_recall: 77.50,
+            std_recall: 3.62,
+            mean_precision: 48.00,
+            std_precision: 1.67,
+            mean_f1: 0.5921,
+            mean_roc_auc: 0.7936,
+            folds: [
+                { fold: "Fold 1", recall: 77.73, precision: 47.84, f1_score: 0.5923, roc_auc: 0.7903 },
+                { fold: "Fold 2", recall: 72.38, precision: 50.47, f1_score: 0.5947, roc_auc: 0.7982 },
+                { fold: "Fold 3", recall: 79.07, precision: 47.59, f1_score: 0.5942, roc_auc: 0.7968 },
+                { fold: "Fold 4", recall: 82.17, precision: 45.81, f1_score: 0.5882, roc_auc: 0.7907 },
+                { fold: "Fold 5", recall: 76.17, precision: 48.29, f1_score: 0.5911, roc_auc: 0.7920 }
+            ]
+        },
+        {
+            model_name: "Attention U-Net + LSTM",
+            architecture: "AttentionUNetLSTM",
+            mean_recall: 77.21,
+            std_recall: 4.59,
+            mean_precision: 46.97,
+            std_precision: 2.10,
+            mean_f1: 0.5829,
+            mean_roc_auc: 0.7844,
+            folds: [
+                { fold: "Fold 1", recall: 80.60, precision: 44.93, f1_score: 0.5770, roc_auc: 0.7782 },
+                { fold: "Fold 2", recall: 78.67, precision: 47.20, f1_score: 0.5900, roc_auc: 0.7903 },
+                { fold: "Fold 3", recall: 69.15, precision: 50.43, f1_score: 0.5832, roc_auc: 0.7858 },
+                { fold: "Fold 4", recall: 78.27, precision: 45.86, f1_score: 0.5783, roc_auc: 0.7800 },
+                { fold: "Fold 5", recall: 79.35, precision: 46.45, f1_score: 0.5860, roc_auc: 0.7879 }
+            ]
+        },
+        {
+            model_name: "U-Net + ConvLSTM",
+            architecture: "UNetConvLSTM",
+            mean_recall: 76.13,
+            std_recall: 4.30,
+            mean_precision: 48.41,
+            std_precision: 1.60,
+            mean_f1: 0.5910,
+            mean_roc_auc: 0.7946,
+            folds: [
+                { fold: "Fold 1", recall: 74.32, precision: 48.35, f1_score: 0.5858, roc_auc: 0.7900 },
+                { fold: "Fold 2", recall: 78.13, precision: 48.75, f1_score: 0.6004, roc_auc: 0.8037 },
+                { fold: "Fold 3", recall: 69.47, precision: 50.89, f1_score: 0.5874, roc_auc: 0.7934 },
+                { fold: "Fold 4", recall: 80.20, precision: 46.72, f1_score: 0.5904, roc_auc: 0.7921 },
+                { fold: "Fold 5", recall: 78.55, precision: 47.35, f1_score: 0.5908, roc_auc: 0.7940 }
+            ]
+        },
+        {
+            model_name: "ResNet + BiLSTM",
+            architecture: "ResNetBiLSTM",
+            mean_recall: 75.65,
+            std_recall: 3.91,
+            mean_precision: 49.76,
+            std_precision: 1.96,
+            mean_f1: 0.5995,
+            mean_roc_auc: 0.8003,
+            folds: [
+                { fold: "Fold 1", recall: 75.84, precision: 48.83, f1_score: 0.5941, roc_auc: 0.7954 },
+                { fold: "Fold 2", recall: 78.85, precision: 50.32, f1_score: 0.6143, roc_auc: 0.8101 },
+                { fold: "Fold 3", recall: 72.65, precision: 51.38, f1_score: 0.6019, roc_auc: 0.8018 },
+                { fold: "Fold 4", recall: 70.90, precision: 51.45, f1_score: 0.5963, roc_auc: 0.7960 },
+                { fold: "Fold 5", recall: 80.03, precision: 46.82, f1_score: 0.5908, roc_auc: 0.7984 }
+            ]
+        },
+        {
+            model_name: "CNN + LSTM",
+            architecture: "CNNLSTM",
+            mean_recall: 74.06,
+            std_recall: 3.73,
+            mean_precision: 49.73,
+            std_precision: 1.67,
+            mean_f1: 0.5942,
+            mean_roc_auc: 0.7973,
+            folds: [
+                { fold: "Fold 1", recall: 75.08, precision: 48.06, f1_score: 0.5860, roc_auc: 0.7907 },
+                { fold: "Fold 2", recall: 77.68, precision: 49.11, f1_score: 0.6017, roc_auc: 0.8049 },
+                { fold: "Fold 3", recall: 75.35, precision: 49.41, f1_score: 0.5968, roc_auc: 0.7995 },
+                { fold: "Fold 4", recall: 67.76, precision: 52.54, f1_score: 0.5919, roc_auc: 0.7944 },
+                { fold: "Fold 5", recall: 74.42, precision: 49.51, f1_score: 0.5946, roc_auc: 0.7968 }
+            ]
+        }
+    ];
+
+    models.forEach((m, idx) => {
+        const rowId = `kfold-detail-${idx}`;
+        const tr = document.createElement('tr');
+        if (m.mean_recall >= 77.0) tr.className = 'champion';
+        tr.innerHTML = `
+            <td>
+                <strong>${m.model_name}</strong>
+            </td>
+            <td style="color: #4ade80; font-weight: 700;">${m.mean_recall.toFixed(1)}% (&plusmn;${m.std_recall.toFixed(1)}%)</td>
+            <td>${m.mean_precision.toFixed(1)}% (&plusmn;${m.std_precision.toFixed(1)}%)</td>
+            <td>${m.mean_f1.toFixed(3)}</td>
+            <td style="color: #38bdf8; font-weight: 700;">${m.mean_roc_auc.toFixed(3)}</td>
+            <td>
+                <button class="nav-btn" style="padding: 2px 7px; font-size: 10px;" onclick="toggleKfoldDetail('${rowId}')">
+                    Inspect 5 Folds ▼
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+
+        // Expandable Detail Row for Folds 1 to 5
+        const detailTr = document.createElement('tr');
+        detailTr.id = rowId;
+        detailTr.style.display = 'none';
+        detailTr.style.background = 'rgba(0,0,0,0.35)';
+
+        let foldCells = m.folds.map(f => `
+            <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 8px; font-size: 10px;">
+                <div style="font-weight: 700; color: #38bdf8; margin-bottom: 2px;">${f.fold}</div>
+                <div style="color: #4ade80; font-weight: 600;">Recall: ${f.recall.toFixed(1)}%</div>
+                <div style="color: #94a3b8;">Prec: ${f.precision.toFixed(1)}%</div>
+                <div style="color: #cbd5e1;">AUC: ${f.roc_auc.toFixed(3)}</div>
+            </div>
+        `).join('');
+
+        detailTr.innerHTML = `
+            <td colspan="6" style="padding: 8px 12px;">
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                    ${foldCells}
+                </div>
+            </td>
+        `;
+        tbody.appendChild(detailTr);
+    });
+}
+
+window.toggleKfoldDetail = function(rowId) {
+    const el = document.getElementById(rowId);
+    if (!el) return;
+    el.style.display = el.style.display === 'none' ? 'table-row' : 'none';
+};
+
 

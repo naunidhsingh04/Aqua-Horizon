@@ -48,6 +48,25 @@ All 5 hybrid architectures are implemented in modular PyTorch files in `ml/` and
 
 ## 🔬 Statistical Validation: 5-Fold Stratified Cross-Validation & Ensemble
 
+### A. 5-Fold Stratified Cross-Validation for 5 Hybrid Deep Learning Models
+
+To verify cross-geographical stability and eliminate fold-specific bias, all 5 hybrid deep learning architectures were trained and validated across **5 Stratified Folds (38,425 multi-year sequences)** using zero-leakage training fold standardizers:
+
+| Hybrid Model Architecture | 5-Fold Mean Recall (±Std) | 5-Fold Mean Precision (±Std) | Mean F1-Score | Mean ROC-AUC | Generalization Status |
+| :--- | :---: | :---: | :---: | :---: | :--- |
+| **CNN + Transformer** | **77.50% (±3.62%)** | 48.00% (±1.67%) | 0.5921 | 0.7936 | Top Mean Temporal Generalization |
+| **Attention U-Net + LSTM** | **77.21% (±4.59%)** | 46.97% (±2.10%) | 0.5829 | 0.7844 | High Basin Attention Sensitivity |
+| **U-Net + ConvLSTM** | **76.13% (±4.30%)** | 48.41% (±1.60%) | 0.5910 | 0.7946 | Spatial-Temporal Flood Extent Stability |
+| **ResNet + BiLSTM** | **75.65% (±3.91%)** | **49.76% (±1.96%)** | **0.5995** | **0.8003** | Highest F1 & ROC-AUC Stability |
+| **CNN + LSTM** | **74.06% (±3.73%)** | 49.73% (±1.67%) | 0.5942 | 0.7973 | Temporal Sequence Baseline |
+
+*Run 5-Fold Hybrid Suite:*
+```bash
+python ml/train_kfold_hybrid_models.py
+```
+
+### B. Tabular Baselines & Resampling Strategies (Control vs SMOTE vs ADASYN vs Ensemble)
+
 To ensure scientific rigor and prevent single-split variance, AQUA HORIZON was also evaluated using **5-Fold Stratified Cross-Validation** across all 41,325 district-year observations:
 
 | Model Configuration | Recall | Precision | F1-Score | PR-AUC | ROC-AUC | Status |
