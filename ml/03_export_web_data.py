@@ -58,7 +58,7 @@ def fetch_live_meteorology():
             'name': anchor['name'],
             'states': anchor['states'],
             'daily_rain_mm': rain_series[:7],
-            'daily_prob': prob_series[:7]
+            'daily_prob': [round(float(p) / 100.0, 3) if float(p) > 1.0 else round(float(p), 3) for p in prob_series[:7]]
         }
 
     return regional_weather, forecast_dates
@@ -248,7 +248,7 @@ def export_live_system():
                 'population': 850000,
                 'severity_score': 1.8,
                 'weather_zone': zone_data['name'],
-                'daily_probs': zone_data['daily_prob'],
+                'daily_probs': [round(float(p) / 100.0, 3) if float(p) > 1.0 else round(float(p), 3) for p in zone_data['daily_prob']],
                 'daily_rains_mm': [round(float(r), 1) for r in zone_data['daily_rain_mm']],
                 'soil_moisture_pct': min(90, max(40, int(45 + zone_data['daily_rain_mm'][0] * 2.5)))
             })

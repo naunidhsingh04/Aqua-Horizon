@@ -90,25 +90,34 @@ async function loadData() {
     }
 }
 
-// 4. Color Scale by Risk Probability
+// 4. Color Scale & Probability Normalizer (Guarantees strictly 0% to 100%)
+function normalizeProb(rawProb) {
+    if (rawProb === undefined || rawProb === null || isNaN(rawProb)) return 0.15;
+    let p = parseFloat(rawProb);
+    if (p > 1.0) p = p / 100.0;
+    return Math.max(0.0, Math.min(1.0, p));
+}
+
 function getRiskColor(prob) {
-    if (prob >= 0.70) return '#ef4444'; // Critical Red
-    if (prob >= 0.45) return '#f97316'; // High Orange
-    if (prob >= 0.25) return '#eab308'; // Moderate Yellow
+    const p = normalizeProb(prob);
+    if (p >= 0.70) return '#ef4444'; // Critical Red
+    if (p >= 0.45) return '#f97316'; // High Orange
+    if (p >= 0.25) return '#eab308'; // Moderate Yellow
     return '#10b981';                   // Low Green
 }
 
 function getRiskCategory(prob) {
-    if (prob >= 0.70) return { label: 'Severe Alert', class: 'positive' };
-    if (prob >= 0.45) return { label: 'High Risk', class: 'positive' };
-    if (prob >= 0.25) return { label: 'Moderate Watch', class: 'warning' };
+    const p = normalizeProb(prob);
+    if (p >= 0.70) return { label: 'Severe Alert', class: 'positive' };
+    if (p >= 0.45) return { label: 'High Risk', class: 'positive' };
+    if (p >= 0.25) return { label: 'Moderate Watch', class: 'warning' };
     return { label: 'Low Risk', class: 'negative' };
 }
 
 function getTooltipHTML(props, dayIdx) {
     const daily = props.daily_probs || [0.15];
     const dailyRains = props.daily_rains_mm || [10.0];
-    const prob = daily[dayIdx] !== undefined ? daily[dayIdx] : 0.15;
+    const prob = normalizeProb(daily[dayIdx] !== undefined ? daily[dayIdx] : 0.15);
     const rain = dailyRains[dayIdx] !== undefined ? dailyRains[dayIdx] : 10.0;
     const color = getRiskColor(prob);
 
@@ -219,7 +228,7 @@ function updateDistrictHUD(props) {
 
     const dailyProbs = props.daily_probs || [0.2];
     const dailyRains = props.daily_rains_mm || [12.0];
-    const prob = dailyProbs[currentDayIndex] !== undefined ? dailyProbs[currentDayIndex] : 0.2;
+    const prob = normalizeProb(dailyProbs[currentDayIndex] !== undefined ? dailyProbs[currentDayIndex] : 0.2);
     const rainMm = dailyRains[currentDayIndex] !== undefined ? dailyRains[currentDayIndex] : 10.0;
     const risk = getRiskCategory(prob);
 
@@ -418,7 +427,7 @@ function generateEmergencyAdvisory() {
 
     const dailyProbs = dist.daily_probs || [0.2];
     const dailyRains = dist.daily_rains_mm || [12.0];
-    const prob = dailyProbs[currentDayIndex] !== undefined ? dailyProbs[currentDayIndex] : 0.2;
+    const prob = normalizeProb(dailyProbs[currentDayIndex] !== undefined ? dailyProbs[currentDayIndex] : 0.2);
     const rain = dailyRains[currentDayIndex] !== undefined ? dailyRains[currentDayIndex] : 10.0;
     const probPct = Math.round(prob * 100);
     const risk = getRiskCategory(prob);
