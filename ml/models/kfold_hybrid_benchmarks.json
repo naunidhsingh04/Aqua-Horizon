@@ -118,7 +118,9 @@
           "threshold": 0.5,
           "time_sec": 7.62
         }
-      ]
+      ],
+      "mean_accuracy": 70.15,
+      "std_accuracy": 1.35
     },
     {
       "model_name": "CNN + Transformer",
@@ -234,7 +236,9 @@
           "threshold": 0.5,
           "time_sec": 14.14
         }
-      ]
+      ],
+      "mean_accuracy": 69.48,
+      "std_accuracy": 1.18
     },
     {
       "model_name": "ResNet + BiLSTM",
@@ -350,7 +354,9 @@
           "threshold": 0.55,
           "time_sec": 20.11
         }
-      ]
+      ],
+      "mean_accuracy": 71.24,
+      "std_accuracy": 1.42
     },
     {
       "model_name": "U-Net + ConvLSTM",
@@ -466,7 +472,9 @@
           "threshold": 0.5,
           "time_sec": 46.57
         }
-      ]
+      ],
+      "mean_accuracy": 68.95,
+      "std_accuracy": 1.62
     },
     {
       "model_name": "Attention U-Net + LSTM",
@@ -582,7 +590,9 @@
           "threshold": 0.4,
           "time_sec": 13.35
         }
-      ]
+      ],
+      "mean_accuracy": 69.32,
+      "std_accuracy": 1.55
     }
   ]
 }

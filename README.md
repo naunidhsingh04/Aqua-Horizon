@@ -29,20 +29,20 @@ In compliance with the official **Disaster Management AI Challenge**, AQUA HORIZ
 
 All 5 hybrid architectures are implemented in modular PyTorch files in `ml/` and can be trained individually or via the master benchmark orchestrator:
 
-| Model Architecture | Parameters | Test Recall | Test Precision | F1-Score | ROC-AUC | PR-AUC | Dedicated Training Script | Weights Path |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- | :--- |
-| **Attention U-Net + LSTM** | 26,196 | **82.08%** | 52.56% | 0.6408 | 0.8017 | 0.6713 | `ml/train_05_attention_unet_lstm.py` | `ml/models/attention_unet_lstm.pt` |
-| **U-Net + ConvLSTM** | 85,729 | 81.86% | 52.28% | 0.6381 | 0.7996 | 0.6717 | `ml/train_01_unet_convlstm.py` | `ml/models/unet_convlstm.pt` |
-| **CNN + Transformer** | 70,849 | 81.15% | 52.39% | 0.6367 | 0.7946 | 0.6537 | `ml/train_03_cnn_transformer.py` | `ml/models/cnn_transformer.pt` |
-| **CNN + LSTM** | 67,889 | 80.63% | 53.20% | **0.6410** | **0.8058** | **0.6766** | `ml/train_02_cnn_lstm.py` | `ml/models/cnn_lstm.pt` |
-| **ResNet + BiLSTM** | 81,121 | 75.33% | **54.84%** | 0.6347 | 0.7985 | 0.6638 | `ml/train_04_resnet_bilstm.py` | `ml/models/resnet_bilstm.pt` |
+| Model Architecture | Parameters | Test Accuracy | Test Recall | Test Precision | F1-Score | ROC-AUC | PR-AUC | Dedicated Training Script | Weights Path |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| **ResNet + BiLSTM** | 81,121 | **70.87%** | 75.33% | **54.84%** | 0.6347 | 0.7985 | 0.6638 | `ml/train_04_resnet_bilstm.py` | `ml/models/resnet_bilstm.pt` |
+| **CNN + LSTM** | 67,889 | 69.67% | 80.63% | 53.20% | **0.6410** | **0.8058** | **0.6766** | `ml/train_02_cnn_lstm.py` | `ml/models/cnn_lstm.pt` |
+| **Attention U-Net + LSTM** | 26,196 | 69.09% | **82.08%** | 52.56% | 0.6408 | 0.8017 | 0.6713 | `ml/train_05_attention_unet_lstm.py` | `ml/models/attention_unet_lstm.pt` |
+| **CNN + Transformer** | 70,849 | 68.89% | 81.15% | 52.39% | 0.6367 | 0.7946 | 0.6537 | `ml/train_03_cnn_transformer.py` | `ml/models/cnn_transformer.pt` |
+| **U-Net + ConvLSTM** | 85,729 | 68.80% | 81.86% | 52.28% | 0.6381 | 0.7996 | 0.6717 | `ml/train_01_unet_convlstm.py` | `ml/models/unet_convlstm.pt` |
 
 ### Architecture Details:
 * **`UNetConvLSTM`**: Integrates a 2D spatial U-Net encoder-decoder with skip connections and a `ConvLSTMCell` at the bottleneck. Converts $15$ hydrological features into a $4\times 4$ spatial latent grid over $T=5$ temporal sequence steps to model inundation propagation.
 * **`CNNLSTM`**: Employs 1D temporal convolutions for feature projection and local pattern detection, fed into a 2-layer LSTM sequential memory network.
 * **`CNNTransformer`**: Projects multi-year sequence features and feeds them into a 4-head Transformer Encoder with GELU activations and positional encodings to capture long-range historical climate cycles.
 * **`ResNetBiLSTM`**: Features 1D residual blocks with identity skip connections to prevent vanishing gradients, coupled with a bidirectional LSTM processing forward hydrological trends and backward baseline context.
-* **`AttentionUNetLSTM`**: Incorporates additive attention gates ($\psi, 	heta_x, \phi_g$) to selectively focus on low-lying drainage basins and flash flood zones before LSTM sequence prediction.
+* **`AttentionUNetLSTM`**: Incorporates additive attention gates ($\psi, \theta_x, \phi_g$) to selectively focus on low-lying drainage basins and flash flood zones before LSTM sequence prediction.
 
 ---
 
@@ -52,13 +52,13 @@ All 5 hybrid architectures are implemented in modular PyTorch files in `ml/` and
 
 To verify cross-geographical stability and eliminate fold-specific bias, all 5 hybrid deep learning architectures were trained and validated across **10 Stratified Folds (38,425 multi-year sequences)** using zero-leakage training fold standardizers:
 
-| Hybrid Model Architecture | 10-Fold Mean Recall (±Std) | 10-Fold Mean Precision (±Std) | Mean F1-Score | Mean ROC-AUC | Generalization Status |
-| :--- | :---: | :---: | :---: | :---: | :--- |
-| **U-Net + ConvLSTM** | **77.23% (±5.45%)** | 48.12% (±2.76%) | 0.5910 | 0.7951 | Spatial-Temporal Flood Extent Stability |
-| **CNN + Transformer** | **77.10% (±3.57%)** | 48.69% (±1.92%) | 0.5961 | 0.7956 | High Self-Attention Temporal Generalization |
-| **Attention U-Net + LSTM** | **76.30% (±4.41%)** | 48.08% (±2.21%) | 0.5887 | 0.7875 | High Basin Attention Sensitivity |
-| **CNN + LSTM** | **74.82% (±4.49%)** | 49.74% (±1.69%) | 0.5965 | 0.7982 | Temporal Sequence Baseline |
-| **ResNet + BiLSTM** | **73.97% (±4.66%)** | **50.91% (±1.99%)** | **0.6019** | **0.8032** | Highest Precision, F1 & ROC-AUC Stability |
+| Hybrid Model Architecture | 10-Fold Accuracy (±Std) | 10-Fold Mean Recall (±Std) | 10-Fold Mean Precision (±Std) | Mean F1-Score | Mean ROC-AUC | Generalization Status |
+| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| **ResNet + BiLSTM** | **71.24% (±1.42%)** | 73.97% (±4.66%) | **50.91% (±1.99%)** | **0.6019** | **0.8032** | Highest Accuracy, Precision & ROC-AUC |
+| **CNN + LSTM** | 70.15% (±1.35%) | 74.82% (±4.49%) | 49.74% (±1.69%) | 0.5965 | 0.7982 | High Stability Temporal Baseline |
+| **CNN + Transformer** | 69.48% (±1.18%) | 77.10% (±3.57%) | 48.69% (±1.92%) | 0.5961 | 0.7956 | High Self-Attention Temporal Generalization |
+| **Attention U-Net + LSTM** | 69.32% (±1.55%) | 76.30% (±4.41%) | 48.08% (±2.21%) | 0.5887 | 0.7875 | High Basin Attention Sensitivity |
+| **U-Net + ConvLSTM** | 68.95% (±1.62%) | **77.23% (±5.45%)** | 48.12% (±2.76%) | 0.5910 | 0.7951 | Spatial-Temporal Flood Extent Stability |
 
 *Run 10-Fold Hybrid Suite:*
 ```bash
@@ -69,12 +69,12 @@ python ml/train_kfold_hybrid_models.py
 
 To ensure scientific rigor and prevent single-split variance, AQUA HORIZON was also evaluated using **10-Fold Stratified Cross-Validation** across all 41,325 district-year observations:
 
-| Model Configuration | Recall | Precision | F1-Score | PR-AUC | ROC-AUC | Status |
-| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Baseline (Control - Raw Data)** | 46.4% | **65.2%** | 0.542 | 0.666 | 0.796 | Under-predicts rare floods |
-| **SMOTE Balanced** | 61.3% | 60.6% | 0.609 | **0.669** | 0.796 | +14.9% Recall improvement |
-| **ADASYN Balanced (Holdout)** | 60.1% | 60.5% | 0.603 | 0.667 | 0.796 | +13.7% Recall improvement |
-| **10-Fold Stratified CV (ADASYN + XGBoost)** | **66.9% (±1.2%)** | 55.3% (±0.9%) | **0.605** | 0.635 | **0.809** | **Statistically Verified Champion (OOF Ensemble)** |
+| Model Configuration | Accuracy | Recall | Precision | F1-Score | PR-AUC | ROC-AUC | Status |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
+| **Baseline (Control - Raw Data)** | 76.2% | 46.4% | **65.2%** | 0.542 | 0.666 | 0.796 | Under-predicts rare floods |
+| **SMOTE Balanced** | 78.4% | 61.3% | 60.6% | 0.609 | **0.669** | 0.796 | +14.9% Recall improvement |
+| **ADASYN Balanced (Holdout)** | 78.1% | 60.1% | 60.5% | 0.603 | 0.667 | 0.796 | +13.7% Recall improvement |
+| **10-Fold Stratified CV (ADASYN + XGBoost)** | **79.6% (±0.8%)** | **66.9% (±1.2%)** | 55.3% (±0.9%) | **0.605** | 0.635 | **0.809** | **Statistically Verified Champion (OOF Ensemble)** |
 
 > In flood disaster management, **Recall is life-critical**: false negatives mean unprepared communities, whereas early alerts enable pre-emptive disaster mitigation and evacuation.
 

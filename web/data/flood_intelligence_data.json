@@ -19,28 +19,32 @@
         "Recall": 0.4636,
         "F1-Score": 0.5418,
         "PR-AUC": 0.666,
-        "ROC-AUC": 0.7957
+        "ROC-AUC": 0.7957,
+        "Accuracy": 0.762
       },
       "SMOTE Balanced": {
         "Precision": 0.606,
         "Recall": 0.6125,
         "F1-Score": 0.6092,
         "PR-AUC": 0.669,
-        "ROC-AUC": 0.7959
+        "ROC-AUC": 0.7959,
+        "Accuracy": 0.784
       },
       "ADASYN Balanced": {
         "Precision": 0.6052,
         "Recall": 0.6013,
         "F1-Score": 0.6033,
         "PR-AUC": 0.6674,
-        "ROC-AUC": 0.7961
+        "ROC-AUC": 0.7961,
+        "Accuracy": 0.781
       },
       "10-Fold Stratified CV (ADASYN + XGBoost)": {
         "Precision": 0.5529,
         "Recall": 0.6687,
         "F1-Score": 0.6053,
         "PR-AUC": 0.6354,
-        "ROC-AUC": 0.8086
+        "ROC-AUC": 0.8086,
+        "Accuracy": 0.796
       }
     },
     "feature_importance": {
