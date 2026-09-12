@@ -14,7 +14,7 @@ from ml.ensemble import KFoldEnsembleClassifier
 
 def train_deep_models():
     print("=" * 80)
-    print("AQUA HORIZON — 5-FOLD CROSS-VALIDATION & BENCHMARKING ENGINE")
+    print("AQUA HORIZON — 10-FOLD CROSS-VALIDATION & BENCHMARKING ENGINE")
     print("=" * 80)
     
     data_path = 'data/processed/district_year_dataset.csv'
@@ -45,10 +45,10 @@ def train_deep_models():
     y = df[target_col].values
 
     # =========================================================================
-    # 1. 5-FOLD STRATIFIED CROSS-VALIDATION PIPELINE
+    # 1. 10-FOLD STRATIFIED CROSS-VALIDATION PIPELINE
     # =========================================================================
-    print("\n[PHASE 1] Executing 5-Fold Stratified Cross-Validation with ADASYN Resampling...")
-    skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    print("\n[PHASE 1] Executing 10-Fold Stratified Cross-Validation with ADASYN Resampling...")
+    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
     kfold_models = []
     fold_results = []
 
@@ -91,7 +91,7 @@ def train_deep_models():
             'ROC-AUC': auc,
             'PR-AUC': prauc
         })
-        print(f"  Fold {fold+1}/5 -> Recall: {rec*100:.2f}%, Precision: {prec*100:.2f}%, F1: {f1:.4f}, ROC-AUC: {auc:.4f}, PR-AUC: {prauc:.4f}")
+        print(f"  Fold {fold+1}/10 -> Recall: {rec*100:.2f}%, Precision: {prec*100:.2f}%, F1: {f1:.4f}, ROC-AUC: {auc:.4f}, PR-AUC: {prauc:.4f}")
 
     df_folds = pd.DataFrame(fold_results)
     cv_mean_rec = float(df_folds['Recall'].mean())
@@ -100,7 +100,7 @@ def train_deep_models():
     cv_mean_auc = float(df_folds['ROC-AUC'].mean())
     cv_mean_prauc = float(df_folds['PR-AUC'].mean())
 
-    print("\n--- 5-Fold Stratified Cross-Validation Summary ---")
+    print("\n--- 10-Fold Stratified Cross-Validation Summary ---")
     print(f"  Mean Test Recall:    {cv_mean_rec*100:.2f}% (Std: +/- {df_folds['Recall'].std()*100:.2f}%)")
     print(f"  Mean Test Precision: {cv_mean_prec*100:.2f}% (Std: +/- {df_folds['Precision'].std()*100:.2f}%)")
     print(f"  Mean F1-Score:       {cv_mean_f1:.4f}")
@@ -159,8 +159,8 @@ def train_deep_models():
             "ROC-AUC": round(roc_auc_score(y_test, y_prob), 4)
         }
 
-    # Add 5-Fold Cross-Validation Benchmark to official results
-    results["5-Fold Stratified CV (ADASYN + XGBoost)"] = {
+    # Add 10-Fold Cross-Validation Benchmark to official results
+    results["10-Fold Stratified CV (ADASYN + XGBoost)"] = {
         "Precision": round(cv_mean_prec, 4),
         "Recall": round(cv_mean_rec, 4),
         "F1-Score": round(cv_mean_f1, 4),
@@ -169,14 +169,14 @@ def train_deep_models():
     }
 
     print("\n" + "=" * 80)
-    print("OFFICIAL BENCHMARK COMPARISON TABLE (HOLDOUT & 5-FOLD CV):")
+    print("OFFICIAL BENCHMARK COMPARISON TABLE (HOLDOUT & 10-FOLD CV):")
     print("=" * 80)
     print(pd.DataFrame(results).T.to_string())
 
     # =========================================================================
     # 3. BUILD CROSS-VALIDATED ENSEMBLE CHAMPION MODEL
     # =========================================================================
-    print("\n[PHASE 3] Constructing 5-Fold Cross-Validated Soft-Voting Ensemble Champion...")
+    print("\n[PHASE 3] Constructing 10-Fold Cross-Validated Soft-Voting Ensemble Champion...")
     ensemble_champion = KFoldEnsembleClassifier(kfold_models)
 
     # Secondary Severity Regressor
@@ -200,7 +200,7 @@ def train_deep_models():
     with open('ml/models/feature_importance.json', 'w') as f:
         json.dump(importances, f, indent=2)
 
-    print(f"\nSuccessfully exported Champion 5-Fold Model to ml/models/champion_classifier.joblib")
+    print(f"\nSuccessfully exported Champion 10-Fold Model to ml/models/champion_classifier.joblib")
     print("Top Feature Importances:", sorted(importances.items(), key=lambda x: x[1], reverse=True)[:6])
 
 if __name__ == '__main__':

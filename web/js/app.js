@@ -710,7 +710,7 @@ function populateHybridBenchmarkModal() {
     });
 }
 
-// 12. 5-Fold Stratified Cross-Validation Modal Population
+// 12. 10-Fold Stratified Cross-Validation Modal Population
 function populateKfoldHybridBenchmarkModal() {
     const tbody = document.getElementById('kfold-hybrid-tbody');
     if (!tbody) return;
@@ -818,7 +818,7 @@ function populateKfoldHybridBenchmarkModal() {
             <td style="color: #38bdf8; font-weight: 700;">${m.mean_roc_auc.toFixed(3)}</td>
             <td>
                 <button class="nav-btn" style="padding: 2px 7px; font-size: 10px;" onclick="toggleKfoldDetail('${rowId}')">
-                    Inspect 5 Folds ▼
+                    Inspect 10 Folds ▼
                 </button>
             </td>
         `;

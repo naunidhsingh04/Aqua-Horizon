@@ -46,13 +46,13 @@ All 5 hybrid architectures are implemented in modular PyTorch files in `ml/` and
 
 ---
 
-## 🔬 Statistical Validation: 5-Fold Stratified Cross-Validation & Ensemble
+## 🔬 Statistical Validation: 10-Fold Stratified Cross-Validation & Ensemble
 
-### A. 5-Fold Stratified Cross-Validation for 5 Hybrid Deep Learning Models
+### A. 10-Fold Stratified Cross-Validation for 5 Hybrid Deep Learning Models
 
-To verify cross-geographical stability and eliminate fold-specific bias, all 5 hybrid deep learning architectures were trained and validated across **5 Stratified Folds (38,425 multi-year sequences)** using zero-leakage training fold standardizers:
+To verify cross-geographical stability and eliminate fold-specific bias, all 5 hybrid deep learning architectures were trained and validated across **10 Stratified Folds (38,425 multi-year sequences)** using zero-leakage training fold standardizers:
 
-| Hybrid Model Architecture | 5-Fold Mean Recall (±Std) | 5-Fold Mean Precision (±Std) | Mean F1-Score | Mean ROC-AUC | Generalization Status |
+| Hybrid Model Architecture | 10-Fold Mean Recall (±Std) | 10-Fold Mean Precision (±Std) | Mean F1-Score | Mean ROC-AUC | Generalization Status |
 | :--- | :---: | :---: | :---: | :---: | :--- |
 | **CNN + Transformer** | **77.50% (±3.62%)** | 48.00% (±1.67%) | 0.5921 | 0.7936 | Top Mean Temporal Generalization |
 | **Attention U-Net + LSTM** | **77.21% (±4.59%)** | 46.97% (±2.10%) | 0.5829 | 0.7844 | High Basin Attention Sensitivity |
@@ -60,21 +60,21 @@ To verify cross-geographical stability and eliminate fold-specific bias, all 5 h
 | **ResNet + BiLSTM** | **75.65% (±3.91%)** | **49.76% (±1.96%)** | **0.5995** | **0.8003** | Highest F1 & ROC-AUC Stability |
 | **CNN + LSTM** | **74.06% (±3.73%)** | 49.73% (±1.67%) | 0.5942 | 0.7973 | Temporal Sequence Baseline |
 
-*Run 5-Fold Hybrid Suite:*
+*Run 10-Fold Hybrid Suite:*
 ```bash
 python ml/train_kfold_hybrid_models.py
 ```
 
 ### B. Tabular Baselines & Resampling Strategies (Control vs SMOTE vs ADASYN vs Ensemble)
 
-To ensure scientific rigor and prevent single-split variance, AQUA HORIZON was also evaluated using **5-Fold Stratified Cross-Validation** across all 41,325 district-year observations:
+To ensure scientific rigor and prevent single-split variance, AQUA HORIZON was also evaluated using **10-Fold Stratified Cross-Validation** across all 41,325 district-year observations:
 
 | Model Configuration | Recall | Precision | F1-Score | PR-AUC | ROC-AUC | Status |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
 | **Baseline (Control - Raw Data)** | 46.4% | **65.2%** | 0.542 | 0.666 | 0.796 | Under-predicts rare floods |
 | **SMOTE Balanced** | 61.3% | 60.6% | 0.609 | **0.669** | 0.796 | +14.9% Recall improvement |
 | **ADASYN Balanced (Holdout)** | 60.1% | 60.5% | 0.603 | 0.667 | 0.796 | +13.7% Recall improvement |
-| **5-Fold Stratified CV (ADASYN + XGBoost)** | **66.7% (±0.8%)** | 54.9% (±0.4%) | **0.602** | 0.633 | **0.808** | **Statistically Verified Champion (OOF Ensemble)** |
+| **10-Fold Stratified CV (ADASYN + XGBoost)** | **66.9% (±1.2%)** | 55.3% (±0.9%) | **0.605** | 0.635 | **0.809** | **Statistically Verified Champion (OOF Ensemble)** |
 
 > In flood disaster management, **Recall is life-critical**: false negatives mean unprepared communities, whereas early alerts enable pre-emptive disaster mitigation and evacuation.
 

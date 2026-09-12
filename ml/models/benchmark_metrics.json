@@ -20,11 +20,11 @@
     "PR-AUC": 0.6674,
     "ROC-AUC": 0.7961
   },
-  "5-Fold Stratified CV (ADASYN + XGBoost)": {
-    "Precision": 0.5489,
-    "Recall": 0.6665,
-    "F1-Score": 0.602,
-    "PR-AUC": 0.633,
-    "ROC-AUC": 0.8079
+  "10-Fold Stratified CV (ADASYN + XGBoost)": {
+    "Precision": 0.5529,
+    "Recall": 0.6687,
+    "F1-Score": 0.6053,
+    "PR-AUC": 0.6354,
+    "ROC-AUC": 0.8086
   }
 }

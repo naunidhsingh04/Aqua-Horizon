@@ -1,6 +1,6 @@
 """
-AQUA HORIZON — 5-Fold Stratified Cross-Validation Suite for 5 Hybrid Architectures
-Evaluates all 5 mandatory hackathon models across 5 folds:
+AQUA HORIZON — 10-Fold Stratified Cross-Validation Suite for 5 Hybrid Architectures
+Evaluates all 5 mandatory hackathon models across 10 folds:
 1. U-Net + ConvLSTM
 2. CNN + LSTM
 3. CNN + Transformer
@@ -58,8 +58,8 @@ def load_all_sequences(csv_path=None, seq_len=5):
     y = np.array(y_list, dtype=np.float32)
     return X, y
 
-def evaluate_kfold_for_model(model_name, model_class, X_all, y_all, is_spatial=False, n_splits=5, epochs=3, batch_size=256, lr=0.001):
-    print(f"\n{'='*80}\nSTARTING 5-FOLD STRATIFIED CV: {model_name.upper()}\n{'='*80}")
+def evaluate_kfold_for_model(model_name, model_class, X_all, y_all, is_spatial=False, n_splits=10, epochs=3, batch_size=256, lr=0.001):
+    print(f"\n{'='*80}\nSTARTING 10-FOLD STRATIFIED CV: {model_name.upper()}\n{'='*80}")
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=42)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     
@@ -151,7 +151,7 @@ def evaluate_kfold_for_model(model_name, model_class, X_all, y_all, is_spatial=F
             'time_sec': float(round(fold_time, 2))
         }
         fold_records.append(record)
-        print(f"  Fold {fold}/5 -> Recall: {record['recall']}% | Prec: {record['precision']}% | F1: {record['f1_score']} | ROC-AUC: {record['roc_auc']} ({fold_time:.1f}s)")
+        print(f"  Fold {fold}/{n_splits} -> Recall: {record['recall']}% | Prec: {record['precision']}% | F1: {record['f1_score']} | ROC-AUC: {record['roc_auc']} ({fold_time:.1f}s)")
         
     df_folds = pd.DataFrame(fold_records)
     mean_rec = float(round(df_folds['recall'].mean(), 2))
@@ -186,7 +186,7 @@ def evaluate_kfold_for_model(model_name, model_class, X_all, y_all, is_spatial=F
 
 def run_all_kfold():
     print("=" * 90)
-    print("AQUA HORIZON — 5-FOLD CROSS-VALIDATION SUITE (5 HYBRID ARCHITECTURES)")
+    print("AQUA HORIZON — 10-FOLD CROSS-VALIDATION SUITE (5 HYBRID ARCHITECTURES)")
     print("Dataset: Zenodo IFI-Impacts (1967-2023) | 38,425 Sequences | Zero Leakage Scalers")
     print("=" * 90)
     
@@ -204,13 +204,13 @@ def run_all_kfold():
     
     results = []
     for cfg in configs:
-        res = evaluate_kfold_for_model(cfg[0], cfg[1], X_all, y_all, cfg[2], n_splits=5, epochs=cfg[3], batch_size=cfg[4], lr=cfg[5])
+        res = evaluate_kfold_for_model(cfg[0], cfg[1], X_all, y_all, cfg[2], n_splits=10, epochs=cfg[3], batch_size=cfg[4], lr=cfg[5])
         results.append(res)
         
     total_time = time.time() - t0
     
     payload = {
-        "suite": "5-Fold Stratified Cross-Validation Benchmark for 5 Hybrid Architectures",
+        "suite": "10-Fold Stratified Cross-Validation Benchmark for 5 Hybrid Architectures",
         "dataset": "Zenodo IFI-Impacts (1967-2023)",
         "total_samples": len(X_all),
         "total_time_sec": round(total_time, 2),
@@ -230,7 +230,7 @@ def run_all_kfold():
         json.dump(payload, f, indent=2)
         
     print("\n" + "=" * 90)
-    print("5-FOLD CROSS-VALIDATION COMPLETE ACROSS ALL 5 HYBRID ARCHITECTURES!")
+    print("10-FOLD CROSS-VALIDATION COMPLETE ACROSS ALL 5 HYBRID ARCHITECTURES!")
     print(f"Saved to: {ml_save_path}")
     print(f"Saved to: {web_save_path}")
     print("=" * 90)
