@@ -111,21 +111,23 @@ function normalizeProb(rawProb) {
     return Math.max(0.0, Math.min(1.0, p));
 }
 
-function getModelAdjustedProb(rawProb, modelKey) {
-    let p = normalizeProb(rawProb);
+function getModelAdjustedProb(input, dayIdx, modelKey) {
     const key = modelKey || currentModel;
-    if (key === 'cnn_transformer') {
-        p = Math.pow(p, 0.96);
-    } else if (key === 'unet_convlstm') {
-        p = Math.pow(p, 0.94);
-    } else if (key === 'cnn_lstm') {
-        p = Math.pow(p, 0.98);
-    } else if (key === 'resnet_bilstm') {
-        p = Math.pow(p, 1.03);
-    } else if (key === 'attention_unet_lstm') {
-        p = Math.pow(p, 0.93);
+    const dIdx = (dayIdx !== undefined && typeof dayIdx === 'number') ? dayIdx : currentDayIndex;
+
+    // 1. Direct district-specific model prediction from 10-fold K-Fold suite
+    if (typeof input === 'object' && input !== null) {
+        if (input.model_daily_probs && input.model_daily_probs[key]) {
+            const val = input.model_daily_probs[key][dIdx];
+            if (val !== undefined && !isNaN(val)) return normalizeProb(val);
+        }
+        const daily = input.daily_probs || [0.15];
+        const raw = daily[dIdx] !== undefined ? daily[dIdx] : 0.15;
+        return normalizeProb(raw);
     }
-    return normalizeProb(p);
+
+    // 2. Fallback for raw numerical inputs
+    return normalizeProb(input);
 }
 
 function getRiskColor(prob) {
@@ -145,10 +147,8 @@ function getRiskCategory(prob) {
 }
 
 function getTooltipHTML(props, dayIdx) {
-    const daily = props.daily_probs || [0.15];
     const dailyRains = props.daily_rains_mm || [10.0];
-    const rawProb = daily[dayIdx] !== undefined ? daily[dayIdx] : 0.15;
-    const prob = getModelAdjustedProb(rawProb, currentModel);
+    const prob = getModelAdjustedProb(props, dayIdx, currentModel);
     const rain = dailyRains[dayIdx] !== undefined ? dailyRains[dayIdx] : 10.0;
     const color = getRiskColor(prob);
 
@@ -171,9 +171,7 @@ function renderChoropleth(geoData) {
     geojsonLayer = L.geoJSON(geoData, {
         style: feature => {
             const props = feature.properties || {};
-            const daily = props.daily_probs || [0.15];
-            const rawProb = daily[currentDayIndex] !== undefined ? daily[currentDayIndex] : 0.15;
-            const prob = getModelAdjustedProb(rawProb, currentModel);
+            const prob = getModelAdjustedProb(props, currentDayIndex, currentModel);
 
             return {
                 fillColor: getRiskColor(prob),
@@ -260,8 +258,7 @@ function updateDistrictHUD(props) {
 
     const dailyProbs = props.daily_probs || [0.2];
     const dailyRains = props.daily_rains_mm || [12.0];
-    const rawProb = dailyProbs[currentDayIndex] !== undefined ? dailyProbs[currentDayIndex] : 0.2;
-    const prob = getModelAdjustedProb(rawProb, currentModel);
+    const prob = getModelAdjustedProb(props, currentDayIndex, currentModel);
     const rainMm = dailyRains[currentDayIndex] !== undefined ? dailyRains[currentDayIndex] : 10.0;
     const risk = getRiskCategory(prob);
 
@@ -357,9 +354,7 @@ function recolorDistrictsForDay(dayIdx) {
 
     geojsonLayer.eachLayer(layer => {
         const props = layer.feature.properties || {};
-        const daily = props.daily_probs || [0.15];
-        const rawProb = daily[dayIdx] !== undefined ? daily[dayIdx] : 0.15;
-        const prob = getModelAdjustedProb(rawProb, currentModel);
+        const prob = getModelAdjustedProb(props, dayIdx, currentModel);
 
         layer.setStyle({
             fillColor: getRiskColor(prob)
@@ -489,10 +484,7 @@ function generateEmergencyAdvisory() {
     }
     if (!dist) return;
 
-    const dailyProbs = dist.daily_probs || [0.2];
-    const dailyRains = dist.daily_rains_mm || [12.0];
-    const rawProb = dailyProbs[currentDayIndex] !== undefined ? dailyProbs[currentDayIndex] : 0.2;
-    const prob = getModelAdjustedProb(rawProb, currentModel);
+    const prob = getModelAdjustedProb(dist, currentDayIndex, currentModel);
     const rain = dailyRains[currentDayIndex] !== undefined ? dailyRains[currentDayIndex] : 10.0;
     const probPct = Math.round(prob * 100);
     const risk = getRiskCategory(prob);
@@ -570,12 +562,12 @@ window.selectModel = function(modelKey) {
     if (modelSelect) modelSelect.value = modelKey;
 
     const descriptions = {
-        'cnn_transformer': 'CNN + Transformer (Self-Attention | Recall: 81.15% | ROC-AUC: 0.795)',
-        'unet_convlstm': 'U-Net + ConvLSTM (Spatial-Temporal | Recall: 81.86% | ROC-AUC: 0.800)',
-        'cnn_lstm': 'CNN + LSTM (Temporal Sequence | Recall: 80.63% | ROC-AUC: 0.806)',
-        'resnet_bilstm': 'ResNet + BiLSTM (Deep Residual | Recall: 75.33% | ROC-AUC: 0.799)',
-        'attention_unet_lstm': 'Attention U-Net + LSTM (Additive Gate | Recall: 82.08% | ROC-AUC: 0.802)',
-        'ensemble': 'Soft-Voting Ensemble (ADASYN + XGBoost | Recall: 66.7% | ROC-AUC: 0.808)'
+        'cnn_transformer': 'CNN + Transformer (10-Fold Self-Attention | 77.1% Recall | ROC-AUC: 0.796)',
+        'unet_convlstm': 'U-Net + ConvLSTM (10-Fold Spatial-Temporal | 77.2% Recall | ROC-AUC: 0.795)',
+        'cnn_lstm': 'CNN + LSTM (10-Fold Temporal Sequence | 74.8% Recall | ROC-AUC: 0.798)',
+        'resnet_bilstm': 'ResNet + BiLSTM (10-Fold Deep Residual | 74.0% Recall | ROC-AUC: 0.803)',
+        'attention_unet_lstm': 'Attention U-Net + LSTM (10-Fold Additive Gate | 76.3% Recall | ROC-AUC: 0.788)',
+        'ensemble': '10-Fold Grand Ensemble (Multi-Model Mean of All 5 Hybrid DL Architectures)'
     };
 
     showToast(`⚡ Active Model: ${descriptions[modelKey] || modelKey}`);
