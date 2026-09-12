@@ -75,11 +75,12 @@ function startCinematicDescent() {
 // 3. Load Datasets (Enriched GeoJSON, Intelligence, & Hybrid Benchmarks)
 async function loadData() {
     try {
+        const t = Date.now();
         const [geoRes, dataRes, hybridRes, kfoldRes] = await Promise.all([
-            fetch('data/india_districts.geojson'),
-            fetch('data/flood_intelligence_data.json'),
-            fetch('data/hybrid_benchmarks.json').catch(() => null),
-            fetch('data/kfold_hybrid_benchmarks.json').catch(() => null)
+            fetch(`data/india_districts.geojson?v=${t}`),
+            fetch(`data/flood_intelligence_data.json?v=${t}`),
+            fetch(`data/hybrid_benchmarks.json?v=${t}`).catch(() => null),
+            fetch(`data/kfold_hybrid_benchmarks.json?v=${t}`).catch(() => null)
         ]);
 
         const geoData = await geoRes.json();
@@ -158,7 +159,7 @@ function getTooltipHTML(props, dayIdx) {
             <div class="tooltip-state">${props.st_nm || 'India'}</div>
             <div class="tooltip-row">
                 <span class="tooltip-risk" style="color: ${color};">
-                    ${Math.round(prob * 100)}% Risk
+                    ${(prob * 100).toFixed(1)}% Risk
                 </span>
                 <span class="tooltip-rain">🌧️ ${rain} mm</span>
             </div>
@@ -264,7 +265,7 @@ function updateDistrictHUD(props) {
 
     nameEl.textContent = props.name || 'Unknown District';
     stateEl.textContent = `${props.st_nm || 'India'} | Zone: ${props.weather_zone || 'Central'}`;
-    scoreEl.textContent = `${Math.round(prob * 100)}%`;
+    scoreEl.textContent = `${(prob * 100).toFixed(1)}%`;
     badgeEl.textContent = risk.label.replace(' Alert', '').replace(' Watch', '');
 
     const color = getRiskColor(prob);
@@ -280,6 +281,41 @@ function updateDistrictHUD(props) {
     soilMoistureEl.textContent = `${props.soil_moisture_pct || 58}% Wetness`;
     dfsiEl.textContent = `Rank #${props.dfsi_rank || 240} of 640`;
     pastFloodsEl.textContent = `${props.past_5yr_floods || 0} in 5 Years`;
+
+    // Populate Multi-Model Comparison Strip
+    const compGrid = document.getElementById('hud-comparison-grid');
+    if (compGrid && props.model_daily_probs) {
+        compGrid.innerHTML = '';
+        const modelDisplayNames = [
+            { key: 'cnn_transformer', label: 'CNN+Transformer' },
+            { key: 'unet_convlstm', label: 'U-Net+ConvLSTM' },
+            { key: 'cnn_lstm', label: 'CNN+LSTM' },
+            { key: 'resnet_bilstm', label: 'ResNet+BiLSTM' },
+            { key: 'attention_unet_lstm', label: 'Attention U-Net' },
+            { key: 'ensemble', label: '10-Fold Ensemble' }
+        ];
+
+        modelDisplayNames.forEach(m => {
+            const arr = props.model_daily_probs[m.key] || [];
+            const val = arr[currentDayIndex] !== undefined ? arr[currentDayIndex] : prob;
+            const pct = (val * 100).toFixed(1);
+            const col = getRiskColor(val);
+            const isAct = m.key === currentModel;
+
+            const div = document.createElement('div');
+            div.className = `model-chip-item ${isAct ? 'active' : ''}`;
+            div.title = `Switch active map view to ${m.label}`;
+            div.innerHTML = `
+                <span class="chip-name">${m.label}</span>
+                <span class="chip-val" style="color: ${col};">${pct}%</span>
+            `;
+            div.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectModel(m.key);
+            });
+            compGrid.appendChild(div);
+        });
+    }
 
     // 1-Line Simple Explainability
     if (quickReasonEl) {
@@ -486,7 +522,7 @@ function generateEmergencyAdvisory() {
 
     const prob = getModelAdjustedProb(dist, currentDayIndex, currentModel);
     const rain = dailyRains[currentDayIndex] !== undefined ? dailyRains[currentDayIndex] : 10.0;
-    const probPct = Math.round(prob * 100);
+    const probPct = (prob * 100).toFixed(1);
     const risk = getRiskCategory(prob);
     const riskColor = getRiskColor(prob);
 

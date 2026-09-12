@@ -101,6 +101,17 @@
       Click any district on the map to inspect its real-time hydrological risk and telemetry.
     </div>
 
+    <!-- Multi-Model 10-Fold Comparison Strip -->
+    <div class="model-comparison-box" id="hud-model-comparison">
+      <div class="comparison-header">
+        <span>🧠 5 Hybrid Models (10-Fold CV)</span>
+        <span style="color: #94a3b8; font-size: 8px;">Click to switch</span>
+      </div>
+      <div class="comparison-grid" id="hud-comparison-grid">
+        <!-- Populated dynamically with each model's live score -->
+      </div>
+    </div>
+
     <!-- Line 5: Action Button -->
     <button class="quick-advisory-btn" id="open-advisory-btn">
       📢 Generate Advisory Alert
@@ -351,6 +362,6 @@
   </div>
 
   <!-- Application JS -->
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=2.2"></script>
 </body>
 </html>
