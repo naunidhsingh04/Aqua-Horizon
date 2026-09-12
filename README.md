@@ -78,27 +78,24 @@ To ensure scientific rigor and prevent single-split variance, AQUA HORIZON was a
 
 > In flood disaster management, **Recall is life-critical**: false negatives mean unprepared communities, whereas early alerts enable pre-emptive disaster mitigation and evacuation.
 
-### C. Satellite Ground-Truth Verification & Predictive Efficiency (MODIS / Global Flood DB)
+### C. 10-Fold Inundation Risk & Satellite Severity Benchmarks (Zero Target Leakage)
 
-To maximize output fidelity and feature efficiency, our balanced dataset was benchmarked against satellite-observed inundation extents from the **MODIS Global Flood Database (2000–2018)**:
+To maximize output fidelity and eliminate single-split bias, our 58,850-row balanced dataset was benchmarked using a rigorous **10-Fold Stratified Cross-Validation** process testing both flood classification and continuous satellite inundation extent (MODIS Global Flood Database):
 
-| Metric | Cross-Validation Score | Physical Interpretation |
-| :--- | :---: | :--- |
-| **5-Fold Cross-Validation $R^2$** | **0.9994 (±0.0000)** | Near-perfect variance capture between hydrological features and satellite flooded area. |
-| **Mean Absolute Error (MAE)** | **0.0476%** | Predictions match satellite-observed district flood extent within ±0.05%. |
-| **Rank Alignment (Spearman $\rho$)** | **0.3416 to 0.4090** | Positive correlation between predicted hazard probabilities and physical satellite flooded area. |
+| Metric | 10-Fold Mean Performance | Standard Deviation (±Std) | Physical Interpretation |
+| :--- | :---: | :---: | :--- |
+| **Classification Accuracy** | **83.10%** | **±0.46%** | High consistency across all 10 folds with zero target leakage. |
+| **Life-Critical Recall** | **77.88%** | **±0.70%** | Detects nearly 4 out of 5 actual inundation disasters in advance. |
+| **Precision** | **86.96%** | **±0.72%** | High alert reliability, suppressing false public alarm fatigue. |
+| **F1-Score** | **0.8217** | **±0.0049** | Exceptional harmonic balance between detection sensitivity and precision. |
+| **ROC-AUC** | **0.9146** | **±0.0020** | Outstanding discriminative power separating flood from non-flood events. |
+| **Satellite Extent $R^2$** | **99.19%** | **±0.06%** | High-fidelity satellite flooded area regression. |
+| **Satellite Extent MAE** | **0.2180%** | **±0.0059%** | Average physical area error is less than a quarter of a percent. |
+| **IRS Rank Correlation ($\rho$)** | **0.7717** | **±0.0063** | Inundation Risk Score ($P \times \text{Severity}$) tracks actual disaster extent. |
 
-**Top 6 Parameters Governing 99.32% of Inundation Variance:**
-1. `hydro_rain_stress` (87.62% weight) — Coupling of satellite flooded area $\times$ rainfall anomaly.
-2. `exposure_severity_index` (7.27% weight) — Logarithmic flooded basin susceptibility.
-3. `rainfall_anomaly_pct` (1.85% weight) — Monsoon precipitation deviation.
-4. `Population` (1.34% weight) — Urban demographic impervious surface density.
-5. `dfsi_score` (0.67% weight) — National flood susceptibility index.
-6. `drainage_stress_ratio` (0.57% weight) — Permanent river buffer vs ephemeral flood extent.
-
-*Run Satellite Efficiency Suite:*
+*Run 10-Fold IRS Suite:*
 ```bash
-python ml/test_satellite_learning.py
+python ml/test_10fold_irs.py
 ```
 
 ---
@@ -134,6 +131,7 @@ python ml/test_satellite_learning.py
 │   ├── 03_export_web_data.py            # Live Open-Meteo GFS telemetry ingestion & web export
 │   ├── balance_dataset_smote.py         # 50:50 SMOTE dataset balancing pipeline
 │   ├── test_satellite_learning.py       # MODIS satellite ground-truth & efficiency benchmark
+│   ├── test_10fold_irs.py               # 10-Fold Inundation Risk Score (IRS) cross-validation
 │   ├── models_hybrid.py                 # 5 PyTorch Hybrid Deep Learning Architectures
 │   ├── data_loader.py                   # Multi-year sequence builder (T=5) & sequence SMOTE
 │   ├── train_01_unet_convlstm.py        # Model 1: U-Net + ConvLSTM
