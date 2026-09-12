@@ -10,7 +10,8 @@ def main():
     print("TESTING DATASET & PARAMETERS AGAINST SATELLITE INUNDATION TARGETS")
     print("=" * 70)
     
-    csv_path = 'data/processed/district_year_dataset_balanced_smote.csv'
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    csv_path = os.path.join(base_dir, 'data', 'processed', 'district_year_dataset_balanced_smote.csv')
     df = pd.read_csv(csv_path)
     print(f"Dataset Loaded: {len(df):,} balanced observations across 726 districts.")
     

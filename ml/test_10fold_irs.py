@@ -15,7 +15,8 @@ def main():
     print("AQUA HORIZON — STRICT ZERO-LEAKAGE 10-FOLD IRS BENCHMARK SUITE")
     print("=" * 80)
     
-    csv_path = 'data/processed/district_year_dataset_balanced_smote.csv'
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    csv_path = os.path.join(base_dir, 'data', 'processed', 'district_year_dataset_balanced_smote.csv')
     df = pd.read_csv(csv_path)
     print(f"Dataset: {len(df):,} balanced observations across 726 Indian districts.")
     
@@ -158,9 +159,17 @@ def main():
         'folds': fold_results
     }
     
-    with open('ml/models/irs_10fold_benchmarks.json', 'w') as f:
+    out_dir = os.path.join(base_dir, 'ml', 'models')
+    os.makedirs(out_dir, exist_ok=True)
+    out_json_path = os.path.join(out_dir, 'irs_10fold_benchmarks.json')
+    with open(out_json_path, 'w') as f:
         json.dump(out_json, f, indent=2)
-    print("\nSaved 10-fold benchmark results to ml/models/irs_10fold_benchmarks.json")
+    print(f"\nSaved 10-fold benchmark results to {out_json_path}")
+    
+    web_dir = os.path.join(base_dir, 'web', 'data')
+    if os.path.exists(web_dir):
+        with open(os.path.join(web_dir, 'irs_10fold_benchmarks.json'), 'w') as f:
+            json.dump(out_json, f, indent=2)
 
 if __name__ == '__main__':
     main()
