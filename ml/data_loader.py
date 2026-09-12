@@ -32,7 +32,7 @@ FEATURE_COLS = [
 
 TARGET_COL = 'flood_occurred'
 
-def load_sequence_data(csv_path=None, seq_len=5, cutoff_year=2012, spatial=False, batch_size=128):
+def load_sequence_data(csv_path=None, seq_len=5, cutoff_year=2012, spatial=False, batch_size=128, balance_smote=False):
     if csv_path is None:
         base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         csv_path = os.path.join(base_dir, 'data', 'processed', 'district_year_dataset.csv')
@@ -74,6 +74,15 @@ def load_sequence_data(csv_path=None, seq_len=5, cutoff_year=2012, spatial=False
     y_train = np.array(y_train_list, dtype=np.float32)
     X_test = np.array(X_test_list, dtype=np.float32)
     y_test = np.array(y_test_list, dtype=np.float32)
+    
+    if balance_smote:
+        from imblearn.over_sampling import SMOTE
+        n_samples, s_len, n_feats = X_train.shape
+        X_flat = X_train.reshape(n_samples, s_len * n_feats)
+        smote = SMOTE(random_state=42)
+        X_flat_res, y_train = smote.fit_resample(X_flat, y_train)
+        X_train = X_flat_res.reshape(-1, s_len, n_feats).astype(np.float32)
+        y_train = y_train.astype(np.float32)
     
     if spatial:
         pad_train = np.zeros((X_train.shape[0], seq_len, 1), dtype=np.float32)
