@@ -172,7 +172,8 @@ function renderChoropleth(geoData) {
         style: feature => {
             const props = feature.properties || {};
             const daily = props.daily_probs || [0.15];
-            const prob = daily[currentDayIndex] !== undefined ? daily[currentDayIndex] : 0.15;
+            const rawProb = daily[currentDayIndex] !== undefined ? daily[currentDayIndex] : 0.15;
+            const prob = getModelAdjustedProb(rawProb, currentModel);
 
             return {
                 fillColor: getRiskColor(prob),
@@ -490,7 +491,8 @@ function generateEmergencyAdvisory() {
 
     const dailyProbs = dist.daily_probs || [0.2];
     const dailyRains = dist.daily_rains_mm || [12.0];
-    const prob = normalizeProb(dailyProbs[currentDayIndex] !== undefined ? dailyProbs[currentDayIndex] : 0.2);
+    const rawProb = dailyProbs[currentDayIndex] !== undefined ? dailyProbs[currentDayIndex] : 0.2;
+    const prob = getModelAdjustedProb(rawProb, currentModel);
     const rain = dailyRains[currentDayIndex] !== undefined ? dailyRains[currentDayIndex] : 10.0;
     const probPct = Math.round(prob * 100);
     const risk = getRiskCategory(prob);

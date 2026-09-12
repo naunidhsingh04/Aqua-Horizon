@@ -54,11 +54,11 @@ To verify cross-geographical stability and eliminate fold-specific bias, all 5 h
 
 | Hybrid Model Architecture | 10-Fold Mean Recall (±Std) | 10-Fold Mean Precision (±Std) | Mean F1-Score | Mean ROC-AUC | Generalization Status |
 | :--- | :---: | :---: | :---: | :---: | :--- |
-| **CNN + Transformer** | **77.50% (±3.62%)** | 48.00% (±1.67%) | 0.5921 | 0.7936 | Top Mean Temporal Generalization |
-| **Attention U-Net + LSTM** | **77.21% (±4.59%)** | 46.97% (±2.10%) | 0.5829 | 0.7844 | High Basin Attention Sensitivity |
-| **U-Net + ConvLSTM** | **76.13% (±4.30%)** | 48.41% (±1.60%) | 0.5910 | 0.7946 | Spatial-Temporal Flood Extent Stability |
-| **ResNet + BiLSTM** | **75.65% (±3.91%)** | **49.76% (±1.96%)** | **0.5995** | **0.8003** | Highest F1 & ROC-AUC Stability |
-| **CNN + LSTM** | **74.06% (±3.73%)** | 49.73% (±1.67%) | 0.5942 | 0.7973 | Temporal Sequence Baseline |
+| **U-Net + ConvLSTM** | **77.23% (±5.45%)** | 48.12% (±2.76%) | 0.5910 | 0.7951 | Spatial-Temporal Flood Extent Stability |
+| **CNN + Transformer** | **77.10% (±3.57%)** | 48.69% (±1.92%) | 0.5961 | 0.7956 | High Self-Attention Temporal Generalization |
+| **Attention U-Net + LSTM** | **76.30% (±4.41%)** | 48.08% (±2.21%) | 0.5887 | 0.7875 | High Basin Attention Sensitivity |
+| **CNN + LSTM** | **74.82% (±4.49%)** | 49.74% (±1.69%) | 0.5965 | 0.7982 | Temporal Sequence Baseline |
+| **ResNet + BiLSTM** | **73.97% (±4.66%)** | **50.91% (±1.99%)** | **0.6019** | **0.8032** | Highest Precision, F1 & ROC-AUC Stability |
 
 *Run 10-Fold Hybrid Suite:*
 ```bash
