@@ -474,10 +474,18 @@ function setupEventListeners() {
         document.getElementById('benchmark-modal').classList.remove('active');
     });
 
-    document.getElementById('open-advisory-btn').addEventListener('click', () => {
-        generateEmergencyAdvisory();
-        document.getElementById('advisory-modal').classList.add('active');
-    });
+    const openAdvBtn = document.getElementById('open-advisory-btn');
+    if (openAdvBtn) {
+        openAdvBtn.addEventListener('click', () => {
+            try {
+                generateEmergencyAdvisory();
+            } catch (err) {
+                console.error("Advisory generator error:", err);
+            }
+            const modal = document.getElementById('advisory-modal');
+            if (modal) modal.classList.add('active');
+        });
+    }
 
     document.getElementById('close-advisory-btn').addEventListener('click', () => {
         document.getElementById('advisory-modal').classList.remove('active');
@@ -520,6 +528,7 @@ function generateEmergencyAdvisory() {
     }
     if (!dist) return;
 
+    const dailyRains = dist.daily_rains_mm || [12.0];
     const prob = getModelAdjustedProb(dist, currentDayIndex, currentModel);
     const rain = dailyRains[currentDayIndex] !== undefined ? dailyRains[currentDayIndex] : 10.0;
     const probPct = (prob * 100).toFixed(1);
