@@ -4,6 +4,8 @@ let geojsonLayer;
 let allFeatures = [];
 let webData = null;
 let currentDistrict = null;
+let pinnedDistrict = null;
+let pinnedLayer = null;
 let currentDayIndex = 0; // 0 = Today, 1 = Tomorrow, ..., 6 = Day 7
 let darkBaseLayer;
 let satelliteLayer;
@@ -41,6 +43,13 @@ function initMap() {
     satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 18,
         attribution: 'Esri Satellite'
+    });
+
+    // Tap outside/empty map area resets pinned district to hover mode
+    map.on('click', () => {
+        if (pinnedDistrict) {
+            unpinDistrict();
+        }
     });
 }
 
@@ -195,13 +204,17 @@ function renderChoropleth(geoData) {
             layer.on({
                 mouseover: e => {
                     highlightDistrict(e, feature);
-                    if (feature.properties) {
+                    // If no district is pinned/tapped, update HUD via cursor hover
+                    if (!pinnedDistrict && feature.properties) {
                         currentDistrict = feature.properties;
                         updateDistrictHUD(feature.properties);
                     }
                 },
                 mouseout: e => resetHighlight(e),
-                click: e => selectDistrict(feature, layer)
+                click: e => {
+                    L.DomEvent.stopPropagation(e);
+                    selectDistrict(feature, layer);
+                }
             });
         }
     }).addTo(map);
@@ -209,21 +222,70 @@ function renderChoropleth(geoData) {
 
 function highlightDistrict(e, feature) {
     const layer = e.target;
-    layer.setStyle({
-        weight: 2.2,
-        color: '#38bdf8',
-        fillOpacity: 0.85
-    });
-    layer.bringToFront();
+    if (layer !== pinnedLayer) {
+        layer.setStyle({
+            weight: 2.2,
+            color: '#67e8f9',
+            fillOpacity: 0.82
+        });
+        layer.bringToFront();
+    }
 }
 
 function resetHighlight(e) {
-    geojsonLayer.resetStyle(e.target);
+    const layer = e.target;
+    if (layer !== pinnedLayer) {
+        geojsonLayer.resetStyle(layer);
+    } else {
+        layer.setStyle({
+            weight: 3.0,
+            color: '#38bdf8',
+            fillOpacity: 0.88
+        });
+        layer.bringToFront();
+    }
+}
+
+function unpinDistrict() {
+    pinnedDistrict = null;
+    if (pinnedLayer && geojsonLayer) {
+        geojsonLayer.resetStyle(pinnedLayer);
+    }
+    pinnedLayer = null;
+    const pinBadge = document.getElementById('hud-pin-badge');
+    if (pinBadge) pinBadge.style.display = 'none';
 }
 
 function selectDistrict(feature, layer) {
     const props = feature.properties || {};
+
+    // Toggle: if tapping the already pinned district, unlock it to return to hover mode
+    if (pinnedDistrict && (pinnedDistrict.clean_dist === props.clean_dist || pinnedDistrict.name === props.name)) {
+        unpinDistrict();
+        return;
+    }
+
+    // Reset previously pinned layer style
+    if (pinnedLayer && geojsonLayer) {
+        geojsonLayer.resetStyle(pinnedLayer);
+    }
+
+    pinnedDistrict = props;
+    pinnedLayer = layer;
     currentDistrict = props;
+
+    // Apply pinned highlight style
+    if (layer) {
+        layer.setStyle({
+            weight: 3.0,
+            color: '#38bdf8',
+            fillOpacity: 0.88
+        });
+        layer.bringToFront();
+    }
+
+    const pinBadge = document.getElementById('hud-pin-badge');
+    if (pinBadge) pinBadge.style.display = 'inline-flex';
 
     if (layer && layer.getBounds) {
         map.flyToBounds(layer.getBounds(), { maxZoom: 7.5, duration: 1.2 });
@@ -391,9 +453,13 @@ function recolorDistrictsForDay(dayIdx) {
     geojsonLayer.eachLayer(layer => {
         const props = layer.feature.properties || {};
         const prob = getModelAdjustedProb(props, dayIdx, currentModel);
+        const isPinned = (layer === pinnedLayer);
 
         layer.setStyle({
-            fillColor: getRiskColor(prob)
+            fillColor: getRiskColor(prob),
+            color: isPinned ? '#38bdf8' : '#1e293b',
+            weight: isPinned ? 3.0 : 0.8,
+            fillOpacity: isPinned ? 0.88 : 0.65
         });
 
         if (layer.setTooltipContent) {
@@ -490,6 +556,15 @@ function setupEventListeners() {
     document.getElementById('close-advisory-btn').addEventListener('click', () => {
         document.getElementById('advisory-modal').classList.remove('active');
     });
+
+    // Unpin badge click action in HUD
+    const pinBadge = document.getElementById('hud-pin-badge');
+    if (pinBadge) {
+        pinBadge.addEventListener('click', (e) => {
+            e.stopPropagation();
+            unpinDistrict();
+        });
+    }
 
     // Copy & WhatsApp Actions
     const copyBtn = document.getElementById('copy-advisory-btn');

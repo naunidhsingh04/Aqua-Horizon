@@ -59,8 +59,11 @@
     <!-- Line 1: District Name & Risk Score -->
     <div class="pill-header">
       <div class="title-group">
-        <h2 class="dist-title" id="hud-district-name">Select District</h2>
-        <span class="dist-subtitle" id="hud-district-state">Click any district on map</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <h2 class="dist-title" id="hud-district-name">Select District</h2>
+          <span id="hud-pin-badge" class="hud-pin-pill" title="District is pinned. Tap again or click empty map to unlock hover mode.">📌 Pinned <span style="font-size: 8px; opacity: 0.75;">(tap to unlock)</span></span>
+        </div>
+        <span class="dist-subtitle" id="hud-district-state">Hover or tap any district on map</span>
       </div>
       <div class="prob-chip" id="hud-prob-chip" style="background: rgba(56, 189, 248, 0.18); border-color: rgba(56, 189, 248, 0.4);">
         <span class="prob-num" id="hud-prob-score" style="color: #38bdf8;">Live</span>
@@ -362,6 +365,6 @@
   </div>
 
   <!-- Application JS -->
-  <script src="js/app.js?v=2.3"></script>
+  <script src="js/app.js?v=2.4"></script>
 </body>
 </html>
