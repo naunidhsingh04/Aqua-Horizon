@@ -28,7 +28,7 @@ def clean_name(name):
     name = name.strip().lower()
     return name
 
-def compute_calibrated_daily_prob(annual_prob, rain_mm, soil_moisture_pct, dfsi_rank, water_pct):
+def compute_calibrated_daily_prob(annual_prob, rain_mm, soil_moisture_pct, dfsi_rank, water_pct, total_districts=725):
     """
     Calibrates annual flood vulnerability into daily operational flood inundation risk (0.0 to 1.0).
     Grounded in IMD hydrological warning thresholds and CWC river basin dynamics.
@@ -36,9 +36,9 @@ def compute_calibrated_daily_prob(annual_prob, rain_mm, soil_moisture_pct, dfsi_
     # 1. Base daily hazard from annual model probability
     base_daily = 0.04 + (float(annual_prob) * 0.30)
     
-    # 2. Basin vulnerability modifier (DFSI rank: 1 is most vulnerable, 640 is least)
-    rank_norm = max(1, min(640, int(dfsi_rank)))
-    basin_vuln = 1.35 - (rank_norm / 640.0) * 0.65  # Ranges from 0.70 (arid) to 1.35 (flood basin)
+    # 2. Basin vulnerability modifier (DFSI rank: 1 is most vulnerable, total_districts is least)
+    rank_norm = max(1, min(total_districts, int(dfsi_rank)))
+    basin_vuln = 1.35 - (rank_norm / float(total_districts)) * 0.65  # Ranges from 0.70 (arid) to 1.35 (flood basin)
     
     # 3. Soil moisture saturation factor
     sm = min(100, max(20, float(soil_moisture_pct)))
@@ -263,6 +263,8 @@ def export_live_system():
 
     district_live_intel = {}
     
+    total_districts = int(df_2023['dfsi_rank'].max())
+
     for _, row in df_2023.iterrows():
         raw_cd = clean_name(row['clean_dist'])
         cd = aliases.get(raw_cd, raw_cd)
@@ -293,7 +295,8 @@ def export_live_system():
                     rain_mm=rain_mm,
                     soil_moisture_pct=soil_moist,
                     dfsi_rank=row['dfsi_rank'],
-                    water_pct=row['Parmanent_Water']
+                    water_pct=row['Parmanent_Water'],
+                    total_districts=total_districts
                 )
                 m_probs.append(d_p)
             model_daily_probs[m_key] = m_probs
@@ -390,7 +393,7 @@ def export_live_system():
                 f_probs = []
                 for r in fallback_rains:
                     sm = min(90, max(30, int(32 + r * 2.0)))
-                    p = compute_calibrated_daily_prob(annual_prob=0.20, rain_mm=r, soil_moisture_pct=sm, dfsi_rank=450, water_pct=0.5)
+                    p = compute_calibrated_daily_prob(annual_prob=0.20, rain_mm=r, soil_moisture_pct=sm, dfsi_rank=total_districts // 2, water_pct=0.5, total_districts=total_districts)
                     f_probs.append(p)
                 fallback_models[m_key] = f_probs
                 
@@ -398,7 +401,7 @@ def export_live_system():
                 'clean_dist': cname,
                 'name': raw_name.title(),
                 'st_nm': st_name,
-                'dfsi_rank': 450,
+                'dfsi_rank': total_districts // 2,
                 'dfsi_score': 85.0,
                 'past_5yr_floods': 0,
                 'past_3yr_floods': 0,
@@ -432,6 +435,7 @@ def export_live_system():
             'base_dataset': 'India Flood Inventory–Impacts (IFI-Impacts 1967–2023)',
             'live_telemetry_source': 'Open-Meteo High-Resolution GFS Weather Feed',
             'forecast_dates': forecast_dates,
+            'total_ranked_districts': int(df_2023['dfsi_rank'].max()),
             'benchmarks': benchmarks,
             'feature_importance': importances,
             'ticker_alerts': ticker_alerts

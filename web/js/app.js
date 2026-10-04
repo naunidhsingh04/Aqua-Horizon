@@ -347,7 +347,8 @@ function updateDistrictHUD(props) {
     // Simple, Plain-English Metrics
     liveRainEl.textContent = `${rainMm} mm`;
     soilMoistureEl.textContent = `${props.soil_moisture_pct || 58}% Wetness`;
-    dfsiEl.textContent = `Rank #${props.dfsi_rank || 240} of 640`;
+    const totalRankedDistricts = webData?.metadata?.total_ranked_districts || 725;
+    dfsiEl.textContent = `Rank #${props.dfsi_rank || Math.round(totalRankedDistricts / 3)} of ${totalRankedDistricts}`;
     pastFloodsEl.textContent = `${props.past_5yr_floods || 0} in 5 Years`;
 
     // Populate Multi-Model Comparison Strip
@@ -405,7 +406,8 @@ function generateLiveExplainability(props, prob, rainMm) {
     }
 
     if (props.dfsi_rank && props.dfsi_rank <= 100) {
-        reasons.push(`Historically one of India's most flood-vulnerable districts (Rank #${props.dfsi_rank} of 640).`);
+        const totalRankedDistricts = webData?.metadata?.total_ranked_districts || 725;
+        reasons.push(`Historically one of India's most flood-vulnerable districts (Rank #${props.dfsi_rank} of ${totalRankedDistricts}).`);
     } else if (props.past_5yr_floods >= 2) {
         reasons.push(`Frequent past flood events (${props.past_5yr_floods} recorded in recent 5 years).`);
     } else {
