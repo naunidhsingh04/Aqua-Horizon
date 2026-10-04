@@ -32,7 +32,7 @@ def main():
     print("\n--- 1. Auxiliary Learning Model: Predicting Satellite Flooded Area % ---")
     reg = XGBRegressor(n_estimators=80, max_depth=5, learning_rate=0.1, random_state=42, n_jobs=2)
     
-    kf = KFold(n_splits=5, shuffle=True, random_state=42)
+    kf = KFold(n_splits=10, shuffle=True, random_state=42)
     r2_scores = []
     mae_scores = []
     

@@ -1,34 +1,65 @@
 {
   "Baseline (Control - Raw)": {
-    "Precision": 0.6516,
-    "Recall": 0.4636,
-    "F1-Score": 0.5418,
-    "PR-AUC": 0.666,
-    "ROC-AUC": 0.7957,
-    "Accuracy": 0.762
+    "strategy": "No Resampling",
+    "holdout": {
+      "Accuracy": 0.7366,
+      "Precision": 0.6516,
+      "Recall": 0.4636,
+      "F1-Score": 0.5418,
+      "PR-AUC": 0.666,
+      "ROC-AUC": 0.7957
+    },
+    "kfold": {
+      "Accuracy": 0.7645,
+      "Accuracy_std": 0.0061,
+      "Precision": 0.5935,
+      "Recall": 0.5781,
+      "Recall_std": 0.015,
+      "F1-Score": 0.5856,
+      "PR-AUC": 0.6385,
+      "ROC-AUC": 0.8098
+    }
   },
   "SMOTE Balanced": {
-    "Precision": 0.606,
-    "Recall": 0.6125,
-    "F1-Score": 0.6092,
-    "PR-AUC": 0.669,
-    "ROC-AUC": 0.7959,
-    "Accuracy": 0.784
+    "strategy": "SMOTE",
+    "holdout": {
+      "Accuracy": 0.7361,
+      "Precision": 0.606,
+      "Recall": 0.6125,
+      "F1-Score": 0.6092,
+      "PR-AUC": 0.669,
+      "ROC-AUC": 0.7959
+    },
+    "kfold": {
+      "Accuracy": 0.7495,
+      "Accuracy_std": 0.0068,
+      "Precision": 0.5547,
+      "Recall": 0.6607,
+      "Recall_std": 0.0139,
+      "F1-Score": 0.603,
+      "PR-AUC": 0.6336,
+      "ROC-AUC": 0.8075
+    }
   },
   "ADASYN Balanced": {
-    "Precision": 0.6052,
-    "Recall": 0.6013,
-    "F1-Score": 0.6033,
-    "PR-AUC": 0.6674,
-    "ROC-AUC": 0.7961,
-    "Accuracy": 0.781
-  },
-  "10-Fold Stratified CV (ADASYN + XGBoost)": {
-    "Precision": 0.5529,
-    "Recall": 0.6687,
-    "F1-Score": 0.6053,
-    "PR-AUC": 0.6354,
-    "ROC-AUC": 0.8086,
-    "Accuracy": 0.796
+    "strategy": "ADASYN",
+    "holdout": {
+      "Accuracy": 0.7343,
+      "Precision": 0.6052,
+      "Recall": 0.6013,
+      "F1-Score": 0.6033,
+      "PR-AUC": 0.6674,
+      "ROC-AUC": 0.7961
+    },
+    "kfold": {
+      "Accuracy": 0.7488,
+      "Accuracy_std": 0.0061,
+      "Precision": 0.5529,
+      "Recall": 0.6687,
+      "Recall_std": 0.0123,
+      "F1-Score": 0.6053,
+      "PR-AUC": 0.6354,
+      "ROC-AUC": 0.8086
+    }
   }
 }

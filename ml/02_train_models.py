@@ -6,7 +6,7 @@ import joblib
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import precision_score, recall_score, f1_score, roc_auc_score, average_precision_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, average_precision_score
 from sklearn.ensemble import GradientBoostingRegressor
 from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE, ADASYN
@@ -44,71 +44,80 @@ def train_deep_models():
     X = df[feature_cols].values
     y = df[target_col].values
 
-    # =========================================================================
-    # 1. 10-FOLD STRATIFIED CROSS-VALIDATION PIPELINE
-    # =========================================================================
-    print("\n[PHASE 1] Executing 10-Fold Stratified Cross-Validation with ADASYN Resampling...")
-    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
-    kfold_models = []
-    fold_results = []
-
-    for fold, (train_idx, val_idx) in enumerate(skf.split(X, y)):
-        X_tr, y_tr = X[train_idx], y[train_idx]
-        X_val, y_val = X[val_idx], y[val_idx]
-
-        # Resample strictly within training fold (Zero Leakage)
-        adasyn = ADASYN(random_state=42, n_neighbors=5)
-        X_tr_res, y_tr_res = adasyn.fit_resample(X_tr, y_tr)
-
-        clf = XGBClassifier(
+    def make_clf(seed):
+        return XGBClassifier(
             n_estimators=140,
             max_depth=5,
             learning_rate=0.07,
             subsample=0.85,
             colsample_bytree=0.85,
             min_child_weight=2,
-            random_state=42 + fold,
+            random_state=seed,
             eval_metric='logloss',
             n_jobs=-1
         )
-        clf.fit(X_tr_res, y_tr_res)
-        kfold_models.append(clf)
 
-        probs = clf.predict_proba(X_val)[:, 1]
-        preds = (probs >= 0.40).astype(int)
-
-        rec = recall_score(y_val, preds)
-        prec = precision_score(y_val, preds)
-        f1 = f1_score(y_val, preds)
-        auc = roc_auc_score(y_val, probs)
-        prauc = average_precision_score(y_val, probs)
-
-        fold_results.append({
-            'Fold': f'Fold {fold+1}',
-            'Recall': rec,
-            'Precision': prec,
-            'F1-Score': f1,
-            'ROC-AUC': auc,
-            'PR-AUC': prauc
-        })
-        print(f"  Fold {fold+1}/10 -> Recall: {rec*100:.2f}%, Precision: {prec*100:.2f}%, F1: {f1:.4f}, ROC-AUC: {auc:.4f}, PR-AUC: {prauc:.4f}")
-
-    df_folds = pd.DataFrame(fold_results)
-    cv_mean_rec = float(df_folds['Recall'].mean())
-    cv_mean_prec = float(df_folds['Precision'].mean())
-    cv_mean_f1 = float(df_folds['F1-Score'].mean())
-    cv_mean_auc = float(df_folds['ROC-AUC'].mean())
-    cv_mean_prauc = float(df_folds['PR-AUC'].mean())
-
-    print("\n--- 10-Fold Stratified Cross-Validation Summary ---")
-    print(f"  Mean Test Recall:    {cv_mean_rec*100:.2f}% (Std: +/- {df_folds['Recall'].std()*100:.2f}%)")
-    print(f"  Mean Test Precision: {cv_mean_prec*100:.2f}% (Std: +/- {df_folds['Precision'].std()*100:.2f}%)")
-    print(f"  Mean F1-Score:       {cv_mean_f1:.4f}")
-    print(f"  Mean ROC-AUC:        {cv_mean_auc:.4f}")
-    print(f"  Mean PR-AUC:         {cv_mean_prauc:.4f}")
+    STRATEGIES = {
+        "Baseline (Control - Raw)": ("No Resampling", None),
+        "SMOTE Balanced": ("SMOTE", SMOTE),
+        "ADASYN Balanced": ("ADASYN", ADASYN)
+    }
 
     # =========================================================================
-    # 2. CHRONOLOGICAL 80:20 RATIO SPLIT (1967-2012 vs 2013-2023)
+    # 1. 10-FOLD STRATIFIED CROSS-VALIDATION PIPELINE (every resampling strategy)
+    # =========================================================================
+    print("\n[PHASE 1] Executing 10-Fold Stratified Cross-Validation for every resampling strategy...")
+    skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+    kfold_summaries = {}
+    champion_fold_models = []  # ADASYN fold models power the deployed ensemble
+
+    for name, (strategy_label, resampler_cls) in STRATEGIES.items():
+        print(f"\n  -- {name} ({strategy_label}) --")
+        fold_results = []
+        fold_models = []
+
+        for fold, (train_idx, val_idx) in enumerate(skf.split(X, y)):
+            X_tr, y_tr = X[train_idx], y[train_idx]
+            X_val, y_val = X[val_idx], y[val_idx]
+
+            # Resample strictly within the training fold only (zero leakage)
+            if resampler_cls is not None:
+                resampler = resampler_cls(random_state=42, n_neighbors=5) if resampler_cls is ADASYN else resampler_cls(random_state=42)
+                X_tr_res, y_tr_res = resampler.fit_resample(X_tr, y_tr)
+            else:
+                X_tr_res, y_tr_res = X_tr, y_tr
+
+            clf = make_clf(seed=42 + fold)
+            clf.fit(X_tr_res, y_tr_res)
+            fold_models.append(clf)
+
+            probs = clf.predict_proba(X_val)[:, 1]
+            preds = (probs >= 0.40).astype(int)
+
+            fold_results.append({
+                'Accuracy': accuracy_score(y_val, preds),
+                'Recall': recall_score(y_val, preds),
+                'Precision': precision_score(y_val, preds),
+                'F1-Score': f1_score(y_val, preds),
+                'ROC-AUC': roc_auc_score(y_val, probs),
+                'PR-AUC': average_precision_score(y_val, probs)
+            })
+
+        df_folds = pd.DataFrame(fold_results)
+        kfold_summaries[name] = {
+            metric: {'mean': float(df_folds[metric].mean()), 'std': float(df_folds[metric].std())}
+            for metric in ['Accuracy', 'Recall', 'Precision', 'F1-Score', 'ROC-AUC', 'PR-AUC']
+        }
+        print(f"    10-Fold Mean Accuracy: {kfold_summaries[name]['Accuracy']['mean']*100:.2f}% "
+              f"(+/- {kfold_summaries[name]['Accuracy']['std']*100:.2f}%) | "
+              f"Recall: {kfold_summaries[name]['Recall']['mean']*100:.2f}% | "
+              f"ROC-AUC: {kfold_summaries[name]['ROC-AUC']['mean']:.4f}")
+
+        if name == "ADASYN Balanced":
+            champion_fold_models = fold_models
+
+    # =========================================================================
+    # 2. CHRONOLOGICAL 80:20 RATIO SPLIT (1967-2012 vs 2013-2023) — single-split baseline
     # =========================================================================
     print("\n[PHASE 2] Benchmarking Chronological 80:20 Split (1967-2012 vs 2013-2023)...")
     cutoff_year = int(df['year'].quantile(0.80)) # 2012
@@ -127,57 +136,57 @@ def train_deep_models():
     adasyn_holdout = ADASYN(random_state=42, n_neighbors=5)
     X_train_adasyn, y_train_adasyn = adasyn_holdout.fit_resample(X_train, y_train)
 
-    configs = {
+    holdout_configs = {
         "Baseline (Control - Raw)": (X_train, y_train),
         "SMOTE Balanced": (X_train_smote, y_train_smote),
         "ADASYN Balanced": (X_train_adasyn, y_train_adasyn)
     }
 
     results = {}
-    for name, (X_tr, y_tr) in configs.items():
-        clf = XGBClassifier(
-            n_estimators=140,
-            max_depth=5,
-            learning_rate=0.07,
-            subsample=0.85,
-            colsample_bytree=0.85,
-            min_child_weight=2,
-            random_state=42,
-            eval_metric='logloss',
-            n_jobs=-1
-        )
+    for name, (X_tr, y_tr) in holdout_configs.items():
+        clf = make_clf(seed=42)
         clf.fit(X_tr, y_tr)
 
         y_prob = clf.predict_proba(X_test)[:, 1]
         y_pred = (y_prob >= 0.40).astype(int)
 
+        strategy_label = STRATEGIES[name][0]
+        kf = kfold_summaries[name]
+
         results[name] = {
-            "Precision": round(precision_score(y_test, y_pred), 4),
-            "Recall": round(recall_score(y_test, y_pred), 4),
-            "F1-Score": round(f1_score(y_test, y_pred), 4),
-            "PR-AUC": round(average_precision_score(y_test, y_prob), 4),
-            "ROC-AUC": round(roc_auc_score(y_test, y_prob), 4)
+            "strategy": strategy_label,
+            "holdout": {
+                "Accuracy": round(accuracy_score(y_test, y_pred), 4),
+                "Precision": round(precision_score(y_test, y_pred), 4),
+                "Recall": round(recall_score(y_test, y_pred), 4),
+                "F1-Score": round(f1_score(y_test, y_pred), 4),
+                "PR-AUC": round(average_precision_score(y_test, y_prob), 4),
+                "ROC-AUC": round(roc_auc_score(y_test, y_prob), 4)
+            },
+            "kfold": {
+                "Accuracy": round(kf['Accuracy']['mean'], 4),
+                "Accuracy_std": round(kf['Accuracy']['std'], 4),
+                "Precision": round(kf['Precision']['mean'], 4),
+                "Recall": round(kf['Recall']['mean'], 4),
+                "Recall_std": round(kf['Recall']['std'], 4),
+                "F1-Score": round(kf['F1-Score']['mean'], 4),
+                "PR-AUC": round(kf['PR-AUC']['mean'], 4),
+                "ROC-AUC": round(kf['ROC-AUC']['mean'], 4)
+            }
         }
 
-    # Add 10-Fold Cross-Validation Benchmark to official results
-    results["10-Fold Stratified CV (ADASYN + XGBoost)"] = {
-        "Precision": round(cv_mean_prec, 4),
-        "Recall": round(cv_mean_rec, 4),
-        "F1-Score": round(cv_mean_f1, 4),
-        "PR-AUC": round(cv_mean_prauc, 4),
-        "ROC-AUC": round(cv_mean_auc, 4)
-    }
-
     print("\n" + "=" * 80)
-    print("OFFICIAL BENCHMARK COMPARISON TABLE (HOLDOUT & 10-FOLD CV):")
+    print("OFFICIAL BENCHMARK COMPARISON TABLE (HOLDOUT & 10-FOLD CV, EVERY STRATEGY):")
     print("=" * 80)
-    print(pd.DataFrame(results).T.to_string())
+    for name, r in results.items():
+        print(f"  {name}: Holdout Acc {r['holdout']['Accuracy']*100:.1f}% | "
+              f"10-Fold Acc {r['kfold']['Accuracy']*100:.1f}% (+/- {r['kfold']['Accuracy_std']*100:.1f}%)")
 
     # =========================================================================
     # 3. BUILD CROSS-VALIDATED ENSEMBLE CHAMPION MODEL
     # =========================================================================
-    print("\n[PHASE 3] Constructing 10-Fold Cross-Validated Soft-Voting Ensemble Champion...")
-    ensemble_champion = KFoldEnsembleClassifier(kfold_models)
+    print("\n[PHASE 3] Constructing 10-Fold Cross-Validated Soft-Voting Ensemble Champion (ADASYN)...")
+    ensemble_champion = KFoldEnsembleClassifier(champion_fold_models)
 
     # Secondary Severity Regressor
     print("Training Secondary Hydrological Severity Regressor...")

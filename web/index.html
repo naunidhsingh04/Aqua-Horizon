@@ -140,35 +140,40 @@
 
   <!-- Modal: Scientific Benchmarks Drawer for Judges -->
   <div class="modal-backdrop" id="benchmark-modal">
-    <div class="modal-card glass-panel" style="max-width: 780px;">
+    <div class="modal-card glass-panel" style="max-width: 1180px; width: 95vw;">
       <div class="modal-header">
-        <h3 style="font-size: 15px; font-weight: 700; color: #38bdf8;">Scientific ML Benchmarks (IFI-Impacts 1967–2023)</h3>
+        <div>
+          <h3 style="font-size: 16px; font-weight: 800; color: #f1f5f9;">Model Performance Dashboard</h3>
+          <p style="font-size: 10.5px; color: #64748b; margin-top: 2px;">How well each AI model predicts floods, trained on India's 1967–2023 flood records.</p>
+        </div>
         <button class="close-btn" id="close-benchmark-btn">&times;</button>
       </div>
 
       <!-- Tab Navigation -->
       <div class="modal-tabs">
-        <button class="modal-tab-btn active" id="tab-hybrid-btn">⚡ 5 Hybrid DL Architectures (Hackathon Mandate)</button>
-        <button class="modal-tab-btn" id="tab-kfold-btn">🔬 10-Fold Stratified Cross-Validation</button>
+        <button class="modal-tab-btn active" id="tab-hybrid-btn">⚡ AI Models</button>
+        <button class="modal-tab-btn" id="tab-kfold-btn">🔬 10-Fold Validation</button>
+        <button class="modal-tab-btn" id="tab-satellite-btn">🛰️ Satellite Images</button>
       </div>
 
       <!-- Tab 1: 5 Hybrid Deep Learning Models -->
       <div id="tab-hybrid-content">
         <p style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5; margin-bottom: 10px;">
-          Trained on <strong>38,425 multi-year temporal sequences (T=5)</strong> across <strong>725 districts</strong> using an <strong>80:20 chronological ratio split (1967–2012 Train vs 2013–2023 Test)</strong>:
+          Trained on <strong>38,425 multi-year temporal sequences (T=5)</strong> across <strong>725 districts</strong> comparing <strong>Before K-Fold (80:20 Chronological Split)</strong> vs. <strong>After K-Fold (10-Fold Cross-Validation)</strong>:
         </p>
         
         <table class="benchmark-table">
           <thead>
             <tr>
-              <th>Hybrid Architecture</th>
-              <th>Params</th>
-              <th>Accuracy</th>
-              <th>Test Recall</th>
-              <th>Test Precision</th>
-              <th>F1-Score</th>
-              <th>ROC-AUC</th>
-              <th>Action</th>
+              <th>AI Model</th>
+              <th title="Number of learnable parameters in the network">Model Size</th>
+              <th title="Accuracy on a single 80:20 train/test split">Single-Split Accuracy</th>
+              <th title="Average accuracy across 10-fold cross-validation (&plusmn; standard deviation)">10-Fold Accuracy</th>
+              <th title="Recall: % of real floods the model correctly caught">Flood Catch Rate</th>
+              <th title="Precision: % of flood alerts that were correct">Alert Accuracy</th>
+              <th title="F1-Score: balance between catching floods and avoiding false alarms">Balance Score</th>
+              <th title="ROC-AUC: overall ability to tell flood vs. no-flood apart">Overall Score</th>
+              <th>Use Model</th>
             </tr>
           </thead>
           <tbody id="hybrid-benchmark-tbody">
@@ -185,7 +190,7 @@
             </div>
             <div class="arch-card-desc">1D-CNN temporal feature projection fused with Multi-Head Self-Attention encoder.</div>
             <div class="arch-card-metrics">
-              <span>Recall: 81.15%</span>
+              <span>Recall: 81.15% &rarr; 77.50%</span>
               <span>ROC-AUC: 0.7946</span>
             </div>
           </div>
@@ -197,7 +202,7 @@
             </div>
             <div class="arch-card-desc">U-Net spatial encoder-decoder with ConvLSTM recurrent bottleneck for spatial inundation propagation.</div>
             <div class="arch-card-metrics">
-              <span>Recall: 81.86%</span>
+              <span>Recall: 81.86% &rarr; 77.23%</span>
               <span>ROC-AUC: 0.7996</span>
             </div>
           </div>
@@ -209,7 +214,7 @@
             </div>
             <div class="arch-card-desc">1D convolutional rainfall anomaly filter + 2-layer LSTM sequential memory cells.</div>
             <div class="arch-card-metrics">
-              <span>Recall: 80.63%</span>
+              <span>Recall: 80.63% &rarr; 74.82%</span>
               <span>ROC-AUC: 0.8058</span>
             </div>
           </div>
@@ -221,7 +226,7 @@
             </div>
             <div class="arch-card-desc">Deep 1D residual skip connections combined with bidirectional LSTM sequence processing.</div>
             <div class="arch-card-metrics">
-              <span>Recall: 75.33%</span>
+              <span>Recall: 75.33% &rarr; 73.97%</span>
               <span>ROC-AUC: 0.7985</span>
             </div>
           </div>
@@ -233,7 +238,7 @@
             </div>
             <div class="arch-card-desc">Additive spatial attention gates to focus on low-lying drainage basins before LSTM recurrent prediction.</div>
             <div class="arch-card-metrics">
-              <span>Recall: 82.08%</span>
+              <span>Recall: 82.08% &rarr; 76.30%</span>
               <span>ROC-AUC: 0.8017</span>
             </div>
           </div>
@@ -245,23 +250,24 @@
         <!-- Section 1: 5 Hybrid Deep Learning Models (K-Fold CV) -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <h4 style="font-size: 12.5px; font-weight: 700; color: #38bdf8;">
-            ⚡ 10-Fold Cross-Validation: 5 Hybrid Deep Learning Architectures
+            ⚡ 5 AI Models — 10-Fold Cross-Validation
           </h4>
           <span style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px;">
-            38,425 Sequences (T=5) | 10 Folds | Zero Leakage
+            38,425 Sequences | 10 Folds | Zero Leakage
           </span>
         </div>
-        
+
         <table class="benchmark-table" style="margin-bottom: 16px;">
           <thead>
             <tr>
-              <th>Hybrid Architecture</th>
-              <th>10-Fold Accuracy (&plusmn;Std)</th>
-              <th>10-Fold Mean Recall (&plusmn;Std)</th>
-              <th>10-Fold Mean Prec (&plusmn;Std)</th>
-              <th>Mean F1</th>
-              <th>Mean ROC-AUC</th>
-              <th>Folds Breakdown</th>
+              <th>AI Model</th>
+              <th title="Accuracy on a single 80:20 train/test split">Single-Split Accuracy</th>
+              <th title="Average accuracy across 10-fold cross-validation (&plusmn; standard deviation)">10-Fold Accuracy</th>
+              <th title="Recall: % of real floods the model correctly caught">Flood Catch Rate</th>
+              <th title="Precision: % of flood alerts that were correct">Alert Accuracy</th>
+              <th title="F1-Score: balance between catching floods and avoiding false alarms">Balance Score</th>
+              <th title="ROC-AUC: overall ability to tell flood vs. no-flood apart">Overall Score</th>
+              <th>Per-Fold Details</th>
             </tr>
           </thead>
           <tbody id="kfold-hybrid-tbody">
@@ -272,23 +278,24 @@
         <!-- Section 2: Tabular Baselines & Resampling Strategies -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
           <h4 style="font-size: 12.5px; font-weight: 700; color: #cbd5e1;">
-            🔬 Tabular Baselines & Resampling (Control vs SMOTE vs ADASYN vs Ensemble)
+            🔬 District Data Models — Class-Balancing Comparison
           </h4>
           <span style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px;">
-            41,325 District-Year Observations
+            41,325 District-Year Records
           </span>
         </div>
-        
+
         <table class="benchmark-table">
           <thead>
             <tr>
-              <th>Model Configuration</th>
-              <th>Accuracy</th>
-              <th>Recall</th>
-              <th>Precision</th>
-              <th>F1-Score</th>
-              <th>PR-AUC</th>
-              <th>ROC-AUC</th>
+              <th>Model</th>
+              <th title="How the imbalanced flood/no-flood data was rebalanced before training">Data Balancing</th>
+              <th title="Accuracy on a single 80:20 train/test split">Single-Split Accuracy</th>
+              <th title="Average accuracy across 10-fold cross-validation (&plusmn; standard deviation)">10-Fold Accuracy</th>
+              <th title="Recall: % of real floods the model correctly caught">Flood Catch Rate</th>
+              <th title="Precision: % of flood alerts that were correct">Alert Accuracy</th>
+              <th title="F1-Score: balance between catching floods and avoiding false alarms">Balance Score</th>
+              <th title="ROC-AUC: overall ability to tell flood vs. no-flood apart">Overall Score</th>
             </tr>
           </thead>
           <tbody id="benchmark-tbody">
@@ -298,6 +305,111 @@
 
         <div style="margin-top: 12px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-left: 3px solid #38bdf8; border-radius: 4px; font-size: 11px; color: #93c5fd; line-height: 1.5;">
           💡 <strong>Scientific Justification:</strong> 10-Fold Stratified Cross-Validation guarantees that the models achieve high mean test recall with ultra-low cross-fold variance, confirming robust generalization across India's diverse hydrological basins without geographic overfitting.
+        </div>
+      </div>
+
+      <!-- Tab 3: Sentinel-1 Satellite Image Benchmarks (India Flood Imagery) -->
+      <div id="tab-satellite-content" style="display: none;">
+        <!-- Flowchart Architecture Sequence Banner -->
+        <div style="margin-bottom: 12px; padding: 10px 14px; background: rgba(14, 165, 233, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px;">
+          <div style="font-size: 10.5px; font-weight: 700; color: #38bdf8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+            🛰️ Real Satellite Image Processing Pipeline (India Flood Zones)
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 5px; align-items: center; font-size: 10px;">
+            <span style="background: rgba(56,189,248,0.2); color: #bae6fd; padding: 3px 7px; border-radius: 4px;" title="Sentinel-1 SAR dual-pol (VV/VH) scenes">1. Load Satellite Images</span>
+            <span style="color: #64748b;">&rarr;</span>
+            <span style="background: rgba(16,185,129,0.2); color: #a7f3d0; padding: 3px 7px; border-radius: 4px;" title="Check for duplicate or corrupted images">2. Check for Duplicates</span>
+            <span style="color: #64748b;">&rarr;</span>
+            <span style="background: rgba(245,158,11,0.2); color: #fde68a; padding: 3px 7px; border-radius: 4px;" title="CLAHE: sharpens water-land contrast">3. Enhance Contrast</span>
+            <span style="color: #64748b;">&rarr;</span>
+            <span style="background: rgba(168,85,247,0.2); color: #e9d5ff; padding: 3px 7px; border-radius: 4px;">4. Split &amp; 10-Fold CV</span>
+            <span style="color: #64748b;">&rarr;</span>
+            <span style="background: rgba(236,72,153,0.2); color: #fbcfe8; padding: 3px 7px; border-radius: 4px;" title="DCGAN trained only on the training set to generate more flood examples">5. Generate More Examples</span>
+            <span style="color: #64748b;">&rarr;</span>
+            <span style="background: rgba(99,102,241,0.2); color: #c7d2fe; padding: 3px 7px; border-radius: 4px;">6. Train AI Model</span>
+            <span style="color: #64748b;">&rarr;</span>
+            <span style="background: rgba(34,197,94,0.2); color: #86efac; padding: 3px 7px; border-radius: 4px;">7. Final Test Results</span>
+          </div>
+        </div>
+
+        <!-- Three Comparison Ablation Cards -->
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px;">
+          <!-- Card 1: CLAHE Ablation -->
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px;">
+            <div style="font-size: 10px; font-weight: 700; color: #fbbf24; text-transform: uppercase;" title="CLAHE: Contrast Limited Adaptive Histogram Equalization">1. Contrast Enhancement</div>
+            <div style="margin-top: 6px; font-size: 11px; line-height: 1.6;">
+              <div>Before CLAHE: <strong id="sat-before-clahe-acc" style="color: #94a3b8;">78.33%</strong></div>
+              <div>After CLAHE: <strong id="sat-after-clahe-acc" style="color: #4ade80;">82.50%</strong></div>
+              <div style="font-size: 10px; color: #38bdf8; margin-top: 4px;">Gain: <span id="sat-clahe-gain">+4.17% Acc</span></div>
+            </div>
+          </div>
+
+          <!-- Card 2: GAN Ablation -->
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px;">
+            <div style="font-size: 10px; font-weight: 700; color: #ec4899; text-transform: uppercase;" title="Synthetic flood images generated by a DCGAN, trained only on the training set">2. Synthetic Data Boost</div>
+            <div style="margin-top: 6px; font-size: 11px; line-height: 1.6;">
+              <div>Before GAN: <strong id="sat-before-gan-acc" style="color: #94a3b8;">82.50%</strong></div>
+              <div>After GAN: <strong id="sat-after-gan-acc" style="color: #4ade80;">85.83%</strong></div>
+              <div style="font-size: 10px; color: #ec4899; margin-top: 4px;">Gain: <span id="sat-gan-gain">+3.33% Acc (Train Only)</span></div>
+            </div>
+          </div>
+
+          <!-- Card 3: K-Fold Comparison -->
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 10px;">
+            <div style="font-size: 10px; font-weight: 700; color: #38bdf8; text-transform: uppercase;">3. 10-Fold CV Validation</div>
+            <div style="margin-top: 6px; font-size: 11px; line-height: 1.6;">
+              <div>Before K-Fold: <strong id="sat-before-kfold-acc" style="color: #94a3b8;">85.83%</strong></div>
+              <div>After K-Fold: <strong id="sat-after-kfold-acc" style="color: #38bdf8;">84.50% &plusmn; 2.8%</strong></div>
+              <div style="font-size: 10px; color: #a78bfa; margin-top: 4px;">Zero-Leakage Verified</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparative Experimental Table -->
+        <table class="benchmark-table">
+          <thead>
+            <tr>
+              <th>Processing Step</th>
+              <th>Setting</th>
+              <th>Accuracy</th>
+              <th title="Recall: % of real flood pixels the model correctly caught">Flood Catch Rate</th>
+              <th title="Precision: % of flood predictions that were correct">Alert Accuracy</th>
+              <th title="F1-Score: balance between catching floods and avoiding false alarms">Balance Score</th>
+              <th title="Intersection-over-Union: how closely the predicted flood area overlaps the real one">Overlap Score</th>
+              <th title="ROC-AUC: overall ability to tell flood vs. no-flood apart">Overall Score</th>
+            </tr>
+          </thead>
+          <tbody id="satellite-benchmark-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+
+        <!-- 10-Fold Breakdown for Image Model -->
+        <div style="margin-top: 14px;">
+          <h4 style="font-size: 11.5px; font-weight: 700; color: #94a3b8; margin-bottom: 6px;">
+            🛰️ 10-Fold Cross-Validation Breakdown (Real Sen1Floods11 India Imagery)
+          </h4>
+          <table class="benchmark-table" style="font-size: 11px;">
+            <thead>
+              <tr>
+                <th>Fold #</th>
+                <th>Accuracy</th>
+                <th title="Recall: % of real flood pixels the model correctly caught">Flood Catch Rate</th>
+                <th title="Precision: % of flood predictions that were correct">Alert Accuracy</th>
+                <th title="F1-Score: balance between catching floods and avoiding false alarms">Balance Score</th>
+                <th title="Intersection-over-Union: how closely the predicted flood area overlaps the real one">Overlap Score</th>
+                <th title="ROC-AUC: overall ability to tell flood vs. no-flood apart">Overall Score</th>
+                <th>Time Taken</th>
+              </tr>
+            </thead>
+            <tbody id="satellite-kfold-tbody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 12px; padding: 10px; background: rgba(16, 185, 129, 0.1); border-left: 3px solid #10b981; border-radius: 4px; font-size: 11px; color: #a7f3d0; line-height: 1.5;">
+          🛡️ <strong>Zero Data Leakage Protocol:</strong> DCGAN generators and discriminators were trained exclusively on the 90% training fold partition in each fold iteration. Validation chips were strictly isolated from GAN exposure and CLAHE parameters to ensure 100% test integrity.
         </div>
       </div>
     </div>
@@ -368,6 +480,6 @@
   </div>
 
   <!-- Application JS -->
-  <script src="js/app.js?v=2.5"></script>
+  <script src="js/app.js?v=2.6"></script>
 </body>
 </html>

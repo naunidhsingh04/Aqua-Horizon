@@ -15,7 +15,6 @@ import re
 import json
 import joblib
 import requests
-import difflib
 import numpy as np
 import pandas as pd
 from ml.ensemble import KFoldEnsembleClassifier
@@ -25,7 +24,7 @@ def clean_name(name):
         return ""
     name = re.sub(r'\(.*?\)', '', name)
     name = name.replace("nagar", "").replace("Nagar", "")
-    name = name.replace("-", "").replace(" ", "").replace("_", "")
+    name = name.replace("-", "").replace(" ", "").replace("_", "").replace(".", "")
     name = name.strip().lower()
     return name
 
@@ -164,19 +163,20 @@ def export_live_system():
     print(f"Total authentic district features: {len(dist_features)} (filtered out {len(geojson['features']) - len(dist_features)} state outlines)")
     geojson['features'] = dist_features
 
+    # Every target below was verified to exist in the historical clean_dist key set
+    # before being added here — no blind fuzzy string-matching is used (that previously
+    # mismatched e.g. "Raigad" to "Raigarh" and "Bengaluru Urban" to "Bengaluru Rural",
+    # two different real districts, corrupting the displayed rank/severity for each).
     aliases = {
         'kutch': 'kachchh',
         'kachchh': 'kachchh',
-        'ahmednagar': 'ahmadnagar',
+        'ahmed': 'ahmad',  # Ahmednagar -> Ahmadnagar (clean_name strips "nagar")
         'beed': 'bid',
         'vizianagaram': 'vizianagaram',
-        'spsnellore': 'sripottisriramulunellore',
-        'sripottisriramulunellore': 'sripottisriramulunellore',
-        'ysrkadapa': 'cuddapah',
         'paschimmedinipur': 'medinipurwest',
         'purbamedinipur': 'purbamedinipur',
-        'dadraandnagarhaveli': 'dadranagarhaveli',
-        'komarambheem': 'asifabad',
+        'dadraandhaveli': 'dadra&haveli',  # Dadra and Nagar Haveli (clean_name strips "Nagar")
+        'komarambheem': 'kumurambheemasifabad',
         'gondia': 'gondiya',
         'buldhana': 'buldana',
         'jajpur': 'jajapur',
@@ -186,7 +186,7 @@ def export_live_system():
         'leh': 'ladakh',
         'lehladakh': 'ladakh',
         'kargil': 'ladakh',
-        'northandmiddleandaman': 'northmiddleandaman',
+        'northandmiddleandaman': 'north&middleandaman',
         'southandaman': 'southandaman',
         'nicobars': 'nicobars',
         'khawzawl': 'champhai',
@@ -201,7 +201,43 @@ def export_live_system():
         'ranipet': 'vellore',
         'tirupattur': 'vellore',
         'mayiladuthurai': 'nagapattinam',
-        'kallakurichi': 'viluppuram'
+        'kallakurichi': 'viluppuram',
+        # Verified same-district spelling/transliteration variants (historical record vs. current name)
+        'nilgiris': 'thenilgiris',
+        'bengaluruurban': 'bangalore',
+        'jagtial': 'jagitial',
+        'jangaon': 'jangoan',
+        'angul': 'anugul',
+        'dang': 'thedangs',
+        'chhotaudaipur': 'chotaudaipur',
+        'jayashankarbhupalapally': 'jayashankar',
+        'southsalmaramankachar': 'southsalmaramancachar',
+        'delhi': 'newdelhi',
+        'jhunjhunu': 'jhunjhunun',
+        'darjeeling': 'darjiling',
+        'dholpur': 'dhaulpur',
+        'jalore': 'jalor',
+        'malda': 'maldah',
+        'mehsana': 'mahesana',
+        'ahmedabad': 'ahmadabad',
+        'purulia': 'puruliya',
+        'panchmahal': 'panchmahals',
+        'narsinghpur': 'narsimhapur',
+        'koderma': 'kodarma',
+        'charkhidadri': 'charkidadri',
+        'chittorgarh': 'chittaurgarh',
+        'bandipora': 'bandipore',
+        'baramulla': 'baramula',
+        'budgam': 'badgam',
+        'shopiyan': 'shupiyan',
+        'lahaulandspiti': 'lahul&spiti',
+        'haridwar': 'hardwar',
+        'ferozepur': 'firozpur',
+        'maharajganj': 'mahrajganj'
+        # Deliberately NOT aliased (no matching or ambiguous/wrong-state historical record;
+        # these fall back to an honest generic baseline instead of borrowing another
+        # district's real flood history): Raigad, Deogarh, Pauri Garhwal, Lakhimpur Kheri,
+        # North/South Sikkim, North/South 24 Parganas, Y.S.R. Kadapa, S.P.S. Nellore.
     }
 
     # Reverse alias mapping for district-to-state lookup
@@ -288,7 +324,20 @@ def export_live_system():
         district_live_intel[cd] = item_data
         district_live_intel[raw_cd] = item_data
 
-    clean_keys = list(district_live_intel.keys())
+    # These clean names are each shared by two genuinely different real districts in
+    # different states (e.g. Aurangabad exists in both Bihar and Maharashtra), but the
+    # underlying 1967-2023 historical inventory only recorded one unified row per name
+    # (it has no reliable per-event state-to-district mapping to split them from, even
+    # though it does carry a State column -- see ml/01_preprocess.py). Rather than
+    # silently showing the same borrowed numbers for both real places, only the first
+    # one encountered keeps the real historical record; the other gets the honest
+    # generic baseline instead of a duplicated/misattributed value.
+    AMBIGUOUS_SHARED_NAMES = {
+        'aurangabad', 'bilaspur', 'balrampur', 'hamirpur', 'pratapgarh',
+        'chandigarh', 'lakshadweep'
+    }
+    used_ambiguous_names = set()
+
     matched = 0
 
     for feat in geojson['features']:
@@ -296,29 +345,34 @@ def export_live_system():
         raw_name = props.get('district') or props.get('NAME_2') or props.get('dtname') or ''
         st_name = props.get('st_nm') or ''
         cname = clean_name(raw_name)
-        
+
         info = None
+        resolved_key = None
         # 1. Direct clean match
         if cname and cname in district_live_intel:
             info = district_live_intel[cname].copy()
-        
+            resolved_key = cname
+
         # 2. Known alias match
         if not info and cname in aliases:
             alias_key = aliases[cname]
             if alias_key in district_live_intel:
                 info = district_live_intel[alias_key].copy()
-        
-        # 3. Fuzzy match
-        if not info and len(cname) >= 4:
-            close = difflib.get_close_matches(cname, clean_keys, n=1, cutoff=0.75)
-            if close:
-                info = district_live_intel[close[0]].copy()
+                resolved_key = alias_key
+
+        # Deliberately no fuzzy/substring matching here: blind string similarity
+        # previously cross-matched unrelated districts (e.g. "Raigad" -> "Raigarh",
+        # "Deogarh" -> "Deoghar", "Bengaluru Urban" -> "Bengaluru Rural"), silently
+        # showing one real district's flood history/rank under another district's name.
+        # Anything not resolved by an exact or explicitly verified alias match below
+        # gets an honest generic baseline instead of a wrong borrowed value.
+
+        if info and resolved_key in AMBIGUOUS_SHARED_NAMES:
+            if resolved_key in used_ambiguous_names:
+                info = None  # second (or later) same-named district -> honest fallback below
             else:
-                for k in clean_keys:
-                    if len(k) >= 5 and (k in cname or cname in k):
-                        info = district_live_intel[k].copy()
-                        break
-        
+                used_ambiguous_names.add(resolved_key)
+
         if info:
             matched += 1
             info['name'] = raw_name.title()

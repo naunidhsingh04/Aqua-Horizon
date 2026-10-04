@@ -1,0 +1,198 @@
+{
+  "suite": "Aqua Horizon Sentinel-1 India Satellite Image Benchmark",
+  "sensor": "Sentinel-1 C-Band SAR Dual-Polarization (VV, VH)",
+  "geographic_region": "India Flood Hazard Zones (Ganga, Brahmaputra, Peninsular Basins)",
+  "data_source": "Real Sen1Floods11 hand-labeled India subset (68 scenes, gs://sen1floods11)",
+  "total_chips": 1200,
+  "patch_size": "64x64 dual-pol",
+  "total_runtime_sec": 549.04,
+  "leakage_checks": {
+    "target_leakage": "Passed (Zero feature-target contamination)",
+    "duplicate_patches": "Passed (Zero duplicates across splits)",
+    "suspicious_patterns": "Passed (Zero NaN/Inf/variance collapse)"
+  },
+  "comparisons": {
+    "clahe_ablation": {
+      "metric": "Accuracy & IoU",
+      "before_clahe": {
+        "accuracy": 83.33,
+        "precision": 81.03,
+        "recall": 61.84,
+        "f1_score": 0.7015,
+        "iou": 54.02,
+        "roc_auc": 0.8722
+      },
+      "after_clahe": {
+        "accuracy": 81.67,
+        "precision": 86.36,
+        "recall": 50.0,
+        "f1_score": 0.6333,
+        "iou": 46.34,
+        "roc_auc": 0.8726
+      },
+      "accuracy_gain_pct": -1.67,
+      "iou_gain_pct": -7.68
+    },
+    "gan_ablation": {
+      "metric": "Accuracy & Recall (Trained strictly on train data)",
+      "before_gan": {
+        "accuracy": 81.67,
+        "precision": 86.36,
+        "recall": 50.0,
+        "f1_score": 0.6333,
+        "iou": 46.34,
+        "roc_auc": 0.8726
+      },
+      "after_gan": {
+        "accuracy": 84.58,
+        "precision": 86.79,
+        "recall": 60.53,
+        "f1_score": 0.7132,
+        "iou": 55.42,
+        "roc_auc": 0.8621
+      },
+      "accuracy_gain_pct": 2.92,
+      "recall_gain_pct": 10.53
+    },
+    "kfold_comparison": {
+      "before_kfold_holdout": {
+        "split": "80:20 Holdout Test",
+        "accuracy": 84.58,
+        "precision": 86.79,
+        "recall": 60.53,
+        "f1_score": 0.7132,
+        "iou": 55.42,
+        "roc_auc": 0.8621
+      },
+      "after_kfold_10fold_cv": {
+        "split": "10-Fold Stratified Cross-Validation",
+        "mean_accuracy": 83.17,
+        "std_accuracy": 3.09,
+        "mean_precision": 80.71,
+        "std_precision": 8.46,
+        "mean_recall": 62.74,
+        "std_recall": 10.47,
+        "mean_f1": 0.6981,
+        "std_f1": 0.0661,
+        "mean_iou": 54.01,
+        "std_iou": 7.69,
+        "mean_roc_auc": 0.8735,
+        "std_roc_auc": 0.0416,
+        "folds": [
+          {
+            "fold": "Fold 1",
+            "accuracy": 81.67,
+            "precision": 67.44,
+            "recall": 78.38,
+            "f1_score": 0.725,
+            "iou": 56.86,
+            "roc_auc": 0.9004,
+            "time_sec": 40.31
+          },
+          {
+            "fold": "Fold 2",
+            "accuracy": 82.5,
+            "precision": 76.67,
+            "recall": 62.16,
+            "f1_score": 0.6866,
+            "iou": 52.27,
+            "roc_auc": 0.8896,
+            "time_sec": 45.06
+          },
+          {
+            "fold": "Fold 3",
+            "accuracy": 80.83,
+            "precision": 82.61,
+            "recall": 50.0,
+            "f1_score": 0.623,
+            "iou": 45.24,
+            "roc_auc": 0.8848,
+            "time_sec": 44.79
+          },
+          {
+            "fold": "Fold 4",
+            "accuracy": 85.83,
+            "precision": 88.89,
+            "recall": 63.16,
+            "f1_score": 0.7385,
+            "iou": 58.54,
+            "roc_auc": 0.915,
+            "time_sec": 45.65
+          },
+          {
+            "fold": "Fold 5",
+            "accuracy": 83.33,
+            "precision": 71.43,
+            "recall": 78.95,
+            "f1_score": 0.75,
+            "iou": 60.0,
+            "roc_auc": 0.8758,
+            "time_sec": 44.83
+          },
+          {
+            "fold": "Fold 6",
+            "accuracy": 88.33,
+            "precision": 96.15,
+            "recall": 65.79,
+            "f1_score": 0.7812,
+            "iou": 64.1,
+            "roc_auc": 0.905,
+            "time_sec": 49.7
+          },
+          {
+            "fold": "Fold 7",
+            "accuracy": 81.67,
+            "precision": 80.77,
+            "recall": 55.26,
+            "f1_score": 0.6562,
+            "iou": 48.84,
+            "roc_auc": 0.8408,
+            "time_sec": 48.19
+          },
+          {
+            "fold": "Fold 8",
+            "accuracy": 87.5,
+            "precision": 87.1,
+            "recall": 71.05,
+            "f1_score": 0.7826,
+            "iou": 64.29,
+            "roc_auc": 0.9024,
+            "time_sec": 45.07
+          },
+          {
+            "fold": "Fold 9",
+            "accuracy": 77.5,
+            "precision": 72.0,
+            "recall": 47.37,
+            "f1_score": 0.5714,
+            "iou": 40.0,
+            "roc_auc": 0.768,
+            "time_sec": 44.75
+          },
+          {
+            "fold": "Fold 10",
+            "accuracy": 82.5,
+            "precision": 84.0,
+            "recall": 55.26,
+            "f1_score": 0.6667,
+            "iou": 50.0,
+            "roc_auc": 0.853,
+            "time_sec": 43.75
+          }
+        ]
+      }
+    }
+  },
+  "overfitting_diagnosis": {
+    "training_accuracy": 83.20754716981132,
+    "validation_accuracy": 84.58333333333333,
+    "generalization_gap_pct": -1.375786163522008,
+    "status": "Healthy / Well-Regularized (Generalization gap < 4%)",
+    "rectifications_applied": [
+      "Spatial Dropout (p=0.30)",
+      "Weight Decay L2 Regularization (1e-4)",
+      "Batch Normalization across all convolutional layers",
+      "Cosine Annealing Learning Rate Scheduling"
+    ]
+  }
+}
