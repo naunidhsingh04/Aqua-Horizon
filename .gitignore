@@ -23,3 +23,6 @@ Thumbs.db
 
 # Downloaded Sen1Floods11 satellite imagery (refetch via ml/download_sen1floods11_india.py)
 data/raw/sen1floods11_india/
+
+# PDFs are never committed
+*.pdf
