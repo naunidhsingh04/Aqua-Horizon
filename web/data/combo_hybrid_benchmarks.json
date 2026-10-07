@@ -13,7 +13,7 @@
     "combination": "soft voting (average of member probabilities)"
   },
   "total_windows": 38425,
-  "runtime_sec": 752.7,
+  "runtime_sec": 409.1,
   "models": [
     {
       "key": "resnet_bilstm",

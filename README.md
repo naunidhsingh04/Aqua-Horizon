@@ -31,11 +31,11 @@ All 5 hybrid architectures are implemented in modular PyTorch files in `ml/` and
 
 | Model Architecture | Parameters | Test Accuracy | Test Recall | Test Precision | F1-Score | ROC-AUC | PR-AUC | Dedicated Training Script | Weights Path |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **ResNet + BiLSTM** | 81,121 | **70.87%** | 75.33% | **54.84%** | 0.6347 | 0.7985 | 0.6638 | `ml/train_04_resnet_bilstm.py` | `ml/models/resnet_bilstm.pt` |
-| **CNN + LSTM** | 67,889 | 69.67% | 80.63% | 53.20% | **0.6410** | **0.8058** | **0.6766** | `ml/train_02_cnn_lstm.py` | `ml/models/cnn_lstm.pt` |
-| **Attention U-Net + LSTM** | 26,196 | 69.09% | **82.08%** | 52.56% | 0.6408 | 0.8017 | 0.6713 | `ml/train_05_attention_unet_lstm.py` | `ml/models/attention_unet_lstm.pt` |
-| **CNN + Transformer** | 70,849 | 68.89% | 81.15% | 52.39% | 0.6367 | 0.7946 | 0.6537 | `ml/train_03_cnn_transformer.py` | `ml/models/cnn_transformer.pt` |
-| **U-Net + ConvLSTM** | 85,729 | 68.80% | 81.86% | 52.28% | 0.6381 | 0.7996 | 0.6717 | `ml/train_01_unet_convlstm.py` | `ml/models/unet_convlstm.pt` |
+| **CNN + Transformer** | 70,849 | 69.88% | 78.91% | 53.51% | 0.6377 | 0.7963 | 0.6404 | `ml/train_03_cnn_transformer.py` | `ml/models/cnn_transformer.pt` |
+| **U-Net + ConvLSTM** | 85,729 | 69.33% | 79.99% | 52.87% | 0.6367 | 0.7946 | 0.6490 | `ml/train_01_unet_convlstm.py` | `ml/models/unet_convlstm.pt` |
+| **ResNet + BiLSTM** | 81,121 | 69.25% | 79.10% | 52.83% | 0.6335 | 0.7979 | 0.6689 | `ml/train_04_resnet_bilstm.py` | `ml/models/resnet_bilstm.pt` |
+| **Attention U-Net + LSTM** | 26,196 | 68.88% | 83.17% | 52.31% | 0.6423 | 0.7995 | 0.6475 | `ml/train_05_attention_unet_lstm.py` | `ml/models/attention_unet_lstm.pt` |
+| **CNN + LSTM** | 67,889 | 67.15% | 84.14% | 50.66% | 0.6324 | 0.7956 | 0.6625 | `ml/train_02_cnn_lstm.py` | `ml/models/cnn_lstm.pt` |
 
 ### Architecture Details:
 * **`UNetConvLSTM`**: Integrates a 2D spatial U-Net encoder-decoder with skip connections and a `ConvLSTMCell` at the bottleneck. Converts $15$ hydrological features into a $4\times 4$ spatial latent grid over $T=5$ temporal sequence steps to model inundation propagation.
@@ -50,31 +50,51 @@ All 5 hybrid architectures are implemented in modular PyTorch files in `ml/` and
 
 ### A. 10-Fold Stratified Cross-Validation for 5 Hybrid Deep Learning Models
 
-To verify cross-geographical stability and eliminate fold-specific bias, all 5 hybrid deep learning architectures were trained and validated across **10 Stratified Folds (38,425 multi-year sequences)** using zero-leakage training fold standardizers:
+To verify cross-geographical stability and eliminate fold-specific bias, all 5 hybrid deep learning architectures were trained and validated across **10 Stratified Folds (38,425 multi-year sequences)** using training-fold-only standardizers:
 
-| Hybrid Model Architecture | 10-Fold Accuracy (±Std) | 10-Fold Mean Recall (±Std) | 10-Fold Mean Precision (±Std) | Mean F1-Score | Mean ROC-AUC | Generalization Status |
-| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
-| **ResNet + BiLSTM** | **71.24% (±1.42%)** | 73.97% (±4.66%) | **50.91% (±1.99%)** | **0.6019** | **0.8032** | Highest Accuracy, Precision & ROC-AUC |
-| **CNN + LSTM** | 70.15% (±1.35%) | 74.82% (±4.49%) | 49.74% (±1.69%) | 0.5965 | 0.7982 | High Stability Temporal Baseline |
-| **CNN + Transformer** | 69.48% (±1.18%) | 77.10% (±3.57%) | 48.69% (±1.92%) | 0.5961 | 0.7956 | High Self-Attention Temporal Generalization |
-| **Attention U-Net + LSTM** | 69.32% (±1.55%) | 76.30% (±4.41%) | 48.08% (±2.21%) | 0.5887 | 0.7875 | High Basin Attention Sensitivity |
-| **U-Net + ConvLSTM** | 68.95% (±1.62%) | **77.23% (±5.45%)** | 48.12% (±2.76%) | 0.5910 | 0.7951 | Spatial-Temporal Flood Extent Stability |
+| Hybrid Model Architecture | 10-Fold Accuracy (±Std) | 10-Fold Mean Recall (±Std) | 10-Fold Mean Precision (±Std) | Mean F1-Score | Mean ROC-AUC |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **CNN + LSTM** | 70.59% (±1.56%) | 75.16% (±2.63%) | 49.61% (±1.83%) | 0.5971 | 0.7980 |
+| **ResNet + BiLSTM** | 70.03% (±1.95%) | 78.01% (±3.88%) | 49.08% (±2.09%) | 0.6016 | 0.8024 |
+| **U-Net + ConvLSTM** | 69.39% (±1.59%) | 77.00% (±4.17%) | 48.33% (±1.57%) | 0.5931 | 0.7967 |
+| **CNN + Transformer** | 69.00% (±1.04%) | 77.84% (±2.68%) | 47.89% (±1.03%) | 0.5927 | 0.7936 |
+| **Attention U-Net + LSTM** | 68.99% (±2.76%) | 75.66% (±5.47%) | 48.09% (±2.66%) | 0.5860 | 0.7878 |
 
 *Run 10-Fold Hybrid Suite:*
 ```bash
 python ml/train_kfold_hybrid_models.py
 ```
 
+> The 10-fold figures above use random folds over overlapping 5-year windows of the same districts, so they can look somewhat better than a forecast of future years would. The 80:20 table (split by year) is the stricter test.
+
+#### Top-3 models and their combinations
+
+The three best single models (ResNet + BiLSTM, CNN + LSTM, CNN + Transformer) are combined by averaging their flood probabilities: first two, last two, first + last, and all three. All seven rows are scored the same way: SMOTE on the training data only, the decision threshold chosen on a validation slice, and the 80:20 split by year and the 10-fold cross-validation both measured on real (unbalanced) test data.
+
+| Model / Combination | 80:20 Accuracy | 10-Fold Accuracy (±Std) | Recall | Precision | F1-Score | ROC-AUC |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **ResNet + BiLSTM** | 71.6% | 71.5% (±1.8%) | 72.2% | 50.8% | 0.595 | 0.800 |
+| **CNN + LSTM** | 71.7% | 69.8% (±1.9%) | 75.4% | 48.8% | 0.591 | 0.798 |
+| **CNN + Transformer** | 72.4% | 69.9% (±1.6%) | 74.5% | 48.9% | 0.589 | 0.794 |
+| **ResNet+BiLSTM + CNN+LSTM** | 70.2% | 71.2% (±1.5%) | 73.7% | 50.3% | 0.597 | 0.803 |
+| **CNN+LSTM + CNN+Transformer** | 72.2% | 70.0% (±1.4%) | 76.0% | 48.9% | 0.595 | 0.799 |
+| **ResNet+BiLSTM + CNN+Transformer** | 72.4% | 71.0% (±1.7%) | 74.4% | 50.1% | 0.598 | 0.803 |
+| **ResNet+BiLSTM + CNN+LSTM + CNN+Transformer** | 72.6% | 70.8% (±2.1%) | 75.0% | 49.9% | 0.598 | 0.803 |
+
+The combinations rank flood risk slightly better (ROC-AUC) than any single model, but the accuracy differences are 1 to 2 points, which is within the fold-to-fold spread (the ± value). *Run:*
+```bash
+python ml/train_combo_hybrid_models.py
+```
+
 ### B. Tabular Baselines & Resampling Strategies (Control vs SMOTE vs ADASYN vs Ensemble)
 
 To ensure scientific rigor and prevent single-split variance, AQUA HORIZON was also evaluated using **10-Fold Stratified Cross-Validation** across all 41,325 district-year observations:
 
-| Model Configuration | Accuracy | Recall | Precision | F1-Score | PR-AUC | ROC-AUC | Status |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **Baseline (Control - Raw Data)** | 76.2% | 46.4% | **65.2%** | 0.542 | 0.666 | 0.796 | Under-predicts rare floods |
-| **SMOTE Balanced** | 78.4% | 61.3% | 60.6% | 0.609 | **0.669** | 0.796 | +14.9% Recall improvement |
-| **ADASYN Balanced (Holdout)** | 78.1% | 60.1% | 60.5% | 0.603 | 0.667 | 0.796 | +13.7% Recall improvement |
-| **10-Fold Stratified CV (ADASYN + XGBoost)** | **79.6% (±0.8%)** | **66.9% (±1.2%)** | 55.3% (±0.9%) | **0.605** | 0.635 | **0.809** | **Statistically Verified Champion (OOF Ensemble)** |
+| Model Configuration | 80:20 Accuracy | 10-Fold Accuracy (±Std) | Recall | Precision | F1-Score | PR-AUC | ROC-AUC |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Baseline (Control - Raw)** | 73.7% | 76.4% (±0.6%) | 57.8% | 59.4% | 0.586 | 0.638 | 0.810 |
+| **SMOTE Balanced** | 73.6% | 75.0% (±0.7%) | 66.1% | 55.5% | 0.603 | 0.634 | 0.807 |
+| **ADASYN Balanced** | 73.4% | 74.9% (±0.6%) | 66.9% | 55.3% | 0.605 | 0.635 | 0.809 |
 
 > In flood disaster management, **Recall is life-critical**: false negatives mean unprepared communities, whereas early alerts enable pre-emptive disaster mitigation and evacuation.
 
@@ -84,16 +104,16 @@ To ensure scientific rigor and prevent single-split variance, AQUA HORIZON was a
 
 To maximize output fidelity and eliminate single-split bias, our 58,850-row balanced dataset was benchmarked using a rigorous **10-Fold Stratified Cross-Validation** process testing both flood classification and continuous satellite inundation extent (MODIS Global Flood Database):
 
-| Metric | 10-Fold Mean Performance | Standard Deviation (±Std) | Physical Interpretation |
+| Metric | 10-Fold Mean | Standard Deviation (±Std) | Note |
 | :--- | :---: | :---: | :--- |
-| **Classification Accuracy** | **83.10%** | **±0.46%** | High consistency across all 10 folds with zero target leakage. |
-| **Life-Critical Recall** | **77.88%** | **±0.70%** | Detects nearly 4 out of 5 actual inundation disasters in advance. |
-| **Precision** | **86.96%** | **±0.72%** | High alert reliability, suppressing false public alarm fatigue. |
-| **F1-Score** | **0.8217** | **±0.0049** | Exceptional harmonic balance between detection sensitivity and precision. |
-| **ROC-AUC** | **0.9146** | **±0.0020** | Outstanding discriminative power separating flood from non-flood events. |
-| **Satellite Extent $R^2$** | **99.19%** | **±0.06%** | High-fidelity satellite flooded area regression. |
-| **Satellite Extent MAE** | **0.2180%** | **±0.0059%** | Average physical area error is less than a quarter of a percent. |
-| **IRS Rank Correlation ($\rho$)** | **0.7717** | **±0.0063** | Inundation Risk Score ($P \times \text{Severity}$) tracks actual disaster extent. |
+| **Classification Accuracy** | 83.10% | ±0.46% | Optimistic: SMOTE rows can sit in both train and test folds |
+| **Recall** | 77.88% | ±0.70% | Share of real floods detected |
+| **Precision** | 86.96% | ±0.72% | Share of flood alerts that were correct |
+| **F1-Score** | 0.8217 | ±0.0049 | Balance of recall and precision |
+| **ROC-AUC** | 0.9146 | ±0.0020 | Separates flood from non-flood |
+| **Satellite Extent R²** | 99.19% | ±0.06% | Inflated: dfsi_score and drainage_stress_ratio are computed from the flooded-area value itself |
+| **Satellite Extent MAE** | 0.2180% | | Inflated for the same reason |
+| **IRS Rank Correlation (ρ)** | 0.7717 | ±0.0063 | Inundation Risk Score (P × severity) vs the real flooded area |
 
 *Run 10-Fold IRS Suite:*
 ```bash
@@ -106,7 +126,7 @@ python ml/test_10fold_irs.py
 
 * **Real-Time Architecture Switching:** Live UI allows users/judges to toggle between **all 5 Hybrid Deep Learning models** and the **Ensemble** via the top navigation bar.
 * **57-Year Historical Grounding:** Trained on the national *India Flood Inventory–Impacts (IFI-Impacts 1967–2023)* dataset from Zenodo (41,325 district-year records).
-* **Strict Zero Target Leakage:** Strictly excludes post-disaster consequence metrics (fatalities, damage) from prediction features.
+* **History-only flood features:** the flood-history inputs (previous 3, 5 and 10 years, acceleration) use only years before the one being predicted. The static district severity score (DFSI) is built from the whole 1967-2023 impact record (including fatalities and injuries), so it carries some information about outcomes; treat the scores accordingly.
 * **Live GFS Satellite Feeds:** Ingests live high-resolution **Open-Meteo GFS weather telemetry** with 7-day precipitation forecasts.
 * **Interactive Fullscreen Geospatial Command Center:**
   * Clean, dark-mode Leaflet choropleth tracking **726 districts** with zero visual clutter.

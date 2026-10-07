@@ -1,0 +1,17 @@
+{
+  "cv_r2_mean": 0.9994723643986931,
+  "cv_r2_std": 5.4545546772667826e-05,
+  "cv_mae_mean": 0.04682277458912637,
+  "top_features": {
+    "hydro_rain_stress": 0.8761893510818481,
+    "exposure_severity_index": 0.07273588329553604,
+    "rainfall_anomaly_pct": 0.018469898030161858,
+    "Population": 0.013371831737458706,
+    "dfsi_score": 0.006722761783748865,
+    "drainage_stress_ratio": 0.005665847100317478
+  },
+  "avg_predicted_probability_pct": 50.00000762939453,
+  "avg_predicted_flooded_area_pct": 2.9632623195648193,
+  "severity_index_min": 0.0,
+  "severity_index_max": 3.202821731567383
+}

@@ -1011,9 +1011,9 @@ function populateComboBenchmarkModal() {
     });
 }
 
-// Satellite (Sentinel-1) section: Before/After CLAHE, Before/After GAN, 10-fold CV.
-// Values come from image_benchmark_metrics.json; if it fails to load, the hardcoded fallback
-// numbers below are shown instead, so check the file loaded when presenting.
+// Satellite (Sentinel-1) tab: before/after CLAHE, before/after GAN, 10-fold CV and the per-fold table.
+// Every value comes from image_benchmark_metrics.json (written by ml/image_pipeline_india.py).
+// If that file is missing the tab says so; no placeholder numbers are shown.
 function populateSatelliteBenchmarkModal() {
     const satTbody = document.getElementById('satellite-benchmark-tbody');
     const kfoldTbody = document.getElementById('satellite-kfold-tbody');
@@ -1022,100 +1022,71 @@ function populateSatelliteBenchmarkModal() {
     satTbody.innerHTML = '';
     kfoldTbody.innerHTML = '';
 
-    const comparisons = imageBenchmarkData?.comparisons || null;
+    const comparisons = imageBenchmarkData?.comparisons;
+    if (!comparisons) {
+        satTbody.innerHTML = '<tr><td colspan="8" style="color:#94a3b8;">Satellite results are not available. Run ml/image_pipeline_india.py to create them.</td></tr>';
+        return;
+    }
 
-    const stages = comparisons ? [
-        { stage: '1. Raw SAR Input', condition: 'Before CLAHE', m: comparisons.clahe_ablation.before_clahe, color: '#94a3b8', isKfold: false },
-        { stage: '2. CLAHE Enhanced SAR', condition: 'After CLAHE', m: comparisons.clahe_ablation.after_clahe, color: '#fbbf24', isKfold: false },
-        { stage: '3. CLAHE + GAN Augmented', condition: 'After GAN (Train Only)', m: comparisons.gan_ablation.after_gan, color: '#ec4899', isKfold: false },
-        { stage: '4. 10-Fold CV Full Pipeline', condition: 'After K-Fold', m: comparisons.kfold_comparison.after_kfold_10fold_cv, color: '#38bdf8', isKfold: true }
-    ] : [
-        { stage: '1. Raw SAR Input', condition: 'Before CLAHE', acc: 78.33, rec: 71.2, prec: 69.8, f1: 0.704, iou: 62.1, auc: 0.812, color: '#94a3b8', isKfold: false },
-        { stage: '2. CLAHE Enhanced SAR', condition: 'After CLAHE', acc: 82.50, rec: 76.4, prec: 74.3, f1: 0.753, iou: 67.2, auc: 0.841, color: '#fbbf24', isKfold: false },
-        { stage: '3. CLAHE + GAN Augmented', condition: 'After GAN (Train Only)', acc: 85.83, rec: 81.6, prec: 77.9, f1: 0.797, iou: 71.4, auc: 0.869, color: '#ec4899', isKfold: false },
-        { stage: '4. 10-Fold CV Full Pipeline', condition: 'After K-Fold', acc: 84.50, rec: 80.2, prec: 76.5, f1: 0.782, iou: 69.8, auc: 0.856, color: '#38bdf8', isKfold: true }
+    const kcv = comparisons.kfold_comparison.after_kfold_10fold_cv;
+    const pctText = v => (v === null || v === undefined || isNaN(v)) ? 'N/A' : `${Number(v).toFixed(1)}%`;
+    const scoreText = v => (v === null || v === undefined || isNaN(v)) ? 'N/A' : Number(v).toFixed(3);
+    const signedPct = v => `${v >= 0 ? '+' : ''}${Number(v).toFixed(1)}%`;
+
+    // One row per processing step; the single-split steps and the 10-fold step use different field names
+    const single = m => ({ acc: m.accuracy, rec: m.recall, prec: m.precision, f1: m.f1_score, iou: m.iou, auc: m.roc_auc });
+    const stages = [
+        { stage: '1. Raw SAR Input', condition: 'Before CLAHE', v: single(comparisons.clahe_ablation.before_clahe), color: '#94a3b8' },
+        { stage: '2. CLAHE Enhanced SAR', condition: 'After CLAHE', v: single(comparisons.clahe_ablation.after_clahe), color: '#fbbf24' },
+        { stage: '3. CLAHE + GAN Augmented', condition: 'After GAN (Train Only)', v: single(comparisons.gan_ablation.after_gan), color: '#ec4899' },
+        { stage: '4. 10-Fold CV Full Pipeline', condition: 'After K-Fold', color: '#38bdf8', kfold: true,
+          v: { acc: kcv.mean_accuracy, rec: kcv.mean_recall, prec: kcv.mean_precision, f1: kcv.mean_f1, iou: kcv.mean_iou, auc: kcv.mean_roc_auc } }
     ];
 
     stages.forEach((s, i) => {
         const tr = document.createElement('tr');
         if (i === stages.length - 1) tr.className = 'champion';
-        let accStr, recStr, precStr, f1Str, iouStr, aucStr;
-        if (s.m && s.isKfold) {
-            accStr = `${(s.m.mean_accuracy||84.5).toFixed(1)}% <small style="color:#64748b">±${(s.m.std_accuracy||2.8).toFixed(1)}%</small>`;
-            recStr = `${(s.m.mean_recall||80.2).toFixed(1)}%`;
-            precStr = `${(s.m.mean_precision||76.5).toFixed(1)}%`;
-            f1Str = (s.m.mean_f1||0.782).toFixed(4);
-            iouStr = `${(s.m.mean_iou||69.8).toFixed(1)}%`;
-            aucStr = (s.m.mean_roc_auc||0.856).toFixed(4);
-        } else if (s.m) {
-            accStr = `${(s.m.accuracy||s.acc||0).toFixed(1)}%`;
-            recStr = `${(s.m.recall||s.rec||0).toFixed(1)}%`;
-            precStr = `${(s.m.precision||s.prec||0).toFixed(1)}%`;
-            f1Str = (s.m.f1_score||s.f1||0).toFixed(4);
-            iouStr = `${(s.m.iou||s.iou||0).toFixed(1)}%`;
-            aucStr = (s.m.roc_auc||s.auc||0).toFixed(4);
-        } else {
-            accStr = `${(s.acc||0).toFixed(1)}%`;
-            recStr = `${(s.rec||0).toFixed(1)}%`;
-            precStr = `${(s.prec||0).toFixed(1)}%`;
-            f1Str = (s.f1||0).toFixed(4);
-            iouStr = `${(s.iou||0).toFixed(1)}%`;
-            aucStr = (s.auc||0).toFixed(4);
-        }
+        const accStr = pctText(s.v.acc) + (s.kfold ? ` <small style="color:#64748b">±${pctText(kcv.std_accuracy)}</small>` : '');
         tr.innerHTML = `
             <td><strong style="color:${s.color}">${s.stage}</strong></td>
             <td><span style="color:${s.color}; font-size:10px;">${s.condition}</span></td>
             <td style="color:${s.color}; font-weight:700;">${accStr}</td>
-            <td style="color:#4ade80;">${recStr}</td>
-            <td>${precStr}</td>
-            <td>${f1Str}</td>
-            <td style="color:#a78bfa;">${iouStr}</td>
-            <td style="color:#38bdf8;">${aucStr}</td>
+            <td style="color:#4ade80;">${pctText(s.v.rec)}</td>
+            <td>${pctText(s.v.prec)}</td>
+            <td>${scoreText(s.v.f1)}</td>
+            <td style="color:#a78bfa;">${pctText(s.v.iou)}</td>
+            <td style="color:#38bdf8;">${scoreText(s.v.auc)}</td>
         `;
         satTbody.appendChild(tr);
     });
 
-    if (comparisons) {
-        // Fill the summary cards with the real values from the JSON
-        const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
-        const bc = comparisons.clahe_ablation;
-        const bg = comparisons.gan_ablation;
-        const bk = comparisons.kfold_comparison;
-        setEl('sat-before-clahe-acc', `${bc.before_clahe.accuracy.toFixed(1)}%`);
-        setEl('sat-after-clahe-acc', `${bc.after_clahe.accuracy.toFixed(1)}%`);
-        setEl('sat-clahe-gain', `+${bc.accuracy_gain_pct.toFixed(1)}% Acc`);
-        setEl('sat-before-gan-acc', `${bg.before_gan.accuracy.toFixed(1)}%`);
-        setEl('sat-after-gan-acc', `${bg.after_gan.accuracy.toFixed(1)}%`);
-        setEl('sat-gan-gain', `+${bg.accuracy_gain_pct.toFixed(1)}% Acc (Train Only)`);
-        setEl('sat-before-kfold-acc', `${bk.before_kfold_holdout.accuracy.toFixed(1)}%`);
-        setEl('sat-after-kfold-acc', `${bk.after_kfold_10fold_cv.mean_accuracy.toFixed(1)}% ±${bk.after_kfold_10fold_cv.std_accuracy.toFixed(1)}%`);
-    }
+    // Summary cards (gains can be negative, so the sign is shown honestly)
+    const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+    const bc = comparisons.clahe_ablation;
+    const bg = comparisons.gan_ablation;
+    const bk = comparisons.kfold_comparison;
+    setEl('sat-before-clahe-acc', pctText(bc.before_clahe.accuracy));
+    setEl('sat-after-clahe-acc', pctText(bc.after_clahe.accuracy));
+    setEl('sat-clahe-gain', `${signedPct(bc.accuracy_gain_pct)} accuracy`);
+    setEl('sat-before-gan-acc', pctText(bg.before_gan.accuracy));
+    setEl('sat-after-gan-acc', pctText(bg.after_gan.accuracy));
+    setEl('sat-gan-gain', `${signedPct(bg.accuracy_gain_pct)} accuracy (training data only)`);
+    setEl('sat-before-kfold-acc', pctText(bk.before_kfold_holdout.accuracy));
+    setEl('sat-after-kfold-acc', `${pctText(kcv.mean_accuracy)} ±${pctText(kcv.std_accuracy)}`);
 
-    const folds = imageBenchmarkData?.comparisons?.kfold_comparison?.after_kfold_10fold_cv?.folds || [
-        {fold:'Fold 1',accuracy:83.2,recall:79.5,precision:75.8,f1_score:0.7760,iou:68.1,roc_auc:0.8480,time_sec:42.3},
-        {fold:'Fold 2',accuracy:85.8,recall:81.2,precision:78.1,f1_score:0.7960,iou:70.8,roc_auc:0.8620,time_sec:40.1},
-        {fold:'Fold 3',accuracy:82.5,recall:79.8,precision:74.2,f1_score:0.7690,iou:67.4,roc_auc:0.8440,time_sec:43.7},
-        {fold:'Fold 4',accuracy:86.7,recall:82.4,precision:79.3,f1_score:0.8080,iou:72.3,roc_auc:0.8710,time_sec:41.2},
-        {fold:'Fold 5',accuracy:84.2,recall:80.1,precision:76.8,f1_score:0.7840,iou:69.5,roc_auc:0.8550,time_sec:44.0},
-        {fold:'Fold 6',accuracy:83.3,recall:78.9,precision:75.1,f1_score:0.7690,iou:67.9,roc_auc:0.8460,time_sec:42.6},
-        {fold:'Fold 7',accuracy:87.5,recall:83.7,precision:80.2,f1_score:0.8190,iou:74.1,roc_auc:0.8790,time_sec:40.8},
-        {fold:'Fold 8',accuracy:82.5,recall:79.0,precision:73.8,f1_score:0.7630,iou:66.8,roc_auc:0.8430,time_sec:44.5},
-        {fold:'Fold 9',accuracy:85.0,recall:80.8,precision:77.4,f1_score:0.7900,iou:70.2,roc_auc:0.8580,time_sec:41.9},
-        {fold:'Fold 10',accuracy:84.2,recall:80.3,precision:76.2,f1_score:0.7820,iou:69.2,roc_auc:0.8540,time_sec:43.1}
-    ];
-
-    folds.forEach((f, i) => {
+    // Per-fold table
+    (kcv.folds || []).forEach((f, i) => {
         const tr = document.createElement('tr');
         tr.style.background = i % 2 === 0 ? 'rgba(255,255,255,0.02)' : 'transparent';
         tr.innerHTML = `
             <td style="color:#38bdf8;font-weight:700;">${f.fold}</td>
-            <td style="color:#67e8f9;font-weight:600;">${(f.accuracy||0).toFixed(1)}%</td>
-            <td style="color:#4ade80;">${(f.recall||0).toFixed(1)}%</td>
-            <td>${(f.precision||0).toFixed(1)}%</td>
-            <td>${(f.f1_score||0).toFixed(4)}</td>
-            <td style="color:#a78bfa;">${(f.iou||0).toFixed(1)}%</td>
-            <td>${(f.roc_auc||0).toFixed(4)}</td>
-            <td style="color:#64748b;font-size:10px;">${(f.time_sec||0).toFixed(1)}s</td>
+            <td style="color:#67e8f9;font-weight:600;">${pctText(f.accuracy)}</td>
+            <td style="color:#4ade80;">${pctText(f.recall)}</td>
+            <td>${pctText(f.precision)}</td>
+            <td>${scoreText(f.f1_score)}</td>
+            <td style="color:#a78bfa;">${pctText(f.iou)}</td>
+            <td>${scoreText(f.roc_auc)}</td>
+            <td style="color:#64748b;font-size:10px;">${f.time_sec == null ? 'N/A' : Number(f.time_sec).toFixed(1) + 's'}</td>
         `;
         kfoldTbody.appendChild(tr);
     });

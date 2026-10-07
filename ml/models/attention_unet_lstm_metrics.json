@@ -2,14 +2,14 @@
   "model_name": "Attention U-Net + LSTM",
   "architecture": "AttentionUNetLSTM",
   "parameters": 26196,
-  "epochs_trained": 2,
+  "epochs_trained": 1,
   "optimal_threshold": 0.55,
-  "recall": 82.08,
-  "precision": 52.56,
-  "f1_score": 0.6408,
-  "roc_auc": 0.8017,
-  "pr_auc": 0.6713,
-  "accuracy": 69.09,
-  "training_time_sec": 29.6,
-  "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\attention_unet_lstm.pt"
+  "recall": 83.17,
+  "precision": 52.31,
+  "f1_score": 0.6423,
+  "roc_auc": 0.7995,
+  "pr_auc": 0.6475,
+  "accuracy": 68.88,
+  "training_time_sec": 8.25,
+  "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\attention_unet_lstm.pt"
 }

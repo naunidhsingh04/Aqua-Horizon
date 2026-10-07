@@ -4,12 +4,12 @@
   "parameters": 81121,
   "epochs_trained": 1,
   "optimal_threshold": 0.5,
-  "recall": 75.33,
-  "precision": 54.84,
-  "f1_score": 0.6347,
-  "roc_auc": 0.7985,
-  "pr_auc": 0.6638,
-  "accuracy": 70.87,
-  "training_time_sec": 5.65,
-  "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\resnet_bilstm.pt"
+  "recall": 79.1,
+  "precision": 52.83,
+  "f1_score": 0.6335,
+  "roc_auc": 0.7979,
+  "pr_auc": 0.6689,
+  "accuracy": 69.25,
+  "training_time_sec": 4.71,
+  "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\resnet_bilstm.pt"
 }

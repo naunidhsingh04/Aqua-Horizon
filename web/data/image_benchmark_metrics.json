@@ -5,7 +5,7 @@
   "data_source": "Real Sen1Floods11 hand-labeled India subset (68 scenes, gs://sen1floods11)",
   "total_chips": 1200,
   "patch_size": "64x64 dual-pol",
-  "total_runtime_sec": 549.04,
+  "total_runtime_sec": 524.07,
   "leakage_checks": {
     "target_leakage": "Passed (Zero feature-target contamination)",
     "duplicate_patches": "Passed (Zero duplicates across splits)",
@@ -87,7 +87,7 @@
             "f1_score": 0.725,
             "iou": 56.86,
             "roc_auc": 0.9004,
-            "time_sec": 40.31
+            "time_sec": 41.56
           },
           {
             "fold": "Fold 2",
@@ -97,7 +97,7 @@
             "f1_score": 0.6866,
             "iou": 52.27,
             "roc_auc": 0.8896,
-            "time_sec": 45.06
+            "time_sec": 43.7
           },
           {
             "fold": "Fold 3",
@@ -107,7 +107,7 @@
             "f1_score": 0.623,
             "iou": 45.24,
             "roc_auc": 0.8848,
-            "time_sec": 44.79
+            "time_sec": 45.84
           },
           {
             "fold": "Fold 4",
@@ -117,7 +117,7 @@
             "f1_score": 0.7385,
             "iou": 58.54,
             "roc_auc": 0.915,
-            "time_sec": 45.65
+            "time_sec": 44.88
           },
           {
             "fold": "Fold 5",
@@ -127,7 +127,7 @@
             "f1_score": 0.75,
             "iou": 60.0,
             "roc_auc": 0.8758,
-            "time_sec": 44.83
+            "time_sec": 40.54
           },
           {
             "fold": "Fold 6",
@@ -137,7 +137,7 @@
             "f1_score": 0.7812,
             "iou": 64.1,
             "roc_auc": 0.905,
-            "time_sec": 49.7
+            "time_sec": 41.69
           },
           {
             "fold": "Fold 7",
@@ -147,7 +147,7 @@
             "f1_score": 0.6562,
             "iou": 48.84,
             "roc_auc": 0.8408,
-            "time_sec": 48.19
+            "time_sec": 43.14
           },
           {
             "fold": "Fold 8",
@@ -157,7 +157,7 @@
             "f1_score": 0.7826,
             "iou": 64.29,
             "roc_auc": 0.9024,
-            "time_sec": 45.07
+            "time_sec": 42.86
           },
           {
             "fold": "Fold 9",
@@ -167,7 +167,7 @@
             "f1_score": 0.5714,
             "iou": 40.0,
             "roc_auc": 0.768,
-            "time_sec": 44.75
+            "time_sec": 44.7
           },
           {
             "fold": "Fold 10",
@@ -177,7 +177,7 @@
             "f1_score": 0.6667,
             "iou": 50.0,
             "roc_auc": 0.853,
-            "time_sec": 43.75
+            "time_sec": 42.12
           }
         ]
       }
