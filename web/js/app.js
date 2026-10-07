@@ -1,4 +1,6 @@
 // AQUA HORIZON - AI-Driven 7-Day Inundation Forecasting & Disaster Intelligence
+// ---- Global state shared by all functions below ----
+// map/layers = Leaflet map objects; webData = flood_intelligence_data.json (per-district intel)
 let map;
 let geojsonLayer;
 let allFeatures = [];
@@ -10,10 +12,74 @@ let currentDayIndex = 0; // 0 = Today, 1 = Tomorrow, ..., 6 = Day 7
 let darkBaseLayer;
 let satelliteLayer;
 let isSatellite = false;
-let currentModel = 'cnn_transformer';
+// currentModel = which model's probabilities colour the map (key into model_daily_probs)
+let currentModel = 'combo_top3';
 let hybridBenchmarksData = null;
 let kfoldHybridBenchmarksData = null;
+let comboBenchmarksData = null;  // Top-3 model combinations (combo_hybrid_benchmarks.json)
 let imageBenchmarkData = null;  // Sentinel-1 India SAR image pipeline benchmarks
+
+// Startup order: build map -> load JSON files -> wire buttons -> intro fly-in animation
+// ---- Model registry: every selectable model (5 single + 4 combined) ----
+// Names, badges and descriptions live here; the numbers are read from the benchmark JSON files.
+const MODEL_META = {
+    cnn_transformer:     { arch: 'CNNTransformer',    name: 'CNN + Transformer',        group: 'single', pill: 'Self-Attention',   pillClass: 'pill-attention', desc: '1D-CNN feature projection with a multi-head self-attention encoder.' },
+    unet_convlstm:       { arch: 'UNetConvLSTM',      name: 'U-Net + ConvLSTM',         group: 'single', pill: 'Spatial-Temporal', pillClass: 'pill-spatial',   desc: 'U-Net encoder-decoder with a ConvLSTM memory cell for spatial flood spread.' },
+    cnn_lstm:            { arch: 'CNNLSTM',           name: 'CNN + LSTM',               group: 'single', pill: 'Sequence',         pillClass: 'pill-temporal',  desc: '1D convolution followed by a 2-layer LSTM over the 5-year window.' },
+    resnet_bilstm:       { arch: 'ResNetBiLSTM',      name: 'ResNet + BiLSTM',          group: 'single', pill: 'Residual',         pillClass: 'pill-temporal',  desc: 'Residual skip connections with a bidirectional LSTM.' },
+    attention_unet_lstm: { arch: 'AttentionUNetLSTM', name: 'Attention U-Net + LSTM',   group: 'single', pill: 'Attention Gate',   pillClass: 'pill-attention', desc: 'Attention-gated U-Net features feeding an LSTM.' },
+    combo_resnet_cnnlstm:          { name: 'ResNet+BiLSTM + CNN+LSTM',                          group: 'combo', members: ['resnet_bilstm', 'cnn_lstm'],                    pill: '2 models', pillClass: 'pill-combo', desc: 'Averages the flood probabilities of ResNet + BiLSTM and CNN + LSTM.' },
+    combo_cnnlstm_cnntransformer:  { name: 'CNN+LSTM + CNN+Transformer',                        group: 'combo', members: ['cnn_lstm', 'cnn_transformer'],                  pill: '2 models', pillClass: 'pill-combo', desc: 'Averages the flood probabilities of CNN + LSTM and CNN + Transformer.' },
+    combo_resnet_cnntransformer:   { name: 'ResNet+BiLSTM + CNN+Transformer',                   group: 'combo', members: ['resnet_bilstm', 'cnn_transformer'],             pill: '2 models', pillClass: 'pill-combo', desc: 'Averages the flood probabilities of ResNet + BiLSTM and CNN + Transformer.' },
+    combo_top3:                    { name: 'ResNet+BiLSTM + CNN+LSTM + CNN+Transformer', label: 'All 3 Top Models', group: 'combo', members: ['resnet_bilstm', 'cnn_lstm', 'cnn_transformer'], pill: '3 models', pillClass: 'pill-combo', desc: 'Averages the flood probabilities of the three best single models.' }
+};
+const modelKeys = group => Object.keys(MODEL_META).filter(k => MODEL_META[k].group === group);
+
+// Percent text with one decimal, e.g. 71.5% (no arrows or before/after pairs)
+const fmtPct = v => (v === null || v === undefined || isNaN(v)) ? 'N/A' : `${Number(v).toFixed(1)}%`;
+const fmtScore = v => (v === null || v === undefined || isNaN(v)) ? 'N/A' : Number(v).toFixed(3);
+
+// All numbers for one model, in one shape. Single models: 80:20 accuracy from hybrid_benchmarks.json and
+// 10-fold results from kfold_hybrid_benchmarks.json. Combined models: combo_hybrid_benchmarks.json.
+function getModelStats(key) {
+    const meta = MODEL_META[key];
+    if (!meta) return null;
+    if (meta.group === 'combo') {
+        const c = comboBenchmarksData?.models?.find(m => m.key === key);
+        if (!c) return { name: meta.name, params: null };
+        const params = meta.members.reduce((sum, k) => sum + (getModelStats(k)?.params || 0), 0);
+        return {
+            name: meta.name, params: params || null,
+            holdoutAcc: c.holdout.accuracy, kAcc: c.kfold.mean_accuracy, kStd: c.kfold.std_accuracy,
+            recall: c.kfold.mean_recall, precision: c.kfold.mean_precision,
+            f1: c.kfold.mean_f1_score, auc: c.kfold.mean_roc_auc
+        };
+    }
+    const h = hybridBenchmarksData?.models?.find(m => m.architecture === meta.arch);
+    const k = kfoldHybridBenchmarksData?.models?.find(m => m.architecture === meta.arch);
+    return {
+        name: meta.name, params: h?.parameters ?? null,
+        holdoutAcc: h?.accuracy, kAcc: k?.mean_accuracy, kStd: k?.std_accuracy,
+        recall: k?.mean_recall, precision: k?.mean_precision, f1: k?.mean_f1, auc: k?.mean_roc_auc,
+        folds: k?.folds
+    };
+}
+
+// Shows the active model's name (and accuracy) in the right panel and the bottom dock
+function updateActiveModelLabels() {
+    const st = getModelStats(currentModel);
+    const name = MODEL_META[currentModel]?.label || st?.name || currentModel;
+    const hud = document.getElementById('hud-active-model');
+    if (hud) {
+        hud.textContent = `Active: ${name}` + (st?.kAcc != null ? ` | ${fmtPct(st.kAcc)} accuracy` : '');
+        hud.title = hud.textContent;
+    }
+    const dock = document.getElementById('dock-active-model');
+    if (dock) {
+        dock.textContent = `Model: ${name}`;
+        dock.title = `Model currently colouring the map: ${name}`;
+    }
+}
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
@@ -85,13 +151,16 @@ function startCinematicDescent() {
 // 3. Load Datasets (Enriched GeoJSON, Intelligence, Hybrid Benchmarks & Satellite)
 async function loadData() {
     try {
+        // ?v=<timestamp> on each URL stops the browser using an old cached copy of the JSON.
+        // All data is read from files saved earlier by the Python scripts; nothing is fetched live here.
         const t = Date.now();
-        const [geoRes, dataRes, hybridRes, kfoldRes, satRes] = await Promise.all([
+        const [geoRes, dataRes, hybridRes, kfoldRes, satRes, comboRes] = await Promise.all([
             fetch(`data/india_districts.geojson?v=${t}`),
             fetch(`data/flood_intelligence_data.json?v=${t}`),
             fetch(`data/hybrid_benchmarks.json?v=${t}`).catch(() => null),
             fetch(`data/kfold_hybrid_benchmarks.json?v=${t}`).catch(() => null),
-            fetch(`data/image_benchmark_metrics.json?v=${t}`).catch(() => null)
+            fetch(`data/image_benchmark_metrics.json?v=${t}`).catch(() => null),
+            fetch(`data/combo_hybrid_benchmarks.json?v=${t}`).catch(() => null)
         ]);
 
         const geoData = await geoRes.json();
@@ -102,6 +171,9 @@ async function loadData() {
         if (kfoldRes && kfoldRes.ok) {
             kfoldHybridBenchmarksData = await kfoldRes.json();
         }
+        if (comboRes && comboRes.ok) {
+            comboBenchmarksData = await comboRes.json();
+        }
         if (satRes && satRes.ok) {
             imageBenchmarkData = await satRes.json();
         }
@@ -110,9 +182,15 @@ async function loadData() {
         populateBenchmarkModal();
         populateHybridBenchmarkModal();
         populateKfoldHybridBenchmarkModal();
+        populateComboBenchmarkModal();
         populateSatelliteBenchmarkModal();
         populateTicker();
         setupDayChips();
+
+        // Make the dropdown and labels match the default model
+        const modelSel = document.getElementById('model-architecture-select');
+        if (modelSel) modelSel.value = currentModel;
+        updateActiveModelLabels();
 
     } catch (err) {
         console.error("Error loading application data:", err);
@@ -120,6 +198,7 @@ async function loadData() {
 }
 
 // 4. Color Scale & Probability Normalizer (Guarantees strictly 0% to 100%)
+// Turns any input into a number between 0 and 1 (accepts 0-100 too); bad input -> 0.15
 function normalizeProb(rawProb) {
     if (rawProb === undefined || rawProb === null || isNaN(rawProb)) return 0.15;
     let p = parseFloat(rawProb);
@@ -127,6 +206,8 @@ function normalizeProb(rawProb) {
     return Math.max(0.0, Math.min(1.0, p));
 }
 
+// Looks up the saved flood probability for one district, one day, one model.
+// Falls back to the default daily_probs, then to 0.15 if nothing is stored.
 function getModelAdjustedProb(input, dayIdx, modelKey) {
     const key = modelKey || currentModel;
     const dIdx = (dayIdx !== undefined && typeof dayIdx === 'number') ? dayIdx : currentDayIndex;
@@ -146,6 +227,7 @@ function getModelAdjustedProb(input, dayIdx, modelKey) {
     return normalizeProb(input);
 }
 
+// Map colours by probability: >=70% red, >=45% orange, >=25% yellow, else green
 function getRiskColor(prob) {
     const p = normalizeProb(prob);
     if (p >= 0.70) return '#ef4444'; // Critical Red
@@ -154,6 +236,7 @@ function getRiskColor(prob) {
     return '#10b981';                   // Low Green
 }
 
+// Same thresholds as getRiskColor, but returns the text label shown in the UI
 function getRiskCategory(prob) {
     const p = normalizeProb(prob);
     if (p >= 0.70) return { label: 'Severe Alert', class: 'positive' };
@@ -162,6 +245,7 @@ function getRiskCategory(prob) {
     return { label: 'Low Risk', class: 'negative' };
 }
 
+// Builds the hover tooltip: district, state, risk % and that day's forecast rain (mm)
 function getTooltipHTML(props, dayIdx) {
     const dailyRains = props.daily_rains_mm || [10.0];
     const prob = getModelAdjustedProb(props, dayIdx, currentModel);
@@ -183,6 +267,7 @@ function getTooltipHTML(props, dayIdx) {
 }
 
 // 5. Render India Districts Choropleth
+// Draws every district polygon, coloured by risk; hover updates the panel, click pins a district
 function renderChoropleth(geoData) {
     geojsonLayer = L.geoJSON(geoData, {
         style: feature => {
@@ -226,6 +311,7 @@ function renderChoropleth(geoData) {
     }).addTo(map);
 }
 
+// Hover effect: thicker cyan outline (skipped for the pinned district)
 function highlightDistrict(e, feature) {
     const layer = e.target;
     if (layer !== pinnedLayer) {
@@ -252,6 +338,7 @@ function resetHighlight(e) {
     }
 }
 
+// Releases the pinned district so the panel follows the mouse again
 function unpinDistrict() {
     pinnedDistrict = null;
     if (pinnedLayer && geojsonLayer) {
@@ -262,6 +349,7 @@ function unpinDistrict() {
     if (pinBadge) pinBadge.style.display = 'none';
 }
 
+// Click handler: pin the district (click again to unpin), zoom to it and show its details
 function selectDistrict(feature, layer) {
     const props = feature.properties || {};
 
@@ -300,6 +388,7 @@ function selectDistrict(feature, layer) {
     updateDistrictHUD(props);
 }
 
+// Finds a district by (part of) its name and selects it, e.g. from the hotspot shortcut buttons
 function selectHotspot(cleanNameSnippet) {
     const target = allFeatures.find(f => {
         const p = f.feature.properties || {};
@@ -325,6 +414,7 @@ function updateDistrictHUD(props) {
     const pastFloodsEl = document.getElementById('hud-past-floods');
     const quickReasonEl = document.getElementById('hud-quick-reason');
 
+    // Read this district's rain (mm) and risk probability for the selected day and model
     const dailyProbs = props.daily_probs || [0.2];
     const dailyRains = props.daily_rains_mm || [12.0];
     const prob = getModelAdjustedProb(props, currentDayIndex, currentModel);
@@ -351,38 +441,54 @@ function updateDistrictHUD(props) {
     dfsiEl.textContent = `Rank #${props.dfsi_rank || Math.round(totalRankedDistricts / 3)} of ${totalRankedDistricts}`;
     pastFloodsEl.textContent = `${props.past_5yr_floods || 0} in 5 Years`;
 
+    // Show every model's probability for the same day side by side (click one to switch the map to it)
     // Populate Multi-Model Comparison Strip
     const compGrid = document.getElementById('hud-comparison-grid');
     if (compGrid && props.model_daily_probs) {
         compGrid.innerHTML = '';
-        const modelDisplayNames = [
-            { key: 'cnn_transformer', label: 'CNN+Transformer' },
-            { key: 'unet_convlstm', label: 'U-Net+ConvLSTM' },
-            { key: 'cnn_lstm', label: 'CNN+LSTM' },
-            { key: 'resnet_bilstm', label: 'ResNet+BiLSTM' },
-            { key: 'attention_unet_lstm', label: 'Attention U-Net' },
-            { key: 'ensemble', label: '10-Fold Ensemble' }
+        // Two columns: single models on the left, combined models on the right
+        const columns = [
+            { title: 'Single models', models: [
+                { key: 'cnn_transformer', label: 'CNN+Transformer' },
+                { key: 'unet_convlstm', label: 'U-Net+ConvLSTM' },
+                { key: 'cnn_lstm', label: 'CNN+LSTM' },
+                { key: 'resnet_bilstm', label: 'ResNet+BiLSTM' },
+                { key: 'attention_unet_lstm', label: 'Attention U-Net' }
+            ] },
+            { title: 'Combined models', models: [
+                { key: 'combo_top3', label: 'All 3 Top' },
+                { key: 'combo_resnet_cnnlstm', label: 'ResNet+LSTM' },
+                { key: 'combo_cnnlstm_cnntransformer', label: 'LSTM+Transf.' },
+                { key: 'combo_resnet_cnntransformer', label: 'ResNet+Transf.' }
+            ] }
         ];
 
-        modelDisplayNames.forEach(m => {
-            const arr = props.model_daily_probs[m.key] || [];
-            const val = arr[currentDayIndex] !== undefined ? arr[currentDayIndex] : prob;
-            const pct = (val * 100).toFixed(1);
-            const col = getRiskColor(val);
-            const isAct = m.key === currentModel;
+        columns.forEach(colDef => {
+            const colEl = document.createElement('div');
+            colEl.className = 'comp-col';
+            colEl.innerHTML = `<div class="comp-col-title">${colDef.title}</div>`;
 
-            const div = document.createElement('div');
-            div.className = `model-chip-item ${isAct ? 'active' : ''}`;
-            div.title = `Switch active map view to ${m.label}`;
-            div.innerHTML = `
-                <span class="chip-name">${m.label}</span>
-                <span class="chip-val" style="color: ${col};">${pct}%</span>
-            `;
-            div.addEventListener('click', (e) => {
-                e.stopPropagation();
-                selectModel(m.key);
+            colDef.models.forEach(m => {
+                const arr = props.model_daily_probs[m.key] || [];
+                const val = arr[currentDayIndex] !== undefined ? arr[currentDayIndex] : prob;
+                const pct = (val * 100).toFixed(1);
+                const col = getRiskColor(val);
+                const isAct = m.key === currentModel;
+
+                const div = document.createElement('div');
+                div.className = `model-chip-item ${isAct ? 'active' : ''}`;
+                div.title = `Switch the map to ${MODEL_META[m.key]?.name || m.label}`;
+                div.innerHTML = `
+                    <span class="chip-name">${m.label}</span>
+                    <span class="chip-val" style="color: ${col};">${pct}%</span>
+                `;
+                div.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    selectModel(m.key);
+                });
+                colEl.appendChild(div);
             });
-            compGrid.appendChild(div);
+            compGrid.appendChild(colEl);
         });
     }
 
@@ -393,6 +499,8 @@ function updateDistrictHUD(props) {
     }
 }
 
+// Plain-language reasons for the risk (max 3): heavy rain (>=15 mm) or moderate (>=8 mm),
+// saturated soil (>=75%), top-100 vulnerability rank, or >=2 floods in the last 5 years
 function generateLiveExplainability(props, prob, rainMm) {
     const reasons = [];
     if (rainMm >= 15.0) {
@@ -455,6 +563,7 @@ function setupDayChips() {
     });
 }
 
+// Re-colours all districts and tooltips when the day or model changes (keeps the pinned style)
 function recolorDistrictsForDay(dayIdx) {
     if (!geojsonLayer) return;
 
@@ -601,6 +710,7 @@ function setupEventListeners() {
 }
 
 // 9. Auto-Drafted Disaster Advisory Generator (Clean, Intuitive, Citizen-Ready)
+// (fills the advisory popup: risk badge, 4 metrics and a ready-to-send SMS text for the selected district)
 function generateEmergencyAdvisory() {
     let dist = currentDistrict;
     if (!dist && allFeatures.length > 0) {
@@ -638,6 +748,13 @@ function generateEmergencyAdvisory() {
     if (soilEl) soilEl.textContent = `${dist.soil_moisture_pct || 65}%`;
     if (windowEl) windowEl.textContent = dateLabel;
 
+    // Which model produced this prediction
+    const modelLineEl = document.getElementById('adv-model-line');
+    if (modelLineEl) {
+        const st = getModelStats(currentModel);
+        modelLineEl.textContent = `Prediction by: ${st?.name || currentModel}` + (st?.kAcc != null ? ` (10-fold accuracy ${fmtPct(st.kAcc)})` : '');
+    }
+
     // Ready-to-Broadcast Citizen Alert (SMS / WhatsApp)
     const citizenMsg = `🚨 AQUA HORIZON FLOOD ALERT: ${dist.name.toUpperCase()} (${dist.st_nm || 'INDIA'})
 ⚠️ Threat Level: ${risk.label} (${probPct}% Risk)
@@ -659,6 +776,8 @@ function populateTicker() {
     marquee.innerHTML = webData.metadata.ticker_alerts.map(t => `<span class="ticker-item">${t}</span>`).join(' &nbsp;&bull;&nbsp; ');
 }
 
+// Table of the XGBoost resampling strategies: 80:20 holdout accuracy vs 10-fold CV accuracy (+/- std).
+// Numbers come from benchmark_metrics.json; the best 10-fold accuracy row is highlighted.
 function populateBenchmarkModal() {
     if (!webData?.metadata?.benchmarks) return;
     const benchmarks = webData.metadata.benchmarks;
@@ -692,32 +811,28 @@ function populateBenchmarkModal() {
     }
 }
 
-// 11. 5 Hybrid Deep Learning Benchmarks & Dynamic Architecture Selector
+// 11. Model Selector
+// Switches the active model: updates the map colours, the panel, the labels, the tables and a toast message.
 window.selectModel = function(modelKey) {
     currentModel = modelKey;
     const modelSelect = document.getElementById('model-architecture-select');
     if (modelSelect) modelSelect.value = modelKey;
 
-    const descriptions = {
-        'cnn_transformer': 'CNN + Transformer (10-Fold Self-Attention | 77.1% Recall | ROC-AUC: 0.796)',
-        'unet_convlstm': 'U-Net + ConvLSTM (10-Fold Spatial-Temporal | 77.2% Recall | ROC-AUC: 0.795)',
-        'cnn_lstm': 'CNN + LSTM (10-Fold Temporal Sequence | 74.8% Recall | ROC-AUC: 0.798)',
-        'resnet_bilstm': 'ResNet + BiLSTM (10-Fold Deep Residual | 74.0% Recall | ROC-AUC: 0.803)',
-        'attention_unet_lstm': 'Attention U-Net + LSTM (10-Fold Additive Gate | 76.3% Recall | ROC-AUC: 0.788)',
-        'ensemble': '10-Fold Grand Ensemble (Multi-Model Mean of All 5 Hybrid DL Architectures)'
-    };
-
-    showToast(`⚡ Active Model: ${descriptions[modelKey] || modelKey}`);
+    const st = getModelStats(modelKey);
+    const label = st
+        ? `${st.name} (10-Fold Accuracy ${fmtPct(st.kAcc)} | Recall ${fmtPct(st.recall)} | ROC-AUC ${fmtScore(st.auc)})`
+        : modelKey;
+    showToast(`⚡ Active Model: ${label}`);
     recolorDistrictsForDay(currentDayIndex);
     if (currentDistrict) updateDistrictHUD(currentDistrict);
+    updateActiveModelLabels();
 
-    // Update active highlight in hybrid benchmark table
+    // Highlight the selected model in every model table and card (and only that one)
     document.querySelectorAll('.hybrid-row').forEach(row => {
-        if (row.getAttribute('data-model') === modelKey) {
-            row.classList.add('champion');
-        } else {
-            row.classList.remove('champion');
-        }
+        row.classList.toggle('champion', row.getAttribute('data-model') === modelKey);
+    });
+    document.querySelectorAll('.arch-card').forEach(card => {
+        card.classList.toggle('selected', card.getAttribute('data-model') === modelKey);
     });
 };
 
@@ -734,283 +849,122 @@ function showToast(message) {
     }
 }
 
+// AI Models tab: one table with all 9 models (5 single, then 4 combined) and one card per model.
+// Every value is a plain percentage (e.g. 71.5%). Numbers come from the three benchmark JSON files.
 function populateHybridBenchmarkModal() {
     const tbody = document.getElementById('hybrid-benchmark-tbody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
+    if (tbody) {
+        tbody.innerHTML = '';
 
-    const models = hybridBenchmarksData?.models || [
-        {
-            model_name: "Attention U-Net + LSTM",
-            architecture: "AttentionUNetLSTM",
-            parameters: 26196,
-            recall: 82.08,
-            precision: 52.56,
-            f1_score: 0.6408,
-            roc_auc: 0.8017,
-            key: "attention_unet_lstm"
-        },
-        {
-            model_name: "U-Net + ConvLSTM",
-            architecture: "UNetConvLSTM",
-            parameters: 85729,
-            recall: 81.86,
-            precision: 52.28,
-            f1_score: 0.6381,
-            roc_auc: 0.7996,
-            key: "unet_convlstm"
-        },
-        {
-            model_name: "CNN + Transformer",
-            architecture: "CNNTransformer",
-            parameters: 70849,
-            recall: 81.15,
-            precision: 52.39,
-            f1_score: 0.6367,
-            roc_auc: 0.7946,
-            key: "cnn_transformer"
-        },
-        {
-            model_name: "CNN + LSTM",
-            architecture: "CNNLSTM",
-            parameters: 67889,
-            recall: 80.63,
-            precision: 53.20,
-            f1_score: 0.6410,
-            roc_auc: 0.8058,
-            key: "cnn_lstm"
-        },
-        {
-            model_name: "ResNet + BiLSTM",
-            architecture: "ResNetBiLSTM",
-            parameters: 81121,
-            recall: 75.33,
-            precision: 54.84,
-            f1_score: 0.6347,
-            roc_auc: 0.7985,
-            key: "resnet_bilstm"
-        }
-    ];
+        const addGroup = label => {
+            const tr = document.createElement('tr');
+            tr.className = 'group-row';
+            tr.innerHTML = `<td colspan="9">${label}</td>`;
+            tbody.appendChild(tr);
+        };
 
-    // Before K-Fold (80:20 holdout) values per model
-    const beforeKfoldMap = {
-        'AttentionUNetLSTM':  { accuracy: 69.09, recall: 82.08, precision: 52.56 },
-        'UNetConvLSTM':       { accuracy: 68.80, recall: 81.86, precision: 52.28 },
-        'CNNTransformer':     { accuracy: 68.89, recall: 81.15, precision: 52.39 },
-        'CNNLSTM':            { accuracy: 69.67, recall: 80.63, precision: 53.20 },
-        'ResNetBiLSTM':       { accuracy: 70.87, recall: 75.33, precision: 54.84 }
-    };
+        const addRow = key => {
+            const meta = MODEL_META[key];
+            const st = getModelStats(key);
+            const tr = document.createElement('tr');
+            tr.className = 'hybrid-row' + (key === currentModel ? ' champion' : '');
+            tr.setAttribute('data-model', key);
+            const size = st.params ? st.params.toLocaleString() + (meta.group === 'combo' ? ' (total)' : '') : 'N/A';
+            tr.innerHTML = `
+                <td><strong>${st.name}</strong><span class="arch-pill ${meta.pillClass}">${meta.pill}</span></td>
+                <td>${size}</td>
+                <td style="color: #94a3b8; font-weight: 600;">${fmtPct(st.holdoutAcc)}</td>
+                <td style="color: #67e8f9; font-weight: 700;">${fmtPct(st.kAcc)} <small style="color:#64748b;">±${fmtPct(st.kStd)}</small></td>
+                <td style="color: #4ade80;">${fmtPct(st.recall)}</td>
+                <td>${fmtPct(st.precision)}</td>
+                <td>${fmtScore(st.f1)}</td>
+                <td style="color: #38bdf8; font-weight: 700;">${fmtScore(st.auc)}</td>
+                <td><button class="nav-btn" style="padding: 3px 8px; font-size: 10px;" onclick="selectModel('${key}')">Use</button></td>
+            `;
+            tbody.appendChild(tr);
+        };
 
-    // After K-Fold (10-Fold CV) values per model
-    const afterKfoldMap = {
-        'AttentionUNetLSTM':  { accuracy: 69.32, stdAcc: 1.55, recall: 76.30, precision: 47.00 },
-        'UNetConvLSTM':       { accuracy: 68.95, stdAcc: 1.62, recall: 77.23, precision: 47.60 },
-        'CNNTransformer':     { accuracy: 69.48, stdAcc: 1.18, recall: 77.10, precision: 48.00 },
-        'CNNLSTM':            { accuracy: 70.15, stdAcc: 1.35, recall: 74.82, precision: 49.74 },
-        'ResNetBiLSTM':       { accuracy: 71.24, stdAcc: 1.42, recall: 73.97, precision: 50.10 }
-    };
+        addGroup('Single models');
+        modelKeys('single').forEach(addRow);
+        addGroup('Combined models (average of the top 3 single models)');
+        modelKeys('combo').forEach(addRow);
+    }
 
-    models.forEach(m => {
-        let key = m.key;
-        if (!key) {
-            if (m.architecture === 'UNetConvLSTM') key = 'unet_convlstm';
-            else if (m.architecture === 'CNNLSTM') key = 'cnn_lstm';
-            else if (m.architecture === 'CNNTransformer') key = 'cnn_transformer';
-            else if (m.architecture === 'ResNetBiLSTM') key = 'resnet_bilstm';
-            else if (m.architecture === 'AttentionUNetLSTM') key = 'attention_unet_lstm';
-        }
-
-        let badge = 'Sequence';
-        let badgeClass = 'pill-temporal';
-        if (m.model_name.includes('ConvLSTM')) {
-            badge = 'Spatial-Temporal';
-            badgeClass = 'pill-spatial';
-        } else if (m.model_name.includes('Transformer')) {
-            badge = 'Self-Attention';
-            badgeClass = 'pill-attention';
-        } else if (m.model_name.includes('Attention U-Net')) {
-            badge = 'Attention Gate';
-            badgeClass = 'pill-attention';
-        } else if (m.model_name.includes('ResNet')) {
-            badge = 'Residual';
-            badgeClass = 'pill-temporal';
-        }
-
-        const bk = beforeKfoldMap[m.architecture] || { accuracy: m.accuracy || 69.1, recall: m.recall, precision: m.precision };
-        const ak = afterKfoldMap[m.architecture] || { accuracy: 69.5, stdAcc: 1.4, recall: m.recall - 4, precision: m.precision };
-
-        const tr = document.createElement('tr');
-        tr.className = `hybrid-row ${key === currentModel ? 'champion' : ''}`;
-        tr.setAttribute('data-model', key);
-        tr.innerHTML = `
-            <td>
-                <strong>${m.model_name}</strong>
-                <span class="arch-pill ${badgeClass}">${badge}</span>
-            </td>
-            <td>${m.parameters ? m.parameters.toLocaleString() : 'N/A'}</td>
-            <td style="color: #94a3b8; font-weight: 600;">${bk.accuracy.toFixed(1)}%</td>
-            <td style="color: #67e8f9; font-weight: 700;">${ak.accuracy.toFixed(1)}% <small style="color:#64748b;">±${ak.stdAcc.toFixed(1)}%</small></td>
-            <td style="color: #fbbf24;">${bk.recall.toFixed(1)}% → <strong style="color:#4ade80">${ak.recall.toFixed(1)}%</strong></td>
-            <td>${bk.precision.toFixed(1)}% → ${ak.precision.toFixed(1)}%</td>
-            <td>${m.f1_score.toFixed(3)}</td>
-            <td style="color: #38bdf8; font-weight: 700;">${m.roc_auc.toFixed(3)}</td>
-            <td>
-                <button class="nav-btn" style="padding: 3px 8px; font-size: 10px;" onclick="selectModel('${key}')">
-                    Activate
-                </button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
+    // One card per model: name, badge, one-line description, key metrics
+    const grid = document.getElementById('arch-grid');
+    if (grid) {
+        grid.innerHTML = '';
+        Object.keys(MODEL_META).forEach(key => {
+            const meta = MODEL_META[key];
+            const st = getModelStats(key);
+            const card = document.createElement('div');
+            card.className = 'arch-card' + (key === currentModel ? ' selected' : '');
+            card.setAttribute('data-model', key);
+            card.addEventListener('click', () => selectModel(key));
+            card.innerHTML = `
+                <div class="arch-card-title">
+                    <span>${st.name}</span>
+                    <span class="arch-pill ${meta.pillClass}">${meta.pill}</span>
+                </div>
+                <div class="arch-card-desc">${meta.desc}</div>
+                <div class="arch-card-metrics">
+                    <span>Accuracy: ${fmtPct(st.kAcc)}</span>
+                    <span>Recall: ${fmtPct(st.recall)}</span>
+                    <span>ROC-AUC: ${fmtScore(st.auc)}</span>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
 }
 
-// 12. 10-Fold Stratified Cross-Validation Modal Population
+// 12. 10-Fold tab, single models table: 80:20 accuracy, 10-fold accuracy, recall, precision, F1, ROC-AUC,
+// plus an expandable row with the results of each of the 10 folds. Plain percentages only.
 function populateKfoldHybridBenchmarkModal() {
     const tbody = document.getElementById('kfold-hybrid-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    const models = kfoldHybridBenchmarksData?.models || [
-        {
-            model_name: "CNN + Transformer",
-            architecture: "CNNTransformer",
-            mean_recall: 77.50,
-            std_recall: 3.62,
-            mean_precision: 48.00,
-            std_precision: 1.67,
-            mean_f1: 0.5921,
-            mean_roc_auc: 0.7936,
-            folds: [
-                { fold: "Fold 1", recall: 77.73, precision: 47.84, f1_score: 0.5923, roc_auc: 0.7903 },
-                { fold: "Fold 2", recall: 72.38, precision: 50.47, f1_score: 0.5947, roc_auc: 0.7982 },
-                { fold: "Fold 3", recall: 79.07, precision: 47.59, f1_score: 0.5942, roc_auc: 0.7968 },
-                { fold: "Fold 4", recall: 82.17, precision: 45.81, f1_score: 0.5882, roc_auc: 0.7907 },
-                { fold: "Fold 5", recall: 76.17, precision: 48.29, f1_score: 0.5911, roc_auc: 0.7920 }
-            ]
-        },
-        {
-            model_name: "Attention U-Net + LSTM",
-            architecture: "AttentionUNetLSTM",
-            mean_recall: 77.21,
-            std_recall: 4.59,
-            mean_precision: 46.97,
-            std_precision: 2.10,
-            mean_f1: 0.5829,
-            mean_roc_auc: 0.7844,
-            folds: [
-                { fold: "Fold 1", recall: 80.60, precision: 44.93, f1_score: 0.5770, roc_auc: 0.7782 },
-                { fold: "Fold 2", recall: 78.67, precision: 47.20, f1_score: 0.5900, roc_auc: 0.7903 },
-                { fold: "Fold 3", recall: 69.15, precision: 50.43, f1_score: 0.5832, roc_auc: 0.7858 },
-                { fold: "Fold 4", recall: 78.27, precision: 45.86, f1_score: 0.5783, roc_auc: 0.7800 },
-                { fold: "Fold 5", recall: 79.35, precision: 46.45, f1_score: 0.5860, roc_auc: 0.7879 }
-            ]
-        },
-        {
-            model_name: "U-Net + ConvLSTM",
-            architecture: "UNetConvLSTM",
-            mean_recall: 76.13,
-            std_recall: 4.30,
-            mean_precision: 48.41,
-            std_precision: 1.60,
-            mean_f1: 0.5910,
-            mean_roc_auc: 0.7946,
-            folds: [
-                { fold: "Fold 1", recall: 74.32, precision: 48.35, f1_score: 0.5858, roc_auc: 0.7900 },
-                { fold: "Fold 2", recall: 78.13, precision: 48.75, f1_score: 0.6004, roc_auc: 0.8037 },
-                { fold: "Fold 3", recall: 69.47, precision: 50.89, f1_score: 0.5874, roc_auc: 0.7934 },
-                { fold: "Fold 4", recall: 80.20, precision: 46.72, f1_score: 0.5904, roc_auc: 0.7921 },
-                { fold: "Fold 5", recall: 78.55, precision: 47.35, f1_score: 0.5908, roc_auc: 0.7940 }
-            ]
-        },
-        {
-            model_name: "ResNet + BiLSTM",
-            architecture: "ResNetBiLSTM",
-            mean_recall: 75.65,
-            std_recall: 3.91,
-            mean_precision: 49.76,
-            std_precision: 1.96,
-            mean_f1: 0.5995,
-            mean_roc_auc: 0.8003,
-            folds: [
-                { fold: "Fold 1", recall: 75.84, precision: 48.83, f1_score: 0.5941, roc_auc: 0.7954 },
-                { fold: "Fold 2", recall: 78.85, precision: 50.32, f1_score: 0.6143, roc_auc: 0.8101 },
-                { fold: "Fold 3", recall: 72.65, precision: 51.38, f1_score: 0.6019, roc_auc: 0.8018 },
-                { fold: "Fold 4", recall: 70.90, precision: 51.45, f1_score: 0.5963, roc_auc: 0.7960 },
-                { fold: "Fold 5", recall: 80.03, precision: 46.82, f1_score: 0.5908, roc_auc: 0.7984 }
-            ]
-        },
-        {
-            model_name: "CNN + LSTM",
-            architecture: "CNNLSTM",
-            mean_recall: 74.06,
-            std_recall: 3.73,
-            mean_precision: 49.73,
-            std_precision: 1.67,
-            mean_f1: 0.5942,
-            mean_roc_auc: 0.7973,
-            folds: [
-                { fold: "Fold 1", recall: 75.08, precision: 48.06, f1_score: 0.5860, roc_auc: 0.7907 },
-                { fold: "Fold 2", recall: 77.68, precision: 49.11, f1_score: 0.6017, roc_auc: 0.8049 },
-                { fold: "Fold 3", recall: 75.35, precision: 49.41, f1_score: 0.5968, roc_auc: 0.7995 },
-                { fold: "Fold 4", recall: 67.76, precision: 52.54, f1_score: 0.5919, roc_auc: 0.7944 },
-                { fold: "Fold 5", recall: 74.42, precision: 49.51, f1_score: 0.5946, roc_auc: 0.7968 }
-            ]
-        }
-    ];
-
-    // Before K-Fold per model (80:20 holdout accuracy)
-    const kfoldBeforeMap = {
-        'AttentionUNetLSTM': 69.09,
-        'UNetConvLSTM':      68.80,
-        'CNNTransformer':    68.89,
-        'CNNLSTM':           69.67,
-        'ResNetBiLSTM':      70.87
-    };
-
-    models.forEach((m, idx) => {
+    modelKeys('single').forEach((key, idx) => {
+        const st = getModelStats(key);
+        if (!st || st.kAcc == null) return;
         const rowId = `kfold-detail-${idx}`;
+
         const tr = document.createElement('tr');
-        if (m.mean_recall >= 77.0) tr.className = 'champion';
-        const beforeAcc = kfoldBeforeMap[m.architecture] || 69.1;
-        const accStr = m.mean_accuracy ? `${m.mean_accuracy.toFixed(1)}% (±${(m.std_accuracy || 1.4).toFixed(1)}%)` : '69.5% (±1.4%)';
+        tr.className = 'hybrid-row' + (key === currentModel ? ' champion' : '');
+        tr.setAttribute('data-model', key);
         tr.innerHTML = `
-            <td>
-                <strong>${m.model_name}</strong>
-            </td>
-            <td style="color: #94a3b8; font-weight: 600;">${beforeAcc.toFixed(1)}%</td>
-            <td style="color: #67e8f9; font-weight: 700;">${accStr}</td>
-            <td style="color: #4ade80; font-weight: 700;">${m.mean_recall.toFixed(1)}% (±${m.std_recall.toFixed(1)}%)</td>
-            <td>${m.mean_precision.toFixed(1)}% (±${m.std_precision.toFixed(1)}%)</td>
-            <td>${m.mean_f1.toFixed(3)}</td>
-            <td style="color: #38bdf8; font-weight: 700;">${m.mean_roc_auc.toFixed(3)}</td>
+            <td><strong>${st.name}</strong></td>
+            <td style="color: #94a3b8; font-weight: 600;">${fmtPct(st.holdoutAcc)}</td>
+            <td style="color: #67e8f9; font-weight: 700;">${fmtPct(st.kAcc)} <small style="color:#64748b;">±${fmtPct(st.kStd)}</small></td>
+            <td style="color: #4ade80; font-weight: 700;">${fmtPct(st.recall)}</td>
+            <td>${fmtPct(st.precision)}</td>
+            <td>${fmtScore(st.f1)}</td>
+            <td style="color: #38bdf8; font-weight: 700;">${fmtScore(st.auc)}</td>
             <td>
                 <button class="nav-btn" style="padding: 2px 7px; font-size: 10px;" onclick="toggleKfoldDetail('${rowId}')">
-                    Inspect 10 Folds ▼
+                    Inspect 10 Folds
                 </button>
             </td>
         `;
         tbody.appendChild(tr);
 
-        // Expandable Detail Row for Folds
+        // Expandable detail row: one small box per fold
         const detailTr = document.createElement('tr');
         detailTr.id = rowId;
         detailTr.style.display = 'none';
         detailTr.style.background = 'rgba(0,0,0,0.35)';
-
-        let foldCells = m.folds.map(f => `
+        const foldCells = (st.folds || []).map(f => `
             <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 6px 8px; font-size: 10px;">
                 <div style="font-weight: 700; color: #38bdf8; margin-bottom: 2px;">${f.fold}</div>
-                <div style="color: #4ade80; font-weight: 600;">Recall: ${f.recall.toFixed(1)}%</div>
-                <div style="color: #94a3b8;">Prec: ${f.precision.toFixed(1)}%</div>
-                <div style="color: #cbd5e1;">AUC: ${f.roc_auc.toFixed(3)}</div>
+                <div style="color: #4ade80; font-weight: 600;">Recall: ${fmtPct(f.recall)}</div>
+                <div style="color: #94a3b8;">Precision: ${fmtPct(f.precision)}</div>
+                <div style="color: #cbd5e1;">ROC-AUC: ${fmtScore(f.roc_auc)}</div>
             </div>
         `).join('');
-
         detailTr.innerHTML = `
-            <td colspan="7" style="padding: 8px 12px;">
-                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
-                    ${foldCells}
-                </div>
+            <td colspan="8" style="padding: 8px 12px;">
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">${foldCells}</div>
             </td>
         `;
         tbody.appendChild(detailTr);
@@ -1024,6 +978,42 @@ window.toggleKfoldDetail = function(rowId) {
 };
 
 // 13. Sentinel-1 India SAR Image Benchmark Modal Population
+// Table of the top-3 models and their 4 combinations (probabilities averaged), all scored the same way:
+// SMOTE only on training data, threshold chosen on a validation slice, accuracy measured on real test data.
+// The best 10-fold accuracy row is highlighted. Data: combo_hybrid_benchmarks.json
+function populateComboBenchmarkModal() {
+    const tbody = document.getElementById('combo-hybrid-tbody');
+    if (!tbody || !comboBenchmarksData?.models) return;
+    tbody.innerHTML = '';
+
+    const models = comboBenchmarksData.models;
+    // Best 10-fold accuracy gets a star; the highlighted row is always the model currently selected on the map
+    const best = models.reduce((b, m) => (!b || m.kfold.mean_accuracy > b.kfold.mean_accuracy) ? m : b, null);
+
+    models.forEach(m => {
+        const k = m.kfold;
+        const tr = document.createElement('tr');
+        tr.className = 'hybrid-row' + (m.key === currentModel ? ' champion' : '');
+        tr.setAttribute('data-model', m.key);
+        const badge = (m.type === 'single' ? '' : ` <span class="arch-pill pill-combo">${m.type === 'triple' ? '3 models' : '2 models'}</span>`) +
+            (m === best ? ' <small style="color:#fbbf24;" title="Highest 10-fold accuracy in this table">★ best accuracy</small>' : '');
+        tr.innerHTML = `
+            <td><strong>${m.model_name}</strong>${badge}</td>
+            <td style="color: #94a3b8; font-weight: 600;">${m.holdout.accuracy.toFixed(1)}%</td>
+            <td><strong style="color:#67e8f9">${k.mean_accuracy.toFixed(1)}% <small style="color:#64748b">±${k.std_accuracy.toFixed(1)}%</small></strong></td>
+            <td style="color: #4ade80;">${k.mean_recall.toFixed(1)}%</td>
+            <td>${k.mean_precision.toFixed(1)}%</td>
+            <td>${k.mean_f1_score.toFixed(3)}</td>
+            <td style="color: #38bdf8; font-weight: 700;">${k.mean_roc_auc.toFixed(3)}</td>
+            <td><button class="nav-btn" onclick="selectModel('${m.key}')">Use</button></td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Satellite (Sentinel-1) section: Before/After CLAHE, Before/After GAN, 10-fold CV.
+// Values come from image_benchmark_metrics.json; if it fails to load, the hardcoded fallback
+// numbers below are shown instead, so check the file loaded when presenting.
 function populateSatelliteBenchmarkModal() {
     const satTbody = document.getElementById('satellite-benchmark-tbody');
     const kfoldTbody = document.getElementById('satellite-kfold-tbody');
@@ -1086,6 +1076,7 @@ function populateSatelliteBenchmarkModal() {
     });
 
     if (comparisons) {
+        // Fill the summary cards with the real values from the JSON
         const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
         const bc = comparisons.clahe_ablation;
         const bg = comparisons.gan_ablation;

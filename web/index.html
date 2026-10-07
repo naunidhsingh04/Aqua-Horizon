@@ -32,15 +32,22 @@
       <span class="brand-text">AQUA HORIZON</span>
     </div>
     <div class="bar-divider"></div>
-    <div class="model-picker-wrap" title="Switch Live Hybrid AI Architecture">
+    <div class="model-picker-wrap" title="Switch the AI model (single or combined) that colours the map">
       <span class="model-picker-icon">🧠</span>
       <select id="model-architecture-select" class="model-dropdown">
-        <option value="cnn_transformer" selected>CNN + Transformer (Self-Attention)</option>
-        <option value="unet_convlstm">U-Net + ConvLSTM (Spatial-Temporal)</option>
-        <option value="cnn_lstm">CNN + LSTM (Sequence)</option>
-        <option value="resnet_bilstm">ResNet + BiLSTM (Deep Residual)</option>
-        <option value="attention_unet_lstm">Attention U-Net + LSTM (Additive Gate)</option>
-        <option value="ensemble">10-Fold Grand Ensemble (All 5 Hybrid Models)</option>
+        <optgroup label="Combined Models (Top 3 Averaged)">
+          <option value="combo_top3" selected>All 3 Top Models Together</option>
+          <option value="combo_resnet_cnnlstm">ResNet+BiLSTM + CNN+LSTM</option>
+          <option value="combo_cnnlstm_cnntransformer">CNN+LSTM + CNN+Transformer</option>
+          <option value="combo_resnet_cnntransformer">ResNet+BiLSTM + CNN+Transformer</option>
+        </optgroup>
+        <optgroup label="Single Models">
+          <option value="cnn_transformer">CNN + Transformer (Self-Attention)</option>
+          <option value="unet_convlstm">U-Net + ConvLSTM (Spatial-Temporal)</option>
+          <option value="cnn_lstm">CNN + LSTM (Sequence)</option>
+          <option value="resnet_bilstm">ResNet + BiLSTM (Deep Residual)</option>
+          <option value="attention_unet_lstm">Attention U-Net + LSTM (Additive Gate)</option>
+        </optgroup>
       </select>
     </div>
     <button class="nav-btn" id="toggle-satellite-btn" title="Toggle Satellite View">
@@ -104,12 +111,8 @@
       Click any district on the map to inspect its real-time hydrological risk and telemetry.
     </div>
 
-    <!-- Multi-Model 10-Fold Comparison Strip -->
-    <div class="model-comparison-box" id="hud-model-comparison">
-      <div class="comparison-header">
-        <span>🧠 5 Hybrid Models (10-Fold CV)</span>
-        <span style="color: #94a3b8; font-size: 8px;">Click to switch</span>
-      </div>
+    <!-- Model Comparison Strip: 5 single + 4 combined models -->
+    <div class="model-comparison-box" id="hud-model-comparison" title="Click any model to switch the map to it">
       <div class="comparison-grid" id="hud-comparison-grid">
         <!-- Populated dynamically with each model's live score -->
       </div>
@@ -136,6 +139,8 @@
       <span class="legend-dot" style="background:#ef4444;" title="Severe (&gt;70%)"></span>
       <span class="legend-hint">Risk Scale</span>
     </div>
+    <div class="dock-divider"></div>
+    <div class="dock-model" id="dock-active-model" title="Model currently colouring the map"></div>
   </div>
 
   <!-- Modal: Scientific Benchmarks Drawer for Judges -->
@@ -144,7 +149,7 @@
       <div class="modal-header">
         <div>
           <h3 style="font-size: 16px; font-weight: 800; color: #f1f5f9;">Model Performance Dashboard</h3>
-          <p style="font-size: 10.5px; color: #64748b; margin-top: 2px;">How well each AI model predicts floods, trained on India's 1967–2023 flood records.</p>
+          <p style="font-size: 10.5px; color: #64748b; margin-top: 2px;">How well each of the 9 models (5 single and 4 combined) predicts floods, trained on India's 1967–2023 flood records.</p>
         </div>
         <button class="close-btn" id="close-benchmark-btn">&times;</button>
       </div>
@@ -156,12 +161,12 @@
         <button class="modal-tab-btn" id="tab-satellite-btn">🛰️ Satellite Images</button>
       </div>
 
-      <!-- Tab 1: 5 Hybrid Deep Learning Models -->
+      <!-- Tab 1: All 9 models (5 single + 4 combined) -->
       <div id="tab-hybrid-content">
         <p style="font-size: 11.5px; color: #cbd5e1; line-height: 1.5; margin-bottom: 10px;">
-          Trained on <strong>38,425 multi-year temporal sequences (T=5)</strong> across <strong>725 districts</strong> comparing <strong>Before K-Fold (80:20 Chronological Split)</strong> vs. <strong>After K-Fold (10-Fold Cross-Validation)</strong>:
+          Trained on <strong>38,425 five-year sequences</strong> across <strong>725 districts</strong>. Nine models are compared: <strong>five single deep-learning models</strong> and <strong>four combined models</strong> that average the flood probabilities of the three best single models. Single-split accuracy uses an 80:20 split by year; 10-fold accuracy is the average over 10 folds.
         </p>
-        
+
         <table class="benchmark-table">
           <thead>
             <tr>
@@ -181,79 +186,23 @@
           </tbody>
         </table>
 
-        <!-- Architecture Cards Grid -->
-        <div class="arch-grid">
-          <div class="arch-card" onclick="selectModel('cnn_transformer')">
-            <div class="arch-card-title">
-              <span>CNN + Transformer</span>
-              <span class="arch-pill pill-attention">Self-Attention</span>
-            </div>
-            <div class="arch-card-desc">1D-CNN temporal feature projection fused with Multi-Head Self-Attention encoder.</div>
-            <div class="arch-card-metrics">
-              <span>Recall: 81.15% &rarr; 77.50%</span>
-              <span>ROC-AUC: 0.7946</span>
-            </div>
-          </div>
+        <p style="font-size: 10.5px; color: #94a3b8; line-height: 1.5; margin-top: 8px;">
+          Combined models were scored with SMOTE applied to training data only and the alert threshold chosen on a separate validation slice. For a like-for-like comparison with the same three single models, see the combined-models table in the 10-Fold Validation tab.
+        </p>
 
-          <div class="arch-card" onclick="selectModel('unet_convlstm')">
-            <div class="arch-card-title">
-              <span>U-Net + ConvLSTM</span>
-              <span class="arch-pill pill-spatial">Spatial-Temporal</span>
-            </div>
-            <div class="arch-card-desc">U-Net spatial encoder-decoder with ConvLSTM recurrent bottleneck for spatial inundation propagation.</div>
-            <div class="arch-card-metrics">
-              <span>Recall: 81.86% &rarr; 77.23%</span>
-              <span>ROC-AUC: 0.7996</span>
-            </div>
-          </div>
-
-          <div class="arch-card" onclick="selectModel('cnn_lstm')">
-            <div class="arch-card-title">
-              <span>CNN + LSTM</span>
-              <span class="arch-pill pill-temporal">Sequence</span>
-            </div>
-            <div class="arch-card-desc">1D convolutional rainfall anomaly filter + 2-layer LSTM sequential memory cells.</div>
-            <div class="arch-card-metrics">
-              <span>Recall: 80.63% &rarr; 74.82%</span>
-              <span>ROC-AUC: 0.8058</span>
-            </div>
-          </div>
-
-          <div class="arch-card" onclick="selectModel('resnet_bilstm')">
-            <div class="arch-card-title">
-              <span>ResNet + BiLSTM</span>
-              <span class="arch-pill pill-temporal">Residual</span>
-            </div>
-            <div class="arch-card-desc">Deep 1D residual skip connections combined with bidirectional LSTM sequence processing.</div>
-            <div class="arch-card-metrics">
-              <span>Recall: 75.33% &rarr; 73.97%</span>
-              <span>ROC-AUC: 0.7985</span>
-            </div>
-          </div>
-
-          <div class="arch-card" onclick="selectModel('attention_unet_lstm')">
-            <div class="arch-card-title">
-              <span>Attention U-Net + LSTM</span>
-              <span class="arch-pill pill-attention">Attention Gate</span>
-            </div>
-            <div class="arch-card-desc">Additive spatial attention gates to focus on low-lying drainage basins before LSTM recurrent prediction.</div>
-            <div class="arch-card-metrics">
-              <span>Recall: 82.08% &rarr; 76.30%</span>
-              <span>ROC-AUC: 0.8017</span>
-            </div>
-          </div>
-        </div>
+        <!-- Model cards (filled by JS: one card per model) -->
+        <div class="arch-grid" id="arch-grid"></div>
       </div>
 
-      <!-- Tab 2: 10-Fold Stratified Cross-Validation & Ensemble -->
+      <!-- Tab 2: 10-Fold Cross-Validation (single models, combined models, data models) -->
       <div id="tab-kfold-content" style="display: none;">
-        <!-- Section 1: 5 Hybrid Deep Learning Models (K-Fold CV) -->
+        <!-- Section 1: Single deep-learning models (10-fold CV) -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <h4 style="font-size: 12.5px; font-weight: 700; color: #38bdf8;">
-            ⚡ 5 AI Models — 10-Fold Cross-Validation
+            ⚡ Single AI Models — 10-Fold Cross-Validation
           </h4>
           <span style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px;">
-            38,425 Sequences | 10 Folds | Zero Leakage
+            38,425 Sequences | 10 Folds
           </span>
         </div>
 
@@ -271,6 +220,34 @@
             </tr>
           </thead>
           <tbody id="kfold-hybrid-tbody">
+            <!-- Populated by JS -->
+          </tbody>
+        </table>
+
+        <!-- Section 1b: Combinations of the top 3 models -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px;">
+          <h4 style="font-size: 12.5px; font-weight: 700; color: #a78bfa;">
+            🧩 Top-3 Models and Their Combinations — Same Test, Side by Side
+          </h4>
+          <span style="font-size: 10px; color: #94a3b8; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px;" id="combo-protocol-badge">
+            SMOTE on training data only | Test data is real
+          </span>
+        </div>
+
+        <table class="benchmark-table" style="margin-bottom: 16px;">
+          <thead>
+            <tr>
+              <th>Model / Combination</th>
+              <th title="Accuracy on a single 80:20 chronological train/test split">Single-Split Accuracy</th>
+              <th title="Average accuracy across 10-fold cross-validation (&plusmn; standard deviation)">10-Fold Accuracy</th>
+              <th title="Recall: % of real floods the model correctly caught">Flood Catch Rate</th>
+              <th title="Precision: % of flood alerts that were correct">Alert Accuracy</th>
+              <th title="F1-Score: balance between catching floods and avoiding false alarms">Balance Score</th>
+              <th title="ROC-AUC: overall ability to tell flood vs. no-flood apart">Overall Score</th>
+              <th>Use Model</th>
+            </tr>
+          </thead>
+          <tbody id="combo-hybrid-tbody">
             <!-- Populated by JS -->
           </tbody>
         </table>
@@ -304,7 +281,7 @@
         </table>
 
         <div style="margin-top: 12px; padding: 10px; background: rgba(56, 189, 248, 0.1); border-left: 3px solid #38bdf8; border-radius: 4px; font-size: 11px; color: #93c5fd; line-height: 1.5;">
-          💡 <strong>Scientific Justification:</strong> 10-Fold Stratified Cross-Validation guarantees that the models achieve high mean test recall with ultra-low cross-fold variance, confirming robust generalization across India's diverse hydrological basins without geographic overfitting.
+          💡 <strong>How to read this:</strong> every score is measured on held-out data that was never used for training or balancing. Combined models average the flood probabilities of their members. The combined-models table re-scores the three best single models under the same rules, so it is the fair side-by-side comparison. Differences of about 1 to 2% are within the fold-to-fold spread.
         </div>
       </div>
 
@@ -452,6 +429,8 @@
         </div>
       </div>
 
+      <div class="adv-model-line" id="adv-model-line"></div>
+
       <!-- Public Alert Message Card (WhatsApp / SMS Format) -->
       <div class="public-alert-card">
         <div class="alert-card-top">
@@ -480,6 +459,6 @@
   </div>
 
   <!-- Application JS -->
-  <script src="js/app.js?v=2.6"></script>
+  <script src="js/app.js?v=2.7"></script>
 </body>
 </html>
