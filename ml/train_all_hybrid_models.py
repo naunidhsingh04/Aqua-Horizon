@@ -34,6 +34,7 @@ def run_all_benchmarks():
     t0 = time.time()
     results = []
     
+    # Each train_* function trains one model, saves its weights + metrics, and returns the metrics
     models = [
         ("1. U-Net + ConvLSTM", train_u_net___convlstm),
         ("2. CNN + LSTM", train_cnn___lstm),
@@ -49,6 +50,7 @@ def run_all_benchmarks():
         
     total_time = time.time() - t0
     
+    # Combine all 5 results into one comparison file (saved for ml/ and for the website)
     summary = {
         "suite_name": "Aqua Horizon 5-Hybrid Deep Learning Benchmark",
         "dataset": "Zenodo IFI-Impacts (1967-2023)",
@@ -61,6 +63,7 @@ def run_all_benchmarks():
     
     # Save in ml/models/
     ml_models_path = os.path.join(os.path.dirname(__file__), 'models', 'hybrid_benchmarks.json')
+    os.makedirs(os.path.dirname(ml_models_path), exist_ok=True)
     with open(ml_models_path, 'w') as f:
         json.dump(summary, f, indent=2)
         

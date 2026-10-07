@@ -24,7 +24,10 @@ def train_cnn___transformer():
     
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Device: {device}")
+    torch.manual_seed(42)   # same results every run
+    np.random.seed(42)
     
+    # Windows of 5 years x 15 features per district; years <= 2012 train, later years test
     # 1. Load Data
     print("Loading Zenodo sequence dataset (T=5 sliding windows)...")
     data = load_sequence_data(seq_len=5, cutoff_year=2012, spatial=False, batch_size=128)
@@ -40,18 +43,22 @@ def train_cnn___transformer():
     total_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Total Trainable Parameters: {total_params:,}")
     
+    # Missed floods cost more: weight = #non-flood/#flood, capped at 2.5
     w_pos = torch.tensor(min(pos_weight, 2.5), device=device)
+    # Weighted binary cross-entropy: loss = -mean( w*y*log(p) + (1-y)*log(1-p) )
     def weighted_bce_loss(preds, targets):
         preds = torch.clamp(preds, 1e-7, 1.0 - 1e-7)
         loss = -(w_pos * targets * torch.log(preds) + (1.0 - targets) * torch.log(1.0 - preds))
         return torch.mean(loss)
 
+    # Adam optimiser (+ small weight decay); learning rate halves if test F1 stops improving
     optimizer = torch.optim.Adam(model.parameters(), lr=0.0008, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=2)
     
     best_f1 = 0.0
     best_metrics = None
     save_path = os.path.join(os.path.dirname(__file__), 'models', 'cnn_transformer.pt')
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
     
     print(f"\nBeginning Training (10 Epochs)...")
     start_time = time.time()
@@ -67,6 +74,7 @@ def train_cnn___transformer():
             preds = model(batch_x)
             loss = weighted_bce_loss(preds, batch_y)
             loss.backward()
+            # Clip gradient size to 1.0 so one bad batch cannot destabilise training
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
             optimizer.step()
             
@@ -76,6 +84,7 @@ def train_cnn___transformer():
         epoch_loss = running_loss / max(n_batches, 1)
         
         # Validation on test split
+        # (each epoch is scored on the held-out 2013-2023 windows; best-F1 epoch is saved)
         model.eval()
         all_preds = []
         all_targets = []
@@ -90,6 +99,8 @@ def train_cnn___transformer():
         all_targets = np.array(all_targets)
         
         # Optimal threshold search
+        # Try cut-offs 0.30-0.60 and keep the one with the best F1 (chosen on the test set,
+        # so these scores are slightly optimistic)
         best_t, best_t_f1, best_t_rec, best_t_prec = 0.40, 0.0, 0.0, 0.0
         for th in np.arange(0.30, 0.65, 0.05):
             bin_preds = (all_preds >= th).astype(int)
@@ -102,11 +113,13 @@ def train_cnn___transformer():
                 
         roc_auc = roc_auc_score(all_targets, all_preds)
         pr_auc = average_precision_score(all_targets, all_preds)
+        # Accuracy = (TP+TN)/all; ROC-AUC / PR-AUC are threshold-free ranking scores
         acc = accuracy_score(all_targets, (all_preds >= best_t).astype(int))
         
         scheduler.step(best_t_f1)
         print(f"  Epoch [{epoch:02d}/10] - Loss: {epoch_loss:.4f} | Test F1: {best_t_f1:.4f} | Recall: {best_t_rec*100:.2f}% | Prec: {best_t_prec*100:.2f}% | ROC-AUC: {roc_auc:.4f} (th={best_t:.2f})")
         
+        # Keep weights/metrics of the best epoch only
         if best_t_f1 > best_f1:
             best_f1 = best_t_f1
             torch.save(model.state_dict(), save_path)

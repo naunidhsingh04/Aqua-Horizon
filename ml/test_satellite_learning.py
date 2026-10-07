@@ -1,10 +1,17 @@
+"""
+Exploratory check: how well do district features predict satellite-measured flooded area?
+"""
 import os
+import json
 import numpy as np
 import pandas as pd
 from xgboost import XGBRegressor, XGBClassifier
 from sklearn.model_selection import KFold
 from sklearn.metrics import r2_score, mean_absolute_error, roc_auc_score, f1_score
 
+# Exploratory script (not the official benchmark): can district features predict the % of a
+# district flooded (satellite-style extent), and what does a combined risk score look like?
+# NOTE: it includes same-year columns (event_count, max_duration), so its numbers are optimistic.
 def main():
     print("=" * 70)
     print("TESTING DATASET & PARAMETERS AGAINST SATELLITE INUNDATION TARGETS")
@@ -15,6 +22,7 @@ def main():
     df = pd.read_csv(csv_path)
     print(f"Dataset Loaded: {len(df):,} balanced observations across 726 districts.")
     
+    # Input columns (history, severity, water, rain features)
     features = [
         'event_count', 'max_duration', 'monsoon_peak_flag', 'cyclonic_flag',
         'y_lag1', 'prior_cum_events', 'prior_3yr_events', 'prior_5yr_events',
@@ -32,6 +40,7 @@ def main():
     print("\n--- 1. Auxiliary Learning Model: Predicting Satellite Flooded Area % ---")
     reg = XGBRegressor(n_estimators=80, max_depth=5, learning_rate=0.1, random_state=42, n_jobs=2)
     
+    # 10-fold cross-validation
     kf = KFold(n_splits=10, shuffle=True, random_state=42)
     r2_scores = []
     mae_scores = []
@@ -46,10 +55,12 @@ def main():
         r2_scores.append(r2)
         mae_scores.append(mae)
     
-    print(f"5-Fold CV R2 Score:   {np.mean(r2_scores):.4f} (+/- {np.std(r2_scores):.4f})")
-    print(f"5-Fold CV MAE:        {np.mean(mae_scores):.4f}% flooded area")
+    print(f"10-Fold CV R2 Score:   {np.mean(r2_scores):.4f} (+/- {np.std(r2_scores):.4f})")
+    print(f"10-Fold CV MAE:        {np.mean(mae_scores):.4f}% flooded area")
+    print("Note: hydro_rain_stress and exposure_severity_index are computed from the flooded-area value being predicted, so this R2 is inflated (a leakage check, not predictive skill).")
     
     # Feature Importances for Satellite Extent
+    # Refit on all data; feature importance = share of the trees' splits/gain each column explains
     reg.fit(X, y_sat_area)
     importances = pd.Series(reg.feature_importances_, index=features).sort_values(ascending=False)
     print("\nTop Parameters Governing Satellite Inundation Extent:")
@@ -63,13 +74,31 @@ def main():
     prob = clf.predict_proba(X)[:, 1]
     
     # Multi-task combined score: Probability x Predicted Physical Severity
+    # Predicted flooded area is a percentage, so keep it within 0-100
     pred_area = np.clip(reg.predict(X), 0, 100)
+    # Same idea as IRS: probability x ln(1 + predicted flooded area %)
     calibrated_severity_index = prob * np.log1p(pred_area)
     
     print("Optimization Complete:")
     print(f"  Average Predicted Probability:       {prob.mean()*100:.1f}%")
     print(f"  Average Satellite Inundation Extent: {pred_area.mean():.2f}% of district")
     print(f"  Calibrated Severity Index Range:     {calibrated_severity_index.min():.3f} to {calibrated_severity_index.max():.3f}")
+
+    # Save the results so 04_final_report.py can include them
+    out = {
+        'cv_r2_mean': float(np.mean(r2_scores)), 'cv_r2_std': float(np.std(r2_scores)),
+        'cv_mae_mean': float(np.mean(mae_scores)),
+        'top_features': {k: float(v) for k, v in importances.head(6).items()},
+        'avg_predicted_probability_pct': float(prob.mean() * 100),
+        'avg_predicted_flooded_area_pct': float(pred_area.mean()),
+        'severity_index_min': float(calibrated_severity_index.min()),
+        'severity_index_max': float(calibrated_severity_index.max()),
+    }
+    out_dir = os.path.join(base_dir, 'ml', 'models')
+    os.makedirs(out_dir, exist_ok=True)
+    with open(os.path.join(out_dir, 'satellite_learning_metrics.json'), 'w') as f:
+        json.dump(out, f, indent=2)
+    print(f"\nSaved results to {os.path.join(out_dir, 'satellite_learning_metrics.json')}")
 
 if __name__ == '__main__':
     main()

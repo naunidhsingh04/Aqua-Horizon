@@ -1,3 +1,10 @@
+"""
+STEP 2 - Train and benchmark the main flood classifier (XGBoost).
+Compares 3 ways of handling the flood/non-flood imbalance (none, SMOTE, ADASYN) using
+ (1) 10-fold cross-validation and (2) one chronological split (train <=2012, test 2013-2023).
+Saves the ADASYN 10-fold ensemble as the deployed model, plus a severity regressor.
+Outputs: ml/models/champion_classifier.joblib, severity_regressor.joblib, benchmark_metrics.json
+"""
 import os
 import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -11,6 +18,10 @@ from sklearn.ensemble import GradientBoostingRegressor
 from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE, ADASYN
 from ml.ensemble import KFoldEnsembleClassifier
+
+# Make every relative path in this script work no matter where it is started from (e.g. Google Colab)
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+os.chdir(ROOT)
 
 def train_deep_models():
     print("=" * 80)
@@ -39,12 +50,14 @@ def train_deep_models():
     ]
     target_col = 'flood_occurred'
 
+    # Replace missing / infinite values with 0 so the model never sees NaN
     df[feature_cols] = df[feature_cols].fillna(0).replace([np.inf, -np.inf], 0)
 
     X = df[feature_cols].values
     y = df[target_col].values
 
     def make_clf(seed):
+        # XGBoost = many small decision trees added one by one, each fixing the previous errors
         return XGBClassifier(
             n_estimators=140,
             max_depth=5,
@@ -57,6 +70,8 @@ def train_deep_models():
             n_jobs=-1
         )
 
+    # Imbalance handling: SMOTE / ADASYN create synthetic flood rows (ADASYN focuses on
+    # the harder-to-classify ones). Baseline uses the raw data as a control.
     STRATEGIES = {
         "Baseline (Control - Raw)": ("No Resampling", None),
         "SMOTE Balanced": ("SMOTE", SMOTE),
@@ -92,8 +107,10 @@ def train_deep_models():
             fold_models.append(clf)
 
             probs = clf.predict_proba(X_val)[:, 1]
-            preds = (probs >= 0.40).astype(int)
+            preds = (probs >= 0.40).astype(int)   # flood if P >= 40% (favours recall)
 
+            # Accuracy, Recall, Precision, F1, ROC-AUC, PR-AUC are all scored on the
+            # untouched validation fold (never on resampled rows)
             fold_results.append({
                 'Accuracy': accuracy_score(y_val, preds),
                 'Recall': recall_score(y_val, preds),
@@ -103,6 +120,7 @@ def train_deep_models():
                 'PR-AUC': average_precision_score(y_val, probs)
             })
 
+        # Mean and standard deviation of each metric across the 10 folds
         df_folds = pd.DataFrame(fold_results)
         kfold_summaries[name] = {
             metric: {'mean': float(df_folds[metric].mean()), 'std': float(df_folds[metric].std())}
@@ -120,6 +138,7 @@ def train_deep_models():
     # 2. CHRONOLOGICAL 80:20 RATIO SPLIT (1967-2012 vs 2013-2023) — single-split baseline
     # =========================================================================
     print("\n[PHASE 2] Benchmarking Chronological 80:20 Split (1967-2012 vs 2013-2023)...")
+    # Train on the oldest 80% of years, test on the newest 20% (tests "predict the future")
     cutoff_year = int(df['year'].quantile(0.80)) # 2012
     train_mask = df['year'] <= cutoff_year
     test_mask = df['year'] > cutoff_year
@@ -188,10 +207,11 @@ def train_deep_models():
     print("\n[PHASE 3] Constructing 10-Fold Cross-Validated Soft-Voting Ensemble Champion (ADASYN)...")
     ensemble_champion = KFoldEnsembleClassifier(champion_fold_models)
 
-    # Secondary Severity Regressor
+    # Secondary Severity Regressor: trained only on flood rows to estimate how severe a flood is.
+    # Target = ln(1 + longest_event_days * ln(1 + DFSI))  (long events in severe districts = high)
     print("Training Secondary Hydrological Severity Regressor...")
     df_flood = df_train[df_train[target_col] == 1].copy()
-    y_sev = np.log1p(df_flood['max_duration'] * np.log1p(df_flood['dfsi_score']))
+    y_sev =np.log1p(df_flood['max_duration'] * np.log1p(df_flood['dfsi_score']))
     X_sev = df_flood[feature_cols].values
 
     reg_sev = GradientBoostingRegressor(n_estimators=100, max_depth=5, learning_rate=0.08, random_state=42)
@@ -205,6 +225,7 @@ def train_deep_models():
     with open('ml/models/benchmark_metrics.json', 'w') as f:
         json.dump(results, f, indent=2)
 
+    # Feature importance = how much each input column helped the trees (averaged over 10 models)
     importances = dict(zip(feature_cols, [round(float(x), 4) for x in ensemble_champion.feature_importances_]))
     with open('ml/models/feature_importance.json', 'w') as f:
         json.dump(importances, f, indent=2)

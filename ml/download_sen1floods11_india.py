@@ -17,6 +17,7 @@ PREFIXES = {
 }
 
 
+# Asks Google Cloud Storage for the files under a folder; returns {file path: size in bytes}
 def list_objects(prefix):
     url = f"https://storage.googleapis.com/storage/v1/b/sen1floods11/o?prefix={prefix}&maxResults=1000"
     with urllib.request.urlopen(url, timeout=30) as r:
@@ -24,6 +25,7 @@ def list_objects(prefix):
     return {item['name']: int(item['size']) for item in data.get('items', [])}
 
 
+# Downloads every file of one folder, skipping files already present with the right size
 def download_folder(folder):
     out_dir = os.path.join(OUT_DIR, folder)
     os.makedirs(out_dir, exist_ok=True)
@@ -37,6 +39,7 @@ def download_folder(folder):
             continue
         urllib.request.urlretrieve(BUCKET_BASE + remote_path, local_path)
 
+    # (size check below compares local file size with the size reported by the bucket)
     # Verify sizes, re-download anything truncated by a network interruption.
     for remote_path, size in remote.items():
         fname = remote_path.split('/')[-1]

@@ -16,6 +16,8 @@ import torch.nn.functional as F
 # =============================================================================
 
 class ConvLSTMCell(nn.Module):
+    # An LSTM cell whose gates are convolutions, so it remembers over time while keeping the
+    # 2D (4x4) layout. Input/forget/output gates decide what to write, keep and show.
     def __init__(self, in_channels, hidden_channels, kernel_size=3):
         super().__init__()
         self.in_channels = in_channels
@@ -31,6 +33,7 @@ class ConvLSTMCell(nn.Module):
         f = torch.sigmoid(cc_f)
         o = torch.sigmoid(cc_o)
         g = torch.tanh(cc_g)
+        # memory = forget*old_memory + input*new_candidate ; output = out_gate * tanh(memory)
         c_cur = f * c_prev + i * g
         h_cur = o * torch.tanh(c_cur)
         return h_cur, c_cur
@@ -68,7 +71,9 @@ class UNetConvLSTM(nn.Module):
         )
 
     def forward(self, x):
-        # x shape: (B, T, C, H, W)
+        # x shape: (B, T, C, H, W) = batch, 5 years, 1 channel, 4x4 grid of the 16 feature values
+        # Per year: encode -> ConvLSTM updates its memory. After the last year, the decoder
+        # merges memory with the skip connection and outputs P(flood) between 0 and 1.
         B, T, C, H, W = x.size()
         h = torch.zeros(B, 32, H, W, device=x.device)
         c = torch.zeros(B, 32, H, W, device=x.device)
@@ -118,7 +123,9 @@ class CNNLSTM(nn.Module):
         )
 
     def forward(self, x):
-        # x shape: (B, T, F) -> permute for 1D CNN: (B*T, F, 1) or (B, F, T)
+        # x shape: (B, T, F) = batch, 5 years, 15 features.
+        # CNN mixes the 15 features per year -> LSTM reads the 5 years in order ->
+        # last hidden state -> small dense head -> sigmoid gives P(flood).
         B, T, F = x.size()
         xt = x.permute(0, 2, 1)  # (B, F, T)
         cnn_out = self.cnn(xt)  # (B, cnn_channels, T)
@@ -161,7 +168,9 @@ class CNNTransformer(nn.Module):
         )
 
     def forward(self, x):
-        # x shape: (B, T, F)
+        # x shape: (B, T, F). Each year is projected to 64 numbers, a learned position vector tells
+        # the model which year is which, then self-attention lets every year look at every other
+        # year. Average over years -> dense head -> sigmoid = P(flood).
         B, T, F = x.size()
         h = self.proj(x) + self.pos_encoder[:, :T, :]
         trans_out = self.transformer(h)  # (B, T, d_model)
@@ -175,6 +184,7 @@ class CNNTransformer(nn.Module):
 # =============================================================================
 
 class ResidualBlock1D(nn.Module):
+    # Output = ReLU(input + transform(input)); the "skip" lets the block only learn a correction
     def __init__(self, channels):
         super().__init__()
         self.block = nn.Sequential(
@@ -219,7 +229,8 @@ class ResNetBiLSTM(nn.Module):
         )
 
     def forward(self, x):
-        # x shape: (B, T, F)
+        # x shape: (B, T, F). Residual blocks extract features, the bidirectional LSTM reads the
+        # 5 years forwards and backwards, last step -> dense head -> sigmoid = P(flood).
         B, T, F = x.size()
         xt = x.permute(0, 2, 1)  # (B, F, T)
         h = self.stem(xt)
@@ -256,6 +267,8 @@ class AttentionGate(nn.Module):
         self.relu = nn.ReLU()
 
     def forward(self, x, g):
+        # alpha (0-1) = how important each location of x is, judged using the deeper features g.
+        # Output = x * alpha, so unimportant locations are scaled down toward 0.
         theta_x = self.W_x(x)
         phi_g = self.W_g(g)
         f = self.relu(theta_x + phi_g)
@@ -293,7 +306,9 @@ class AttentionUNetLSTM(nn.Module):
         )
 
     def forward(self, x):
-        # x shape: (B, T, C, H, W)
+        # x shape: (B, T, C, H, W). Per year: encode, apply the attention gate, average-pool to a
+        # 48-number summary. The 5 summaries form a sequence read by an LSTM -> dense head ->
+        # sigmoid = P(flood).
         B, T, C, H, W = x.size()
         time_feats = []
         for t in range(T):
@@ -310,3 +325,31 @@ class AttentionUNetLSTM(nn.Module):
         lstm_out, _ = self.lstm(seq)
         out = torch.sigmoid(self.head(lstm_out[:, -1, :])).squeeze(-1)
         return out
+
+
+if __name__ == '__main__':
+    # Self-test: build each of the 5 networks, count its parameters and push one dummy batch through it.
+    print("=" * 78)
+    print("AQUA HORIZON - 5 HYBRID DEEP LEARNING ARCHITECTURES (self-test)")
+    print("=" * 78)
+    torch.manual_seed(42)
+    seq = torch.randn(4, 5, 15)        # 4 districts x 5 years x 15 features
+    grid = torch.randn(4, 5, 1, 4, 4)  # the same data as 4x4 grids, for the U-Net models
+    tests = [
+        ("U-Net + ConvLSTM", UNetConvLSTM(), grid),
+        ("CNN + LSTM", CNNLSTM(), seq),
+        ("CNN + Transformer", CNNTransformer(), seq),
+        ("ResNet + BiLSTM", ResNetBiLSTM(), seq),
+        ("Attention U-Net + LSTM", AttentionUNetLSTM(), grid),
+    ]
+    print(f"{'Model':<24} | {'Parameters':>10} | {'Input shape':<18} | Output (flood probability per district)")
+    print("-" * 78)
+    for name, model, x in tests:
+        model.eval()
+        with torch.no_grad():
+            out = model(x)
+        n_params = sum(p.numel() for p in model.parameters())
+        assert out.shape == (4,) and bool(((out >= 0) & (out <= 1)).all()), "output must be 4 probabilities in [0, 1]"
+        print(f"{name:<24} | {n_params:>10,} | {str(tuple(x.shape)):<18} | {[round(float(v), 3) for v in out]}")
+    print("-" * 78)
+    print("All 5 architectures built and produced valid probabilities between 0 and 1.")

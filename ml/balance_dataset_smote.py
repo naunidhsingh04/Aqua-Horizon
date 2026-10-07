@@ -1,3 +1,10 @@
+"""
+Balances the dataset with SMOTE: floods are rarer than non-floods, so SMOTE creates synthetic
+flood rows (interpolating between a real flood row and one of its 5 nearest flood neighbours)
+until flood / non-flood is 50:50. Each synthetic row is labelled with its nearest real
+district so it carries a district name.
+Output: data/processed/district_year_dataset_balanced_smote.csv
+"""
 import os
 import argparse
 import numpy as np
@@ -62,6 +69,7 @@ def balance_dataset_with_smote(
     print(f"  Synthesized Flood Samples: +{n_synth:,}")
     print(f"  Total Balanced Records:     {n_total:,}")
     
+    # SMOTE appends synthetic rows after the original n_orig rows (numbers only, no names).
     # Nearest neighbor mapping for synthesized points to inherit metadata
     minority_mask = (y == 1).values
     minority_indices = np.where(minority_mask)[0]

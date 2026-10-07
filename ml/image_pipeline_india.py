@@ -85,6 +85,7 @@ def load_sen1floods11_india_chips(patch_size=64, max_nodata_frac=0.08, water_thr
         s1 = np.nan_to_num(np.clip(s1, -50.0, 1.0), nan=-50.0)
         s1 = np.transpose(s1, (1, 2, 0))  # (512, 512, 2)
 
+        # Cut the 512x512 scene into non-overlapping 64x64 chips (8 x 8 = 64 chips per scene)
         h, w = lbl.shape
         for ty in range(0, h - patch_size + 1, patch_size):
             for tx in range(0, w - patch_size + 1, patch_size):
@@ -94,6 +95,8 @@ def load_sen1floods11_india_chips(patch_size=64, max_nodata_frac=0.08, water_thr
                 if nodata_frac > max_nodata_frac:
                     continue
 
+                # water_frac = water pixels / valid pixels in this 64x64 patch.
+                # Patch is labelled FLOOD (1) if water_frac >= water_thresh (10%), else 0.
                 water_frac = float(np.mean(lbl_patch[valid] == 1)) if valid.any() else 0.0
                 water_mask = (lbl_patch == 1).astype(np.float32)
                 label = 1 if water_frac >= water_thresh else 0
@@ -146,6 +149,8 @@ def run_data_leakage_checks(X, y, masks):
         channel_mean = np.mean(X[:, :, :, c], axis=(1, 2))
         corr = np.corrcoef(channel_mean, y)[0, 1]
         corrs.append(corr)
+    # Correlation of each radar channel's average brightness with the label; a value near 1
+    # would mean the label is leaking into the input
     max_corr = np.max(np.abs(corrs))
     print(f"[Check 1] Target Leakage Check: Max input-target correlation = {max_corr:.4f}")
     assert max_corr < 0.95, "[!] CRITICAL: Target leakage detected in raw imagery!"
@@ -155,6 +160,7 @@ def run_data_leakage_checks(X, y, masks):
     hashes = set()
     duplicates = 0
     for i in range(len(X)):
+        # Fingerprint of the chip's raw bytes: identical chips -> identical hash -> duplicate
         h = hashlib.md5(X[i].tobytes()).hexdigest()
         if h in hashes:
             duplicates += 1
@@ -167,6 +173,7 @@ def run_data_leakage_checks(X, y, masks):
     # 3. Suspicious Pattern Check
     nan_count = np.isnan(X).sum()
     inf_count = np.isinf(X).sum()
+    # A chip with almost no variation (< 1e-4) is a blank / broken image
     variances = np.var(X, axis=(1, 2, 3))
     dead_chips = (variances < 1e-4).sum()
     print(f"[Check 3] Suspicious Pattern Check: NaNs={nan_count}, Infs={inf_count}, Zero-Var Chips={dead_chips}")
@@ -185,6 +192,7 @@ def apply_clahe_sar(images_raw):
     print("STEP 4: CLAHE CONTRAST ENHANCEMENT (OPENCV)")
     print("="*70)
     
+    # CLAHE = boosts local contrast tile by tile (8x8 tiles); clipLimit=2 stops it amplifying speckle noise
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     images_clahe = []
     
@@ -193,6 +201,7 @@ def apply_clahe_sar(images_raw):
         enhanced_channels = []
         for c in range(chip.shape[-1]):
             channel = chip[:, :, c]
+            # min-max scaling: (x - min) / (max - min) * 255
             # Normalize to 0-255 uint8 for CLAHE
             c_min, c_max = channel.min(), channel.max()
             if c_max - c_min > 1e-5:
@@ -214,6 +223,7 @@ def apply_clahe_sar(images_raw):
 def normalize_raw_sar(images_raw):
     """Min-max normalize raw SAR chips to [0, 1] without CLAHE."""
     norm_chips = []
+    # Min-max normalisation per channel: (x - min) / (max - min) -> values between 0 and 1
     for chip in images_raw:
         channels = []
         for c in range(chip.shape[-1]):
@@ -230,6 +240,8 @@ def normalize_raw_sar(images_raw):
 # -----------------------------------------------------------------------------
 # 5. DEEP CONVOLUTIONAL GAN (DCGAN) FOR SYNTHETIC SAR FLOOD AUGMENTATION
 # -----------------------------------------------------------------------------
+# GAN = two networks competing. Generator turns random noise (64 numbers) into a fake 64x64
+# 2-channel radar chip; Discriminator tries to tell real chips from fake ones.
 class SARGenerator(nn.Module):
     def __init__(self, latent_dim=64, channels=2):
         super(SARGenerator, self).__init__()
@@ -289,6 +301,8 @@ def train_sar_dcgan(train_flood_chips, epochs=12, latent_dim=64, batch_size=32):
     generator = SARGenerator(latent_dim=latent_dim, channels=2).to(device)
     discriminator = SARDiscriminator(channels=2).to(device)
     
+    # BCE loss: Generator wants D(fake) -> 1 ; Discriminator wants D(real) -> 1 and D(fake) -> 0.
+    # d_loss = (loss on real + loss on fake) / 2
     adversarial_loss = nn.BCELoss()
     optimizer_G = optim.Adam(generator.parameters(), lr=0.0002, betas=(0.5, 0.999))
     optimizer_D = optim.Adam(discriminator.parameters(), lr=0.0002, betas=(0.5, 0.999))
@@ -334,6 +348,7 @@ def train_sar_dcgan(train_flood_chips, epochs=12, latent_dim=64, batch_size=32):
 
 def augment_with_gan(generator, train_X, train_y, n_synthetic=120, latent_dim=64):
     """Generates synthetic flood chips using the fold-trained DCGAN."""
+    # Make n_synthetic fake flood chips from random noise and append them to the TRAINING data only
     generator.eval()
     with torch.no_grad():
         z = torch.randn((n_synthetic, latent_dim), device=device)
@@ -347,6 +362,8 @@ def augment_with_gan(generator, train_X, train_y, n_synthetic=120, latent_dim=64
 # -----------------------------------------------------------------------------
 # 6. SATELLITE FLOOD CLASSIFICATION & DETECTION MODEL
 # -----------------------------------------------------------------------------
+# Classifier: 3 blocks of [Conv -> BatchNorm -> ReLU -> MaxPool] shrink 64x64 -> 8x8 while
+# growing channels 2 -> 128; global average pooling + 2 dense layers give flood / no-flood scores.
 class SARFloodNet(nn.Module):
     """
     Deep Convolutional SAR Flood Classifier with Batch Normalization,
@@ -413,6 +430,8 @@ def train_and_evaluate_model(X_train, y_train, X_val, y_val, epochs=8, lr=0.001,
     val_loader = DataLoader(val_dataset, batch_size=32, shuffle=False)
     
     model = SARFloodNet(in_channels=2, num_classes=2, dropout_p=dropout_p).to(device)
+    # Cross-entropy loss for 2 classes; AdamW = Adam with weight decay; cosine schedule smoothly
+    # lowers the learning rate to ~0 over the epochs
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
@@ -467,9 +486,12 @@ def train_and_evaluate_model(X_train, y_train, X_val, y_val, epochs=8, lr=0.001,
             val_auc = roc_auc_score(val_targets, val_probs)
         except Exception:
             val_auc = 0.5
+        # IoU (Jaccard) = TP / (TP + FP + FN): overlap between predicted and real flood chips
         val_iou = jaccard_score(val_targets, val_preds, zero_division=0)
         
         # Overfitting check
+        # Generalisation gap = train accuracy - validation accuracy (big gap = overfitting).
+        # NOTE: the best epoch is picked using the validation set itself, so scores are slightly optimistic.
         gap = train_acc - val_acc
         if val_acc > best_acc:
             best_acc = val_acc
@@ -509,6 +531,7 @@ def main():
     print("\n" + "="*70)
     print("STEP 5: 80:20 HOLDOUT SPLIT & EXPERIMENTAL ABLATIONS")
     print("="*70)
+    # Random 80/20 split that keeps the flood/no-flood ratio equal in both parts
     train_idx, test_idx = train_test_split(
         np.arange(len(labels)), test_size=0.20, random_state=SEED, stratify=labels
     )
@@ -540,6 +563,7 @@ def main():
     # EXPERIMENT C: GAN AUGMENTATION (After GAN, 80:20 Holdout)
     # -------------------------------------------------------------------------
     print("\n[C] Training DCGAN STRICTLY on Training Set & Augmenting (After GAN)...")
+    # GAN only ever sees flood chips from the TRAINING part (never the test part)
     flood_train_chips = images_clahe[train_idx][labels[train_idx] == 1]
     dcgan_gen = train_sar_dcgan(flood_train_chips, epochs=10, batch_size=32)
     
@@ -561,6 +585,7 @@ def main():
     print("\n" + "="*70)
     print("STEP 6: 10-FOLD STRATIFIED CROSS-VALIDATION (AFTER K-FOLD)")
     print("="*70)
+    # Repeat: train (with a fresh GAN) on 9/10 of the chips, test on the other 1/10, 10 times
     skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=SEED)
     
     fold_accuracies = []
@@ -605,6 +630,7 @@ def main():
         })
         print(f"  [Fold {fold:02d}/10] Acc: {f_metrics['accuracy']:.2f}% | Rec: {f_metrics['recall']:.2f}% | F1: {f_metrics['f1_score']:.4f} | IoU: {f_metrics['iou']:.2f}% ({fold_time:.1f}s)")
         
+    # Mean and standard deviation of each metric over the 10 folds
     kfold_summary = {
         'mean_accuracy': float(np.mean(fold_accuracies)),
         'std_accuracy': float(np.std(fold_accuracies)),

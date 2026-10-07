@@ -1,9 +1,20 @@
+"""
+Command-line tool: python predict.py <district name>
+Prints the flood probability for one district under 4 what-if rainfall scenarios,
+using the trained ensemble classifier and severity regressor from ml/models/.
+"""
 import sys
 import re
 import joblib
 import json
 import numpy as np
 import pandas as pd
+import os
+
+# Make imports and relative paths work no matter where the script is started from (e.g. Google Colab)
+ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, ROOT)
+os.chdir(ROOT)
 from ml.ensemble import KFoldEnsembleClassifier
 
 if hasattr(sys.stdout, 'reconfigure'):
@@ -19,15 +30,16 @@ def clean_name(name):
 
 def predict_district(district_query):
     # Load trained model artifacts
-    clf = joblib.load('ml/models/champion_classifier.joblib')
-    reg = joblib.load('ml/models/severity_regressor.joblib')
-    
+    clf = joblib.load('ml/models/champion_classifier.joblib')   # flood probability (10-model ensemble)
+    reg = joblib.load('ml/models/severity_regressor.joblib')    # flood severity estimate
+
     # Load latest district feature baseline (2023)
     df = pd.read_csv('data/processed/district_year_dataset.csv')
     df_latest = df[df['year'] == 2023].copy()
-    
+
     clean_q = clean_name(district_query)
-    
+
+    # Find the district: exact name first, then partial match on cleaned / original name
     match = df_latest[df_latest['clean_dist'] == clean_q]
     if match.empty:
         match = df_latest[df_latest['clean_dist'].str.contains(clean_q, na=False)]
@@ -61,7 +73,8 @@ def predict_district(district_query):
     ]
     
     x_base = row[feature_cols].copy()
-    
+
+    # What-if rainfall scenarios: value = rainfall anomaly % vs normal (not live data)
     scenarios = {
         "Drought / Deficit Rainfall (-30% Rain)": -30.0,
         "Normal Baseline (0% Anomaly)": 0.0,
@@ -84,14 +97,17 @@ def predict_district(district_query):
     print("-" * 75)
 
     for sc_name, rain_val in scenarios.items():
+        # Same district, only the two rain-dependent features change per scenario:
+        #   hydro_rain_stress = (flooded_area% + 0.5) * (1 + anomaly/100)
         x = x_base.copy()
         x['rainfall_anomaly_pct'] = rain_val
         x['hydro_rain_stress'] = (x['Corrected_Percent_Flooded_Area'] + 0.5) * (1.0 + (rain_val / 100.0))
         x_vec = np.nan_to_num(x.values.astype(float)).reshape(1, -1)
         
-        prob = clf.predict_proba(x_vec)[0, 1]
-        est_sev = reg.predict(x_vec)[0]
-        
+        prob = clf.predict_proba(x_vec)[0, 1]   # P(flood), averaged over 10 models
+        est_sev = reg.predict(x_vec)[0]         # severity estimate shown below
+
+        # Alert levels: >=70% severe, >=45% high, >=25% moderate, else low
         if prob >= 0.70:
             badge = "[SEVERE ALERT]"
             action = "Immediate evacuation of low-lying floodplains; stage NDRF"
