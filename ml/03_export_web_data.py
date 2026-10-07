@@ -19,7 +19,13 @@ import numpy as np
 import pandas as pd
 from ml.ensemble import KFoldEnsembleClassifier
 
+# Make every relative path in this script work no matter where it is started from (e.g. Google Colab)
+ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+os.chdir(ROOT)
+
 def clean_name(name):
+    # Same idea as 01_preprocess.clean_name but stricter: also removes spaces, "-", "_" and "."
+    # so "Y.S.R. Kadapa" and "ysr kadapa" compare equal. Used to match names across files.
     if not isinstance(name, str):
         return ""
     name = re.sub(r'\(.*?\)', '', name)
@@ -32,6 +38,9 @@ def compute_calibrated_daily_prob(annual_prob, rain_mm, soil_moisture_pct, dfsi_
     """
     Calibrates annual flood vulnerability into daily operational flood inundation risk (0.0 to 1.0).
     Grounded in IMD hydrological warning thresholds and CWC river basin dynamics.
+
+    Formula (hand-tuned multipliers, NOT fitted to data):
+        daily = clip( (0.04 + 0.30*annual_prob) * basin_vuln * soil_mult * rain_mult, 0.025, 0.92 )
     """
     # 1. Base daily hazard from annual model probability
     base_daily = 0.04 + (float(annual_prob) * 0.30)
@@ -64,12 +73,16 @@ def compute_calibrated_daily_prob(annual_prob, rain_mm, soil_moisture_pct, dfsi_
     else:
         rain_mult = 4.00 + min(2.0, (r - 120.0) / 60.0) # >4.00 (extreme cloudburst)
         
+    # Multiply all four factors, then keep the result between 2.5% and 92%
     raw_daily = base_daily * basin_vuln * soil_mult * rain_mult
     # Strict realistic meteorological boundaries: min 2.5%, max 92%
     daily_prob = float(np.clip(raw_daily, 0.025, 0.92))
     return round(daily_prob, 3)
 
 def fetch_live_meteorology():
+    # Calls the free Open-Meteo API ONCE per run for 7 regional anchor points (one city per zone).
+    # Every district in a zone later reuses that zone's 7-day rain FORECAST (precipitation_sum, mm).
+    # This runs only when the script is run - the website just shows the saved result.
     print("Connecting to Global Satellite & Meteorological Live Feeds (Open-Meteo GFS)...")
     regional_anchors = [
         {'id': 'north', 'name': 'Northern Plains & Himalayas', 'lat': 28.61, 'lon': 77.20, 'states': ['delhi', 'punjab', 'haryana', 'uttar pradesh', 'chandigarh', 'himachal pradesh', 'uttarakhand', 'jammu and kashmir', 'ladakh']},
@@ -85,6 +98,7 @@ def fetch_live_meteorology():
     lons = ','.join(str(c['lon']) for c in regional_anchors)
     url = f'https://api.open-meteo.com/v1/forecast?latitude={lats}&longitude={lons}&daily=precipitation_sum,precipitation_probability_max,wind_speed_10m_max&timezone=Asia%2FKolkata'
 
+    # If the request fails, api_data stays empty and made-up fallback rain values are used below
     try:
         r = requests.get(url, timeout=12)
         api_data = r.json()
@@ -114,12 +128,17 @@ def fetch_live_meteorology():
             'name': anchor['name'],
             'states': anchor['states'],
             'daily_rain_mm': rain_series[:7],
+            # API gives rain probability in % (0-100); convert to 0-1
             'daily_prob': [round(float(p) / 100.0, 3) if float(p) > 1.0 else round(float(p), 3) for p in prob_series[:7]]
         }
 
     return regional_weather, forecast_dates
 
 def export_live_system():
+    # Main job: for every district, take the trained model's annual flood probability, combine it
+    # with the zone's 7-day rain forecast + estimated soil moisture, and write the result to
+    # web/data/*.json (read by the website). Steps: 1 fetch rain -> 2 load models/data ->
+    # 3 compute 7 daily probabilities per district per model -> 4 attach to map GeoJSON -> 5 save.
     print("=" * 75)
     print("EXPORTING MULTI-SOURCE LIVE FLOOD INTELLIGENCE ENGINE (10-FOLD HYBRIDS)")
     print("=" * 75)
@@ -133,7 +152,8 @@ def export_live_system():
     benchmarks = json.load(open('ml/models/benchmark_metrics.json'))
     importances = json.load(open('ml/models/feature_importance.json'))
 
-    # Load 10-Fold K-Fold District Predictions if available
+    # Per-district probabilities from the 5 deep-learning models (if that file was generated);
+    # otherwise every model falls back to the XGBoost annual probability below.
     kfold_preds_path = 'ml/models/kfold_district_predictions.csv'
     kfold_lookup = {}
     if os.path.exists(kfold_preds_path):
@@ -142,6 +162,16 @@ def export_live_system():
             kfold_lookup[clean_name(r['clean_dist'])] = r.to_dict()
         print(f"Loaded 10-Fold K-Fold Predictions for {len(kfold_lookup)} districts across all 5 models.")
 
+    # Probabilities of the top-3 model combinations (ml/train_combo_hybrid_models.py), added to the same lookup
+    combo_preds_path = 'ml/models/combo_district_predictions.csv'
+    if os.path.exists(combo_preds_path):
+        cdf = pd.read_csv(combo_preds_path)
+        for _, r in cdf.iterrows():
+            kfold_lookup.setdefault(clean_name(r['clean_dist']), {}).update(
+                {k: v for k, v in r.to_dict().items() if k.startswith('combo_')})
+        print(f"Loaded combination-model predictions for {len(cdf)} districts.")
+
+    # Use each district's 2023 row = its most recent feature values
     df_grid = pd.read_csv('data/processed/district_year_dataset.csv')
     df_2023 = df_grid[df_grid['year'] == 2023].copy()
 
@@ -252,6 +282,7 @@ def export_live_system():
             if dname in aliases:
                 dist_to_state[aliases[dname]] = st_clean
 
+    # Picks which of the 7 weather zones a state belongs to (default: central)
     def get_zone_for_state(state_name):
         sn = str(state_name).lower()
         for zid, zdata in regional_weather.items():
@@ -259,7 +290,10 @@ def export_live_system():
                 return zid
         return 'central'
 
-    hybrid_model_keys = ['unet_convlstm', 'cnn_lstm', 'cnn_transformer', 'resnet_bilstm', 'attention_unet_lstm', 'ensemble']
+    # 5 single deep-learning models + 4 combinations of the top 3 (first 2, last 2, first+last, all 3)
+    hybrid_model_keys = ['unet_convlstm', 'cnn_lstm', 'cnn_transformer', 'resnet_bilstm', 'attention_unet_lstm',
+                         'combo_resnet_cnnlstm', 'combo_cnnlstm_cnntransformer',
+                         'combo_resnet_cnntransformer', 'combo_top3']
 
     district_live_intel = {}
     
@@ -274,6 +308,7 @@ def export_live_system():
         zone_id = get_zone_for_state(st_resolved)
         zone_data = regional_weather[zone_id]
         
+        # Annual flood probability for this district from the trained XGBoost ensemble
         base_x = row[feature_cols].copy()
         base_x_vec = np.nan_to_num(base_x.values.astype(float)).reshape(1, -1)
         annual_prob = float(clf.predict_proba(base_x_vec)[0, 1])
@@ -283,12 +318,14 @@ def export_live_system():
         # Look up 10-fold hybrid predictions
         k_dict = kfold_lookup.get(cd) or kfold_lookup.get(raw_cd) or {}
         
+        # For each model and each of the next 7 days: daily probability from annual probability + rain
         model_daily_probs = {}
         for m_key in hybrid_model_keys:
             m_ann_prob = float(k_dict.get(m_key, annual_prob)) if k_dict else annual_prob
             m_probs = []
             for d_idx in range(7):
                 rain_mm = daily_rains[d_idx]
+                # Soil wetness estimate: 32 + 2.2*rain_mm + 4*permanent_water%, kept in 28-96%
                 soil_moist = min(96, max(28, int(32 + rain_mm * 2.2 + float(row['Parmanent_Water']) * 4.0)))
                 d_p = compute_calibrated_daily_prob(
                     annual_prob=m_ann_prob,
@@ -301,7 +338,7 @@ def export_live_system():
                 m_probs.append(d_p)
             model_daily_probs[m_key] = m_probs
 
-        # Severity estimate
+        # Severity estimate from the regressor (log-scale score, see 02_train_models.py)
         sev_score = round(float(reg.predict(base_x_vec)[0]), 1)
         today_sm = min(96, max(28, int(32 + daily_rains[0] * 2.2 + float(row['Parmanent_Water']) * 4.0)))
 
@@ -320,7 +357,7 @@ def export_live_system():
             'severity_score': sev_score,
             'weather_zone': zone_data['name'],
             'model_daily_probs': model_daily_probs,
-            'daily_probs': model_daily_probs.get('cnn_transformer', model_daily_probs['ensemble']),
+            'daily_probs': model_daily_probs['cnn_transformer'],
             'daily_rains_mm': [round(float(r), 1) for r in daily_rains],
             'soil_moisture_pct': today_sm
         }
@@ -343,6 +380,8 @@ def export_live_system():
 
     matched = 0
 
+    # Attach the computed data to each district polygon on the map (matched by cleaned name,
+    # then by the verified alias table above). Unmatched districts get generic baseline values.
     for feat in geojson['features']:
         props = feat.get('properties', {})
         raw_name = props.get('district') or props.get('NAME_2') or props.get('dtname') or ''
@@ -388,6 +427,7 @@ def export_live_system():
             zone_data = regional_weather[zone_id]
             fallback_rains = zone_data['daily_rain_mm']
             
+            # Mid-ranked, annual probability 0.20 placeholder - not real district history
             fallback_models = {}
             for m_key in hybrid_model_keys:
                 f_probs = []
@@ -428,6 +468,7 @@ def export_live_system():
         "🛰️ LIVE TELEMETRY: 726 Indian Districts Monitored for Hydrological Soil Saturation & DFSI Severity"
     ]
 
+    # Final file the website reads: metadata (dates, benchmarks) + per-district intelligence
     web_payload = {
         'metadata': {
             'system_name': 'AQUA HORIZON - AI Flood Intelligence System',
@@ -443,6 +484,7 @@ def export_live_system():
         'district_intel': district_live_intel
     }
 
+    os.makedirs('web/data', exist_ok=True)
     with open('web/data/india_districts.geojson', 'w', encoding='utf-8') as f:
         json.dump(geojson, f)
     with open('web/data/flood_intelligence_data.json', 'w', encoding='utf-8') as f:
