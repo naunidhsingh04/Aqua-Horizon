@@ -53,7 +53,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 # -----------------------------------------------------------------------------
 # 1. REAL SEN1FLOODS11 INDIA DATA LOADER
 # -----------------------------------------------------------------------------
-def load_sen1floods11_india_chips(patch_size=64, max_nodata_frac=0.08, water_thresh=0.10, max_chips=1200):
+def load_sen1floods11_india_chips(patch_size=64, max_nodata_frac=0.08, water_thresh=0.10, max_chips=1200, country='India'):
     """
     Loads the real Sen1Floods11 hand-labeled India subset (68 Sentinel-1 scenes,
     downloaded from the public gs://sen1floods11 bucket into
@@ -64,8 +64,10 @@ def load_sen1floods11_india_chips(patch_size=64, max_nodata_frac=0.08, water_thr
     determines the binary flood/no-flood classification target.
     """
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    s1_dir = os.path.join(base_dir, 'data', 'raw', 'sen1floods11_india', 'S1Hand')
-    lbl_dir = os.path.join(base_dir, 'data', 'raw', 'sen1floods11_india', 'LabelHand')
+    # country='India' is the training set; ml/test_other_countries.py passes Pakistan, Sri-Lanka, USA
+    folder = 'sen1floods11_' + country.lower().replace('-', '_')
+    s1_dir = os.path.join(base_dir, 'data', 'raw', folder, 'S1Hand')
+    lbl_dir = os.path.join(base_dir, 'data', 'raw', folder, 'LabelHand')
 
     s1_files = sorted(glob.glob(os.path.join(s1_dir, '*_S1Hand.tif')))
     print(f"[*] Loading {len(s1_files)} real Sentinel-1 Sen1Floods11 India scenes (512x512 dual-pol VV/VH)...")

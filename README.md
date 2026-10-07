@@ -120,6 +120,24 @@ To maximize output fidelity and eliminate single-split bias, our 58,850-row bala
 python ml/test_10fold_irs.py
 ```
 
+### D. Satellite model tested in other countries (trained on India only)
+
+The Sentinel-1 flood classifier is trained on India chips only, then run unchanged on Sen1Floods11 chips from the USA, Pakistan and Sri Lanka. Nothing from those countries is used for training or for choosing the best epoch. Only these four events are tested; Nepal, Bhutan and Myanmar are not in Sen1Floods11.
+
+| Test set | Chips | Flood chips | Accuracy | Recall | Precision | F1 | ROC-AUC | Accuracy of always saying "no flood" |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **India (held-out 20%, same country)** | 240 | 31.7% | 82.9% | 69.7% | 74.7% | 0.721 | 0.863 | 68.3% |
+| **USA** | 4289 | 10.4% | 42.9% | 91.3% | 14.5% | 0.250 | 0.803 | 89.5% |
+| **Pakistan** | 1130 | 14.6% | 53.3% | 62.4% | 18.1% | 0.281 | 0.632 | 85.4% |
+| **Sri-Lanka** | 2237 | 20.4% | 84.9% | 37.1% | 77.2% | 0.501 | 0.865 | 79.6% |
+
+How to read this: the model works in Sri Lanka (accuracy 84.9%, ROC-AUC 0.865) but misses many floods there (recall 37%). In the USA and Pakistan it raises many false alarms, so its accuracy is below simply always answering "no flood". The USA still ranks flood chips well (AUC 0.803), so a different decision threshold would help there; Pakistan ranks poorly (AUC 0.632). One India-only model does not carry over to every country. *Run:*
+```bash
+python ml/download_sen1floods11_india.py India Pakistan Sri-Lanka USA
+python ml/test_other_countries.py
+```
+Outputs: `ml/models/other_countries_metrics.json`, `ml/models/other_countries_predictions.csv` (one row per chip) and sample pictures in `ml/models/other_countries_samples/`. The website is not changed by this test.
+
 ---
 
 ## 🚀 Key Features of the Live Platform
@@ -168,6 +186,7 @@ python ml/test_10fold_irs.py
 │   ├── train_combo_hybrid_models.py     # Top-3 models and their 4 combinations (averaged probabilities)
 │   ├── download_sen1floods11_india.py   # Downloads the real Sentinel-1 flood scenes
 │   ├── image_pipeline_india.py          # Satellite images: checks, CLAHE, GAN, 10-fold CV
+│   ├── test_other_countries.py          # India-trained satellite model tested on USA, Pakistan, Sri Lanka
 │   └── models/                          # Saved weights (.pt), model files and JSON / CSV results
 ├── web/
 │   ├── index.html                       # Command center interface
@@ -208,6 +227,7 @@ python ml/test_10fold_irs.py               # Inundation Risk Score
 python ml/test_satellite_learning.py
 python ml/download_sen1floods11_india.py   # satellite images (needs internet)
 python ml/image_pipeline_india.py
+python ml/test_other_countries.py       # India-trained satellite model on USA, Pakistan, Sri Lanka
 python ml/03_export_web_data.py            # website data (needs internet for the rain forecast)
 python ml/04_final_report.py               # consolidated report
 ```

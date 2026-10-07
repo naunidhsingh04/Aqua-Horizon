@@ -1,0 +1,80 @@
+{
+  "suite": "Train on India, test on other countries (Sentinel-1, Sen1Floods11 hand-labelled)",
+  "trained_on": "India chips only (CLAHE + DCGAN on training part); best epoch picked on 20% of India",
+  "task": "64x64 dual-pol chip -> flood (>=10% water pixels) / no flood, threshold 0.5",
+  "results": {
+    "India (held-out 20%, same country)": {
+      "chips": 240,
+      "flood_chips": 76,
+      "flood_share_pct": 31.7,
+      "accuracy": 82.92,
+      "recall": 69.74,
+      "precision": 74.65,
+      "f1_score": 0.7211,
+      "iou": 56.38,
+      "roc_auc": 0.863,
+      "confusion": {
+        "true_flood_found": 53,
+        "missed_flood": 23,
+        "false_alarm": 18,
+        "true_no_flood": 146
+      },
+      "always_no_flood_accuracy": 68.33
+    },
+    "USA": {
+      "chips": 4289,
+      "flood_chips": 448,
+      "flood_share_pct": 10.4,
+      "accuracy": 42.9,
+      "recall": 91.29,
+      "precision": 14.51,
+      "f1_score": 0.2504,
+      "iou": 14.31,
+      "roc_auc": 0.8032,
+      "confusion": {
+        "true_flood_found": 409,
+        "missed_flood": 39,
+        "false_alarm": 2410,
+        "true_no_flood": 1431
+      },
+      "always_no_flood_accuracy": 89.55
+    },
+    "Pakistan": {
+      "chips": 1130,
+      "flood_chips": 165,
+      "flood_share_pct": 14.6,
+      "accuracy": 53.27,
+      "recall": 62.42,
+      "precision": 18.1,
+      "f1_score": 0.2807,
+      "iou": 16.32,
+      "roc_auc": 0.6318,
+      "confusion": {
+        "true_flood_found": 103,
+        "missed_flood": 62,
+        "false_alarm": 466,
+        "true_no_flood": 499
+      },
+      "always_no_flood_accuracy": 85.4
+    },
+    "Sri-Lanka": {
+      "chips": 2237,
+      "flood_chips": 456,
+      "flood_share_pct": 20.4,
+      "accuracy": 84.94,
+      "recall": 37.06,
+      "precision": 77.17,
+      "f1_score": 0.5007,
+      "iou": 33.4,
+      "roc_auc": 0.8654,
+      "confusion": {
+        "true_flood_found": 169,
+        "missed_flood": 287,
+        "false_alarm": 50,
+        "true_no_flood": 1731
+      },
+      "always_no_flood_accuracy": 79.62
+    }
+  },
+  "runtime_sec": 225.5
+}
