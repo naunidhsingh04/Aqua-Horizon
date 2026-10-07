@@ -78,7 +78,9 @@ To ensure scientific rigor and prevent single-split variance, AQUA HORIZON was a
 
 > In flood disaster management, **Recall is life-critical**: false negatives mean unprepared communities, whereas early alerts enable pre-emptive disaster mitigation and evacuation.
 
-### C. 10-Fold Inundation Risk & Satellite Severity Benchmarks (Zero Target Leakage)
+### C. 10-Fold Inundation Risk & Satellite Severity Benchmarks
+
+> **Note:** this benchmark uses the already-balanced SMOTE dataset, so synthetic rows can appear in both the training and test folds. Treat these figures as an upper bound; the stricter results (SMOTE on training data only) are in `ml/train_combo_hybrid_models.py`.
 
 To maximize output fidelity and eliminate single-split bias, our 58,850-row balanced dataset was benchmarked using a rigorous **10-Fold Stratified Cross-Validation** process testing both flood classification and continuous satellite inundation extent (MODIS Global Flood Database):
 
@@ -122,34 +124,40 @@ python ml/test_10fold_irs.py
 
 ```text
 ├── data/
-│   ├── raw/                             # Raw Zenodo IFI-Impacts CSV files
-│   ├── processed/                       # 41,325-row District-Year panel dataset
+│   ├── raw/                             # Raw Zenodo IFI-Impacts CSV files (+ Sen1Floods11 images, downloaded by script)
+│   ├── processed/                       # 41,325-row District-Year panel dataset (created by 01_preprocess.py)
 │   └── india_districts.geojson          # Clean 726-district boundary polygons
 ├── ml/
-│   ├── 01_preprocess.py                 # Multi-district explosion & zero-leakage feature engineering
-│   ├── 02_train_models.py               # 80:20 chronological training, SMOTE, ADASYN & XGBoost
-│   ├── 03_export_web_data.py            # Live Open-Meteo GFS telemetry ingestion & web export
+│   ├── 01_preprocess.py                 # Multi-district explosion & feature engineering (DFSI, flood history)
+│   ├── 02_train_models.py               # XGBoost district model: SMOTE / ADASYN, 10-fold + split by year
+│   ├── 03_export_web_data.py            # Live Open-Meteo rain forecast + model outputs -> web/data/*.json
+│   ├── 04_final_report.py               # One consolidated report of every file's output
 │   ├── balance_dataset_smote.py         # 50:50 SMOTE dataset balancing pipeline
-│   ├── test_satellite_learning.py       # MODIS satellite ground-truth & efficiency benchmark
+│   ├── test_satellite_learning.py       # District features vs flooded-area % (10-fold)
 │   ├── test_10fold_irs.py               # 10-Fold Inundation Risk Score (IRS) cross-validation
-│   ├── models_hybrid.py                 # 5 PyTorch Hybrid Deep Learning Architectures
-│   ├── data_loader.py                   # Multi-year sequence builder (T=5) & sequence SMOTE
+│   ├── models_hybrid.py                 # The 5 PyTorch hybrid deep-learning architectures (self-test inside)
+│   ├── data_loader.py                   # Multi-year sequence builder (T=5) (self-test inside)
+│   ├── ensemble.py                      # K-Fold soft-voting ensemble classifier (self-test inside)
 │   ├── train_01_unet_convlstm.py        # Model 1: U-Net + ConvLSTM
 │   ├── train_02_cnn_lstm.py             # Model 2: CNN + LSTM
 │   ├── train_03_cnn_transformer.py      # Model 3: CNN + Transformer
 │   ├── train_04_resnet_bilstm.py        # Model 4: ResNet + BiLSTM
 │   ├── train_05_attention_unet_lstm.py  # Model 5: Attention U-Net + LSTM
-│   ├── train_all_hybrid_models.py       # Master Training & Benchmark Orchestrator
-│   ├── train_kfold_hybrid_models.py     # 10-Fold Stratified Cross-Validation Suite
-│   ├── ensemble.py                      # K-Fold Soft-Voting Ensemble Classifier
-│   └── models/                          # Saved PyTorch weights (.pt) & JSON benchmarks
+│   ├── train_all_hybrid_models.py       # Runs train_01 to train_05 and writes the comparison table
+│   ├── train_kfold_hybrid_models.py     # 10-fold validation of the 5 models + per-district probabilities
+│   ├── train_combo_hybrid_models.py     # Top-3 models and their 4 combinations (averaged probabilities)
+│   ├── download_sen1floods11_india.py   # Downloads the real Sentinel-1 flood scenes
+│   ├── image_pipeline_india.py          # Satellite images: checks, CLAHE, GAN, 10-fold CV
+│   └── models/                          # Saved weights (.pt), model files and JSON / CSV results
 ├── web/
-│   ├── index.html                       # Modern command center interface
-│   ├── css/style.css                    # Dark glassmorphic styling & responsive dock
-│   ├── js/app.js                        # Leaflet map logic, hover tooltips & hybrid switcher
-│   └── data/                            # GeoJSON, intelligence payloads & hybrid benchmarks
-├── predict.py                           # Standalone CLI flood risk predictor
-├── run_app.py                           # Threaded local web server
+│   ├── index.html                       # Command center interface
+│   ├── css/style.css                    # Dark glass styling, themed scrollbars
+│   ├── js/app.js                        # Map logic, model switcher, model-data tables
+│   └── data/                            # GeoJSON, intelligence payloads & benchmark JSON (created by the scripts)
+├── AquaHorizon_Colab.ipynb              # Runs every file in order on Google Colab
+├── requirements.txt                     # Python packages
+├── predict.py                           # CLI flood-risk predictor for one district
+├── run_app.py                           # Web server (local, or inside a Colab notebook)
 ├── vercel.json                          # Production deployment config
 └── README.md
 ```
@@ -158,24 +166,32 @@ python ml/test_10fold_irs.py
 
 ## ⚡ Quick Start
 
+### 0. Run everything on Google Colab (recommended for verification)
+1. Open [Google Colab](https://colab.research.google.com), choose **File > Upload notebook**, and upload `AquaHorizon_Colab.ipynb`.
+2. Run the first code cell and select `AquaHorizon.zip` (the project folder, zipped) when asked.
+3. Run the remaining cells in order. Every Python file runs and prints its own output; step 12 prints the final report and step 13 shows the website.
+
 ### 1. Prerequisites & Dependencies
 ```bash
-pip install torch numpy pandas scikit-learn xgboost imbalanced-learn joblib requests
+pip install -r requirements.txt
 ```
 
-### 2. Run Master Hybrid Model Suite
-To train and benchmark all 5 hybrid deep learning architectures:
+### 2. Run the whole pipeline in order
 ```bash
-python ml/train_all_hybrid_models.py
+python ml/01_preprocess.py                 # dataset
+python ml/balance_dataset_smote.py         # 50:50 balanced copy
+python ml/02_train_models.py               # XGBoost district model
+python ml/train_all_hybrid_models.py       # the 5 deep-learning models (runs train_01 to train_05)
+python ml/train_kfold_hybrid_models.py     # 10-fold validation of the 5 models
+python ml/train_combo_hybrid_models.py     # top-3 models and their combinations
+python ml/test_10fold_irs.py               # Inundation Risk Score
+python ml/test_satellite_learning.py
+python ml/download_sen1floods11_india.py   # satellite images (needs internet)
+python ml/image_pipeline_india.py
+python ml/03_export_web_data.py            # website data (needs internet for the rain forecast)
+python ml/04_final_report.py               # consolidated report
 ```
-Or train individual architectures:
-```bash
-python ml/train_01_unet_convlstm.py
-python ml/train_02_cnn_lstm.py
-python ml/train_03_cnn_transformer.py
-python ml/train_04_resnet_bilstm.py
-python ml/train_05_attention_unet_lstm.py
-```
+Or train one architecture on its own, for example `python ml/train_02_cnn_lstm.py`.
 
 ### 3. Access the Web Application
 
@@ -189,13 +205,10 @@ python ml/train_05_attention_unet_lstm.py
   Open your browser at: `http://localhost:8000`
 
 ### 4. CLI Prediction Tool
-Predict live or hypothetical scenario flood risk for any district:
+Flood probability for one district under four what-if rainfall scenarios:
 ```bash
-# Predict live risk for Patna
-python predict.py --district Patna
-
-# Predict with custom rainfall scenario (+35mm rain)
-python predict.py --district Dibrugarh --rain 35.0
+python predict.py Patna
+python predict.py Dibrugarh
 ```
 
 ---
