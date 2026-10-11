@@ -1,727 +1,727 @@
 clean_dist,Dist_Name,combo_resnet_cnnlstm,combo_cnnlstm_cnntransformer,combo_resnet_cnntransformer,combo_top3
-adilabad,Adilabad,0.6369,0.6261,0.6199,0.6277
-agar malwa,Agar Malwa,0.0371,0.0412,0.0443,0.0409
-agra,Agra,0.6067,0.598,0.6024,0.6024
-ahmad,Ahmadnagar,0.0633,0.0639,0.0615,0.0629
-ahmadabad,Ahmadabad,0.053,0.044,0.05,0.049
-aizawl,Aizawl,0.4598,0.5168,0.4942,0.4903
-ajmer,Ajmer,0.5687,0.5811,0.5791,0.5763
-akola,Akola,0.9222,0.9158,0.9161,0.918
-alappuzha,Alappuzha,0.9388,0.9449,0.9325,0.9387
-aligarh,Aligarh,0.49,0.5058,0.5111,0.5023
-alipurduar,Alipurduar,0.0943,0.0772,0.0834,0.085
-alirajpur,Alirajpur,0.4216,0.4818,0.4566,0.4533
+adilabad,Adilabad,0.648,0.6251,0.6458,0.6396
+agar malwa,Agar Malwa,0.0421,0.0462,0.0475,0.0453
+agra,Agra,0.6213,0.5904,0.6056,0.6058
+ahmad,Ahmadnagar,0.0716,0.0715,0.0809,0.0747
+ahmadabad,Ahmadabad,0.042,0.0399,0.0473,0.0431
+aizawl,Aizawl,0.4644,0.5151,0.4976,0.4923
+ajmer,Ajmer,0.5889,0.5935,0.6023,0.5949
+akola,Akola,0.9349,0.922,0.922,0.9263
+alappuzha,Alappuzha,0.9563,0.9484,0.9489,0.9512
+aligarh,Aligarh,0.5033,0.5087,0.5111,0.5077
+alipurduar,Alipurduar,0.0905,0.084,0.0809,0.0851
+alirajpur,Alirajpur,0.424,0.4923,0.4599,0.4587
 almora,"Almora
-",0.3779,0.3794,0.3636,0.3736
-alwar,Alwar,0.6085,0.5993,0.6461,0.618
-ambala,Ambala,0.4242,0.4291,0.4502,0.4345
-ambedkar,Ambedkar Nagar,0.491,0.5562,0.5455,0.5309
-amethi,Amethi,0.4717,0.4679,0.4861,0.4752
-amravati,Amravati,0.9161,0.9161,0.9136,0.9153
-amreli,Amreli,0.8538,0.8919,0.8659,0.8705
-amritsar,Amritsar,0.7786,0.793,0.7804,0.784
-amroha,Amroha,0.4473,0.4722,0.4796,0.4664
-anand,Anand,0.4774,0.4918,0.4914,0.4869
-anantapur,Anantapur,0.0905,0.081,0.075,0.0822
-anantnag,Anantnag,0.8269,0.8242,0.8167,0.8226
-anjaw,Anjaw,0.4472,0.3857,0.4172,0.4167
-anugul,Anugul,0.4366,0.5155,0.4863,0.4795
-anuppur,Anuppur,0.2723,0.2919,0.2893,0.2845
-araria,Araria,0.4582,0.5058,0.5204,0.4948
-aravalli,Aravalli,0.0988,0.0837,0.1028,0.0951
-ariyalur,Ariyalur,0.4373,0.4455,0.4112,0.4313
-arwal,Arwal,0.4431,0.5063,0.5315,0.4936
-ashok,Ashoknagar,0.571,0.5353,0.5492,0.5518
-auraiya,Auraiya,0.328,0.3827,0.3874,0.366
-aurangabad,Aurangabad,0.8358,0.8033,0.8175,0.8189
-azamgarh,Azamgarh,0.7039,0.7097,0.7023,0.7053
-badgam,Badgam,0.1796,0.1267,0.1662,0.1575
-bagalkote,Bagalkote,0.4207,0.4114,0.3993,0.4104
-bageshwar,Bageshwar,0.6311,0.6093,0.6215,0.6206
-baghpat,Baghpat,0.5079,0.5101,0.4904,0.5028
-bahraich,Bahraich,0.7477,0.7748,0.7533,0.7586
-baksa,Baksa,0.7904,0.7752,0.7663,0.7773
-balaghat,Balaghat,0.5647,0.5446,0.556,0.5551
-balangir,Balangir,0.3921,0.4195,0.4228,0.4115
-baleshwar,Baleshwar,0.7684,0.7794,0.7779,0.7753
-ballari,Ballari,0.8168,0.8382,0.8051,0.82
-ballia,Ballia,0.8099,0.8376,0.8163,0.8213
-balod,Balod,0.1154,0.1118,0.1355,0.1209
-baloda bazar,Baloda Bazar,0.0456,0.0409,0.0463,0.0442
-balrampur,Balrampur,0.6908,0.7072,0.7007,0.6996
-bametara,Bametara,0.0535,0.0459,0.0562,0.0518
-banas kantha,Banas Kantha,0.6295,0.6206,0.6214,0.6239
-banda,Banda,0.5874,0.5906,0.5895,0.5892
-bandipore,Bandipore,0.0615,0.0632,0.0708,0.0652
-bangalore,Bangalore,0.036,0.0496,0.0507,0.0455
-banka,Banka,0.5477,0.5616,0.5529,0.5541
-bankura,Bankura,0.4925,0.5451,0.5131,0.5169
-banswara,Banswara,0.6669,0.6625,0.6515,0.6603
-bara banki,Bara Banki,0.8817,0.8765,0.8807,0.8796
-baramula,Baramula,0.0763,0.0671,0.0811,0.0748
-baran,Baran,0.5005,0.4476,0.5015,0.4832
-bareilly,Bareilly,0.5706,0.5636,0.5809,0.5717
-bargarh,Bargarh,0.665,0.6567,0.6396,0.6538
-barmer,Barmer,0.5694,0.5369,0.5601,0.5555
-barnala,Barnala,0.4166,0.41,0.3936,0.4068
-barpeta,Barpeta,0.9469,0.9506,0.9427,0.9467
-barwani,Barwani,0.492,0.5142,0.5013,0.5025
-bastar,Bastar,0.3925,0.3654,0.3987,0.3855
-basti,Basti,0.812,0.8013,0.8169,0.81
-bathinda,Bathinda,0.6374,0.6198,0.6039,0.6204
-baudh,Baudh,0.0801,0.0857,0.0936,0.0864
-begusarai,Begusarai,0.6348,0.6836,0.6718,0.6634
-belagavi,Belagavi,0.8721,0.8851,0.8821,0.8798
-bengaluru rural,Bengaluru Rural,0.7539,0.7577,0.7522,0.7546
-betul,Betul,0.5798,0.5613,0.5297,0.557
-bhadohi,Bhadohi,0.4472,0.4787,0.485,0.4703
-bhadradri kothagudem,Bhadradri Kothagudem,0.1684,0.1646,0.1938,0.1756
-bhadrak,Bhadrak,0.5773,0.5842,0.5907,0.5841
-bhagalpur,Bhagalpur,0.6945,0.7204,0.7165,0.7105
-bhandara,Bhandara,0.8818,0.8877,0.8976,0.889
-bharatpur,Bharatpur,0.6064,0.6053,0.6048,0.6055
-bharuch,Bharuch,0.885,0.897,0.8911,0.891
-bhav,Bhavnagar,0.7758,0.7903,0.7633,0.7764
-bhilwara,Bhilwara,0.6284,0.6092,0.6028,0.6135
-bhind,Bhind,0.4951,0.485,0.4678,0.4826
-bhiwani,Bhiwani,0.4039,0.4406,0.409,0.4178
-bhojpur,Bhojpur,0.6008,0.6257,0.614,0.6135
-bhopal,Bhopal,0.6592,0.6628,0.6515,0.6578
-bid,Bid,0.1128,0.0896,0.0975,0.1
-bidar,Bidar,0.0898,0.0786,0.0812,0.0832
-bijapur,Bijapur,0.7506,0.7389,0.739,0.7428
-bijnor,Bijnor,0.4431,0.4722,0.4728,0.4627
-bikaner,Bikaner,0.6219,0.6047,0.5987,0.6084
-bilaspur,Bilaspur,0.8978,0.9165,0.9051,0.9065
-birbhum,Birbhum,0.4722,0.5368,0.5054,0.5048
-bishnupur,Bishnupur,0.1709,0.2335,0.2286,0.211
-biswanath,Biswanath,0.9043,0.9166,0.9182,0.9131
-bokaro,Bokaro,0.4464,0.4307,0.4434,0.4402
-bongaigaon,Bongaigaon,0.9375,0.9424,0.9385,0.9395
-botad,Botad,0.5578,0.5317,0.5151,0.5348
-budaun,Budaun,0.5462,0.5673,0.5424,0.552
-bulandshahr,Bulandshahr,0.5277,0.5423,0.5364,0.5355
-buldana,Buldana,0.1065,0.0867,0.0911,0.0948
-bundi,Bundi,0.6637,0.6729,0.6832,0.6733
-burhanpur,Burhanpur,0.6228,0.6132,0.6016,0.6125
-buxar,Buxar,0.4913,0.5334,0.5152,0.5133
-cachar,Cachar,0.9434,0.9402,0.9369,0.9402
-central,Central,0.4328,0.3883,0.4341,0.4184
-chamarajaa,Chamarajanagara,0.2073,0.2517,0.2692,0.2428
-chamba,Chamba,0.9388,0.9389,0.9384,0.9387
-chamoli,Chamoli,0.8006,0.8315,0.8157,0.8159
-champawat,Champawat,0.4742,0.4623,0.4787,0.4717
-champhai,Champhai,0.206,0.211,0.2244,0.2138
-chandauli,Chandauli,0.4145,0.4143,0.4264,0.4184
-chandel,Chandel,0.088,0.1013,0.1084,0.0992
-chandigarh,Chandigarh,0.2522,0.2702,0.2832,0.2685
-chandrapur,Chandrapur,0.9335,0.9327,0.9315,0.9326
-changlang,Changlang,0.4264,0.37,0.4413,0.4125
-charaideo,Charaideo,0.5718,0.5653,0.6125,0.5832
-charki dadri,Charki Dadri,0.225,0.2481,0.2358,0.2363
-chatra,Chatra,0.3438,0.3049,0.3296,0.3261
-chengalpattu,Chengalpattu,0.3289,0.319,0.3227,0.3235
-chennai,Chennai,0.8325,0.8505,0.8406,0.8412
-chhatarpur,Chhatarpur,0.5421,0.5823,0.5637,0.5627
-chhindwara,Chhindwara,0.6927,0.6702,0.6883,0.6838
-chikkaballapura,Chikkaballapura,0.6845,0.6633,0.6797,0.6758
-chikkamagaluru,Chikkamagaluru,0.5004,0.5161,0.5318,0.5161
-chirang,Chirang,0.8918,0.9052,0.9028,0.8999
-chitradurga,Chitradurga,0.7828,0.8282,0.8163,0.8091
-chitrakoot,Chitrakoot,0.5389,0.5571,0.5376,0.5446
-chittaurgarh,Chittaurgarh,0.0463,0.0461,0.0511,0.0478
-chittoor,Chittoor,0.6401,0.6409,0.6217,0.6343
-chota udaipur,Chota Udaipur,0.4329,0.4586,0.4483,0.4466
-churachandpur,Churachandpur,0.0674,0.0769,0.0827,0.0756
-churu,Churu,0.5329,0.5327,0.5321,0.5326
-coimbatore,Coimbatore,0.6978,0.744,0.7089,0.7169
-cooch behar,Cooch Behar,0.7249,0.752,0.737,0.738
-cuddalore,Cuddalore,0.582,0.6761,0.6331,0.6304
-cuttack,Cuttack,0.7842,0.7955,0.7846,0.7881
-dadra & haveli,Dadra & Nagar Haveli,0.0761,0.064,0.072,0.0707
-dakshin bastar dantewada,Dakshin Bastar Dantewada,0.1377,0.1253,0.145,0.136
-dakshin dinajpur,Dakshin Dinajpur,0.4899,0.532,0.5148,0.5123
-dakshina kannada,Dakshina Kannada,0.9393,0.9435,0.938,0.9403
-daman,Daman,0.0462,0.04,0.0469,0.0444
-damoh,Damoh,0.3605,0.4116,0.3909,0.3877
-darbhanga,Darbhanga,0.7745,0.7835,0.7684,0.7755
-darjiling,Darjiling,0.1038,0.065,0.0885,0.0858
-darrang,Darrang,0.9433,0.9463,0.9388,0.9428
-datia,Datia,0.4686,0.4792,0.4537,0.4672
-dausa,Dausa,0.4521,0.4671,0.4637,0.4609
-davanagere,Davanagere,0.1072,0.0794,0.0945,0.0937
-debagarh,Debagarh,0.0657,0.0852,0.0942,0.0817
-dehradun,Dehradun,0.7333,0.7675,0.7653,0.7554
-deoghar,Deoghar,0.3259,0.2389,0.2983,0.2877
-deoria,Deoria,0.7271,0.7179,0.7234,0.7228
-devbhumi dwarka,Devbhumi Dwarka,0.2475,0.2313,0.2477,0.2422
-dewas,Dewas,0.4578,0.4821,0.4659,0.4686
-dhalai,Dhalai,0.4002,0.4174,0.4071,0.4082
-dhamtari,Dhamtari,0.2054,0.231,0.2401,0.2255
-dhanbad,Dhanbad,0.2877,0.3003,0.3072,0.2984
-dhar,Dhar,0.437,0.4821,0.4639,0.461
-dharmapuri,Dharmapuri,0.3795,0.387,0.3672,0.3779
-dharwad,Dharwad,0.9047,0.904,0.9066,0.9051
-dhaulpur,Dhaulpur,0.1843,0.1243,0.1536,0.1541
-dhemaji,Dhemaji,0.9579,0.955,0.9534,0.9554
-dhenkanal,Dhenkanal,0.52,0.6071,0.5815,0.5696
-dhubri,Dhubri,0.9343,0.9363,0.9301,0.9336
-dhule,Dhule,0.7014,0.6263,0.6364,0.6547
-dibrugarh,Dibrugarh,0.9268,0.928,0.9228,0.9258
-dima hasao,Dima Hasao,0.5584,0.5416,0.5655,0.5552
-dimapur,Dimapur,0.1419,0.1352,0.1615,0.1462
-dindigul,Dindigul,0.5033,0.5131,0.4771,0.4978
-dindori,Dindori,0.5329,0.5134,0.5407,0.529
-diu,Diu,0.0322,0.0314,0.0341,0.0326
-doda,Doda,0.7574,0.7711,0.7473,0.7586
-dohad,Dohad,0.0515,0.0531,0.0543,0.0529
-dumka,Dumka,0.1264,0.0999,0.1276,0.118
-dungarpur,Dungarpur,0.3328,0.3432,0.3876,0.3546
-durg,Durg,0.5144,0.4825,0.4933,0.4968
-east,East ,0.1794,0.2358,0.2176,0.2109
-east district,East District,0.1093,0.1128,0.1237,0.1153
-east garo hills,East Garo Hills,0.3282,0.3449,0.3364,0.3365
-east godavari,East Godavari,0.8,0.8177,0.8063,0.808
-east jaintia hills,East Jaintia Hills,0.1524,0.1091,0.1558,0.1391
-east kameng,East Kameng,0.4009,0.3632,0.3953,0.3865
-east khasi hills,East Khasi Hills,0.4768,0.4512,0.4763,0.4681
-east nimar,East Nimar,0.3793,0.3536,0.3888,0.3739
-east siang,East Siang,0.6959,0.697,0.6872,0.6933
-ernakulam,Ernakulam,0.9163,0.9201,0.9121,0.9162
-erode,Erode,0.617,0.6096,0.606,0.6108
-etah,Etah,0.5815,0.5757,0.5715,0.5762
-etawah,Etawah,0.764,0.7418,0.7558,0.7539
-faizabad,Faizabad,0.0902,0.0633,0.0733,0.0756
-faridabad,Faridabad,0.3342,0.3569,0.3322,0.3411
-faridkot,Faridkot,0.5628,0.5419,0.5463,0.5504
-farrukhabad,Farrukhabad,0.5488,0.5474,0.5596,0.552
-fatehabad,Fatehabad,0.3408,0.3449,0.3357,0.3405
-fatehgarh sahib,Fatehgarh Sahib,0.5595,0.5112,0.5446,0.5385
-fatehpur,Fatehpur,0.7016,0.7099,0.7054,0.7057
-fazilka,Fazilka,0.473,0.4488,0.4436,0.4551
-firozabad,Firozabad,0.5068,0.5096,0.5188,0.5117
-firozpur,Firozpur,0.1207,0.0934,0.1134,0.1092
-gadag,Gadag,0.7686,0.7623,0.7463,0.7591
-gadchiroli,Gadchiroli,0.8715,0.8756,0.8727,0.8733
-gajapati,Gajapati,0.3741,0.4645,0.4263,0.4216
-ganderbal,Ganderbal,0.7048,0.7003,0.7148,0.7067
-gandhi,Gandhinagar,0.4741,0.4915,0.4888,0.4848
-ganga,Ganganagar,0.4345,0.4517,0.438,0.4414
-ganjam,Ganjam,0.5073,0.5447,0.5349,0.529
-garhwa,Garhwa,0.2765,0.3118,0.3286,0.3056
-garhwal,Garhwal,0.7158,0.6872,0.7081,0.7037
-gariaband,Gariaband,0.0656,0.054,0.0666,0.0621
-gautam buddha,Gautam Buddha Nagar,0.4754,0.4879,0.4797,0.481
-gaya,Gaya,0.5469,0.5825,0.5578,0.5624
-ghaziabad,Ghaziabad,0.5249,0.5404,0.5257,0.5303
-ghazipur,Ghazipur,0.0667,0.0538,0.0572,0.0593
-gir somnath,Gir Somnath,0.6959,0.7576,0.7279,0.7271
-giridih,Giridih,0.1046,0.0898,0.1041,0.0995
-goalpara,Goalpara,0.9298,0.9283,0.9244,0.9275
-godda,Godda,0.1971,0.146,0.1972,0.1801
-golaghat,Golaghat,0.9282,0.9374,0.9294,0.9317
-gomati,Gomati,0.3277,0.3333,0.3228,0.328
-gonda,Gonda,0.882,0.8867,0.8844,0.8844
-gondiya,Gondiya,0.064,0.054,0.0603,0.0594
-gopalganj,Gopalganj,0.6658,0.7234,0.6896,0.6929
-gorakhpur,Gorakhpur,0.7137,0.7076,0.7054,0.7089
-gumla,Gumla,0.5183,0.4876,0.4987,0.5015
-guna,Guna,0.6299,0.5919,0.6009,0.6076
-guntur,Guntur,0.7455,0.7615,0.7707,0.7592
-gurdaspur,Gurdaspur,0.7588,0.7279,0.7212,0.736
-gurugram,Gurugram,0.3243,0.3482,0.327,0.3331
-gwalior,Gwalior,0.4544,0.4739,0.4677,0.4653
-hailakandi,Hailakandi,0.7474,0.7438,0.7585,0.7499
-hamirpur,Hamirpur,0.9349,0.9271,0.9288,0.9303
-hanumangarh,Hanumangarh,0.3684,0.4065,0.3497,0.3748
-hapur,Hapur,0.471,0.4807,0.4898,0.4805
-harda,Harda,0.6334,0.5929,0.6355,0.6206
-hardoi,Hardoi,0.5819,0.5936,0.5928,0.5895
-hardwar,Hardwar,0.0547,0.0443,0.0533,0.0508
-hassan,Hassan,0.7613,0.7845,0.7892,0.7783
-hathras,Hathras,0.5446,0.5289,0.5371,0.5369
-haveri,Haveri,0.7235,0.7065,0.7038,0.7113
-hazaribagh,Hazaribagh,0.4862,0.3943,0.4423,0.4409
-hingoli,Hingoli,0.7894,0.7833,0.7888,0.7872
-hisar,Hisar,0.3464,0.3875,0.3762,0.37
-hojai,Hojai,0.8119,0.8162,0.8139,0.814
-hooghly,Hooghly,0.6499,0.6638,0.6769,0.6635
-hoshangabad,Hoshangabad,0.0841,0.0673,0.0738,0.0751
-hoshiarpur,Hoshiarpur,0.6691,0.6551,0.6797,0.6679
-howrah,Howrah,0.7023,0.763,0.7538,0.7397
-hyderabad,Hyderabad,0.7495,0.7248,0.7313,0.7352
-idukki,Idukki,0.9438,0.9401,0.9377,0.9405
-imphal east,Imphal East,0.2229,0.2667,0.2655,0.2517
-imphal west,Imphal West,0.1975,0.2531,0.234,0.2282
-indore,Indore,0.6488,0.6399,0.6368,0.6419
-jabalpur,Jabalpur,0.5923,0.595,0.5974,0.5949
-jagatsinghapur,Jagatsinghapur,0.5892,0.6272,0.5966,0.6043
-jagitial,Jagitial,0.056,0.0565,0.063,0.0585
-jaipur,Jaipur,0.789,0.7872,0.7795,0.7852
-jaisalmer,Jaisalmer,0.4295,0.4578,0.4503,0.4459
-jajapur,Jajapur,0.345,0.4098,0.3917,0.3822
-jalandhar,Jalandhar,0.7598,0.7672,0.7595,0.7622
-jalaun,Jalaun,0.6191,0.6706,0.6398,0.6432
-jalgaon,Jalgaon,0.8371,0.8439,0.8369,0.8393
-jalna,Jalna,0.8241,0.8027,0.8126,0.8131
-jalor,Jalor,0.0991,0.0896,0.1095,0.0994
-jalpaiguri,Jalpaiguri,0.6632,0.6809,0.6782,0.6741
-jam,Jamnagar,0.7397,0.7779,0.7446,0.7541
-jammu,Jammu,0.5886,0.6592,0.6256,0.6244
-jamtara,Jamtara,0.0709,0.0607,0.0709,0.0675
-jamui,Jamui,0.5036,0.5129,0.5154,0.5106
-jangoan,Jangoan,0.0892,0.0747,0.0925,0.0855
-janjgir - champa,Janjgir - Champa,0.0524,0.0488,0.0513,0.0508
-jashpur,Jashpur,0.0628,0.0594,0.0731,0.0651
-jaunpur,Jaunpur,0.6372,0.6495,0.6395,0.6421
-jayashankar,Jayashankar,0.0575,0.05,0.058,0.0552
-jehanabad,Jehanabad,0.3444,0.4178,0.4249,0.3957
-jhabua,Jhabua,0.2919,0.3194,0.3186,0.31
-jhajjar,Jhajjar,0.1919,0.2425,0.2247,0.2197
-jhalawar,Jhalawar,0.6493,0.6076,0.638,0.6316
-jhansi,Jhansi,0.5318,0.5637,0.5325,0.5427
-jhargram,Jhargram,0.0554,0.0456,0.057,0.0527
-jharsuguda,Jharsuguda,0.5476,0.578,0.5598,0.5618
-jhunjhunun,Jhunjhunun,0.1434,0.1183,0.136,0.1325
-jind,Jind,0.3968,0.429,0.4191,0.415
-jiribam,Jiribam,0.1934,0.1759,0.1845,0.1846
-jodhpur,Jodhpur,0.6726,0.6693,0.6767,0.6728
-jogulamba gadwal,Jogulamba Gadwal,0.1336,0.0975,0.1443,0.1251
-jorhat,Jorhat,0.9328,0.9334,0.9299,0.932
-junagadh,Junagadh,0.9166,0.9268,0.921,0.9215
-kabeerdham,Kabeerdham,0.0711,0.0719,0.0811,0.0747
-kachchh,Kachchh,0.6345,0.7085,0.6574,0.6668
-kaimur,Kaimur (bhabua),0.4933,0.5319,0.5051,0.5101
-kaithal,Kaithal,0.4349,0.4713,0.4336,0.4466
-kakching,Kakching,0.1019,0.0977,0.1007,0.1001
-kalaburagi,Kalaburagi,0.784,0.7936,0.776,0.7845
-kalahandi,Kalahandi,0.7199,0.7636,0.7274,0.7369
-kalimpong,Kalimpong,0.3079,0.2585,0.3056,0.2907
-kallakurichi,Kallakurichi,0.3349,0.3928,0.3622,0.3633
-kamareddy,Kamareddy,0.2535,0.2405,0.2374,0.2438
-kamjong,Kamjong,0.093,0.096,0.1094,0.0995
-kamle,Kamle,0.4011,0.3912,0.4037,0.3987
-kamrup,Kamrup,0.9265,0.9198,0.919,0.9218
-kamrup metropolitan,Kamrup Metropolitan,0.0592,0.0595,0.0608,0.0598
-kancheepuram,Kancheepuram,0.3986,0.4195,0.3834,0.4005
-kandhamal,Kandhamal,0.5,0.5505,0.5171,0.5225
-kangpokpi,Kangpokpi,0.0932,0.0876,0.1065,0.0958
-kangra,Kangra,0.9495,0.9479,0.9446,0.9473
-kannauj,Kannauj,0.4904,0.528,0.4949,0.5044
-kanniyakumari,Kanniyakumari,0.1952,0.156,0.1808,0.1773
-kannur,Kannur,0.9458,0.9433,0.9405,0.9432
-kanpur,Kanpur Nagar,0.5274,0.5546,0.5664,0.5495
-kanpur dehat,Kanpur Dehat,0.5737,0.5688,0.5822,0.5749
-kapurthala,Kapurthala,0.7494,0.755,0.7649,0.7564
-karaikal,Karaikal,0.1042,0.1246,0.1337,0.1209
-karauli,Karauli,0.3979,0.4527,0.4402,0.4303
-karbi anglong,Karbi Anglong,0.8344,0.8651,0.8583,0.8526
-kargil,Kargil,0.3779,0.3287,0.3639,0.3568
-karim,Karimnagar,0.6947,0.6424,0.6414,0.6595
-karimganj,Karimganj,0.7232,0.752,0.7432,0.7394
-karnal,Karnal,0.3904,0.4212,0.3979,0.4032
-karur,Karur,0.4116,0.419,0.3914,0.4073
-kasaragod,Kasaragod,0.9366,0.9363,0.9368,0.9366
-kasganj,Kasganj,0.2648,0.3266,0.3375,0.3096
-kathua,Kathua,0.7073,0.6932,0.6958,0.6988
-katihar,Katihar,0.7175,0.724,0.7111,0.7175
-katni,Katni,0.4161,0.4506,0.4225,0.4297
-kaushambi,Kaushambi,0.5474,0.5825,0.5663,0.5654
-kendrapara,Kendrapara,0.7125,0.7512,0.7441,0.7359
-kendujhar,Kendujhar,0.6483,0.6509,0.6527,0.6506
-khagaria,Khagaria,0.7768,0.7921,0.7748,0.7812
-khammam,Khammam,0.7552,0.7268,0.7351,0.739
-kheda,Kheda,0.6091,0.6169,0.6021,0.6094
-kheri,Kheri,0.6956,0.7039,0.7175,0.7057
-khordha,Khordha,0.4018,0.4695,0.448,0.4398
-khowai,Khowai,0.2116,0.2665,0.2241,0.2341
-khunti,Khunti,0.1921,0.2176,0.2497,0.2198
-kinnaur,Kinnaur,0.8942,0.8694,0.8711,0.8782
-kiphire,Kiphire,0.1778,0.1695,0.1565,0.1679
-kishanganj,Kishanganj,0.7402,0.7926,0.7689,0.7673
-kishtwar,Kishtwar,0.6764,0.7114,0.701,0.6962
-kodagu,Kodagu,0.9149,0.9267,0.9211,0.9209
-kodarma,Kodarma,0.0546,0.0506,0.0559,0.0537
-kohima,Kohima,0.2935,0.2875,0.2774,0.2861
-kokrajhar,Kokrajhar,0.8282,0.8526,0.8511,0.8439
-kolar,Kolar,0.6243,0.6057,0.6096,0.6132
-kolasib,Kolasib,0.2497,0.212,0.2466,0.2361
-kolhapur,Kolhapur,0.8847,0.8996,0.8881,0.8908
-kolkata,Kolkata,0.725,0.7815,0.737,0.7478
-kollam,Kollam,0.9014,0.896,0.884,0.8938
-kondagaon,Kondagaon,0.0635,0.0531,0.0673,0.0613
-koppal,Koppal,0.6272,0.6605,0.6464,0.6447
-koraput,Koraput,0.8958,0.905,0.8967,0.8992
-korba,Korba,0.3166,0.2962,0.2797,0.2975
-koriya,Koriya,0.0625,0.0565,0.0649,0.0613
-kota,Kota,0.6269,0.6292,0.6449,0.6337
-kottayam,Kottayam,0.9434,0.9432,0.9398,0.9421
-kozhikode,Kozhikode,0.9423,0.9386,0.9331,0.938
-kra daadi,Kra Daadi,0.4166,0.3622,0.3923,0.3903
-krishna,Krishna,0.7569,0.7854,0.7648,0.769
-krishnagiri,Krishnagiri,0.5175,0.473,0.4818,0.4908
-kulgam,Kulgam,0.3954,0.4038,0.3707,0.39
-kullu,Kullu,0.95,0.9462,0.9457,0.9473
-kumuram bheem asifabad,Kumuram Bheem Asifabad,0.5297,0.4837,0.5577,0.5237
-kupwara,Kupwara,0.5118,0.498,0.4931,0.501
-kurnool,Kurnool,0.8151,0.7914,0.7819,0.7961
-kurukshetra,Kurukshetra,0.4096,0.4152,0.4125,0.4124
-kurung kumey,Kurung Kumey,0.4785,0.4333,0.4597,0.4572
-kushi,Kushinagar,0.4077,0.4762,0.4731,0.4523
-lahul & spiti,Lahul & Spiti,0.0735,0.0736,0.0762,0.0744
-lakhimpur,Lakhimpur,0.9286,0.9326,0.9198,0.927
-lakhisarai,Lakhisarai,0.5457,0.5739,0.5745,0.5647
-lakshadweep,Lakshadweep,0.038,0.0352,0.045,0.0394
-lalitpur,Lalitpur,0.5484,0.5257,0.536,0.5367
-latehar,Latehar,0.078,0.0757,0.0827,0.0788
-latur,Latur,0.8056,0.7753,0.78,0.787
-lawngtlai,Lawngtlai,0.2921,0.2788,0.2941,0.2884
-leh,Leh,0.0752,0.0677,0.0739,0.0723
-lepa rada,Lepa Rada,0.0836,0.0669,0.0924,0.081
-lohardaga,Lohardaga,0.1774,0.1572,0.1842,0.1729
-lohit,Lohit,0.5886,0.5721,0.5994,0.5867
-longding,Longding,0.4178,0.3682,0.3958,0.3939
-longleng,Longleng,0.0737,0.0624,0.0759,0.0707
-lower dibang valley,Lower Dibang Valley,0.3464,0.3599,0.3621,0.3561
-lower siang,Lower Siang,0.4742,0.4265,0.4528,0.4512
-lower subansiri,Lower Subansiri,0.1688,0.1238,0.1769,0.1565
-lucknow,Lucknow,0.6236,0.6266,0.6551,0.6351
-ludhiana,Ludhiana,0.6161,0.6061,0.6149,0.6124
-lunglei,Lunglei,0.3332,0.3902,0.3494,0.3576
-madhepura,Madhepura,0.5118,0.58,0.5537,0.5485
-madhubani,Madhubani,0.6315,0.6613,0.6513,0.648
-madurai,Madurai,0.6003,0.5976,0.5769,0.5916
-mahabub,Mahabubnagar,0.5073,0.5067,0.4937,0.5025
-mahabubabad,Mahabubabad,0.299,0.327,0.3733,0.3331
-mahasamund,Mahasamund,0.1963,0.232,0.2191,0.2158
-mahe,Mahe,0.0495,0.0441,0.0519,0.0485
-mahendragarh,Mahendragarh,0.1477,0.1998,0.1859,0.1778
-mahesana,Mahesana,0.5421,0.5468,0.5405,0.5431
-mahisagar,Mahisagar,0.6206,0.5857,0.5987,0.6017
-mahoba,Mahoba,0.5048,0.4993,0.5131,0.5057
-mahrajganj,Mahrajganj,0.4195,0.4587,0.4607,0.4463
-mainpuri,Mainpuri,0.5038,0.5219,0.5139,0.5132
-majuli,Majuli,0.8851,0.9077,0.8888,0.8939
-malappuram,Malappuram,0.9134,0.9048,0.9022,0.9068
-maldah,Maldah,0.4909,0.5961,0.5774,0.5548
-malkangiri,Malkangiri,0.4676,0.4865,0.4946,0.4829
-mamit,Mamit,0.145,0.1433,0.1656,0.1513
-mancherial,Mancherial,0.1705,0.1554,0.1748,0.1669
-mandi,Mandi,0.9138,0.9201,0.9176,0.9172
-mandla,Mandla,0.3532,0.3863,0.3752,0.3716
-mandsaur,Mandsaur,0.4423,0.4593,0.4693,0.457
-mandya,Mandya,0.5991,0.6094,0.6044,0.6043
-mansa,Mansa,0.6332,0.6393,0.6395,0.6374
-mathura,Mathura,0.5455,0.5634,0.5578,0.5556
-mau,Mau,0.4677,0.4932,0.4887,0.4832
-mayurbhanj,Mayurbhanj,0.482,0.5267,0.5205,0.5097
-medak,Medak,0.5044,0.4774,0.5025,0.4948
-medchal malkajgiri,Medchal Malkajgiri,0.1992,0.1693,0.1981,0.1888
-medinipur west,Medinipur West,0.0656,0.053,0.058,0.0589
-meerut,Meerut,0.5408,0.5669,0.5599,0.5559
-mirpur,Mirpur,0.2964,0.3133,0.3356,0.3151
-mirzapur,Mirzapur,0.692,0.7091,0.7,0.7004
-moga,Moga,0.5375,0.5109,0.5051,0.5178
-mokokchung,Mokokchung,0.0801,0.069,0.0861,0.0784
-mon,Mon,0.0625,0.0559,0.0667,0.0617
-moradabad,Moradabad,0.6255,0.6038,0.6195,0.6163
-morbi,Morbi,0.5482,0.5646,0.5365,0.5498
-morena,Morena,0.663,0.6486,0.6346,0.6487
-morigaon,Morigaon,0.2048,0.1936,0.2051,0.2012
-mulugu,Mulugu,0.4271,0.4165,0.4659,0.4365
-mumbai,Mumbai,0.9465,0.939,0.9351,0.9402
-mumbai suburban,Mumbai Suburban,0.7214,0.6972,0.7126,0.7104
-mungeli,Mungeli,0.1771,0.1798,0.1623,0.1731
-munger,Munger,0.683,0.6795,0.686,0.6829
-murshidabad,Murshidabad,0.5803,0.6351,0.6019,0.6057
-muzaffar,Muzaffarnagar,0.6222,0.6367,0.6187,0.6259
-muzaffarabad,Muzaffarabad,0.3797,0.3923,0.3903,0.3874
-muzaffarpur,Muzaffarpur,0.6871,0.6896,0.6962,0.691
-mysuru,Mysuru,0.7476,0.7407,0.7625,0.7502
-nabarangapur,Nabarangapur,0.0444,0.0409,0.0459,0.0437
-nadia,Nadia,0.5592,0.6094,0.5795,0.5827
-nagaon,Nagaon,0.9156,0.9129,0.9027,0.9104
-nagapattinam,Nagapattinam,0.4906,0.5578,0.5385,0.529
-nagaur,Nagaur,0.4432,0.4598,0.4571,0.4534
-nagpur,Nagpur,0.9407,0.933,0.9246,0.9328
-nainital,Nainital,0.5832,0.5538,0.5508,0.5626
-nalanda,Nalanda,0.3592,0.461,0.4833,0.4345
-nalbari,Nalbari,0.9198,0.928,0.9199,0.9225
-nalgonda,Nalgonda,0.6034,0.5564,0.5719,0.5772
-namakkal,Namakkal,0.4678,0.4588,0.4425,0.4563
-namsai,Namsai,0.4169,0.3813,0.4022,0.4001
-nanded,Nanded,0.8945,0.8925,0.8898,0.8922
-nandurbar,Nandurbar,0.7432,0.7633,0.7549,0.7538
-narayanpet,Narayanpet,0.3753,0.3746,0.3946,0.3815
-narayanpur,Narayanpur,0.2014,0.2343,0.2476,0.2278
-narmada,Narmada,0.728,0.7694,0.7714,0.7562
-narsimhapur,Narsimhapur,0.4472,0.4843,0.4319,0.4544
-nashik,Nashik,0.8436,0.8203,0.8424,0.8354
-navsari,Navsari,0.6811,0.7234,0.7197,0.7081
-nawada,Nawada,0.5131,0.5613,0.5362,0.5369
-nayagarh,Nayagarh,0.396,0.4263,0.4209,0.4144
-neemuch,Neemuch,0.2972,0.299,0.3408,0.3123
-new delhi,New Delhi,0.4872,0.4641,0.4809,0.4774
-nicobars,Nicobars,0.0581,0.0558,0.0677,0.0605
-nirmal,Nirmal,0.1938,0.1718,0.1609,0.1755
-niwari,Niwari,0.1199,0.1383,0.1393,0.1325
-nizamabad,Nizamabad,0.6896,0.6601,0.6528,0.6675
-noney,Noney,0.4566,0.4442,0.4912,0.464
-north,North,0.365,0.4389,0.397,0.4003
-north & middle andaman,North  & Middle Andaman,0.0479,0.0496,0.0558,0.0511
-north district,North  District,0.0735,0.0755,0.0728,0.0739
-north east,North East,0.1522,0.182,0.1668,0.167
-north garo hills,North Garo Hills,0.3686,0.3168,0.3485,0.3446
-north goa,North Goa,0.4233,0.4111,0.4101,0.4148
-north tripura,North Tripura,0.5439,0.588,0.5563,0.5627
-north twenty four pargan*,North Twenty Four Pargan*,0.0401,0.0427,0.0564,0.0464
-north west,North West,0.1811,0.2212,0.1982,0.2001
-nuapada,Nuapada,0.3482,0.393,0.3881,0.3764
-nuh,Nuh,0.2174,0.2286,0.2216,0.2225
-osmanabad,Osmanabad,0.0969,0.0943,0.091,0.0941
-pakke kessang,Pakke Kessang,0.3027,0.3079,0.3211,0.3106
-pakur,Pakur,0.0989,0.0809,0.0937,0.0912
-palakkad,Palakkad,0.9117,0.8922,0.8907,0.8982
-palamu,Palamu,0.5591,0.5786,0.5525,0.5634
-palghar,Palghar,0.8032,0.8073,0.8325,0.8143
-pali,Pali,0.6681,0.6328,0.6413,0.6474
-palwal,Palwal,0.2041,0.2105,0.2023,0.2057
-panch mahals,Panch Mahals,0.6264,0.6318,0.6054,0.6212
-panchkula,Panchkula,0.2883,0.3296,0.3374,0.3184
-panipat,Panipat,0.3715,0.4082,0.3767,0.3854
-panna,Panna,0.2237,0.3028,0.2821,0.2695
-papum pare,Papum Pare,0.8071,0.8231,0.823,0.8177
-parbhani,Parbhani,0.8306,0.8327,0.8285,0.8306
-paschim bardhaman,Paschim Bardhaman,0.0859,0.059,0.0743,0.0731
-pashchim champaran,Pashchim Champaran,0.6842,0.6925,0.6879,0.6882
-pashchimi singhbhum,Pashchimi Singhbhum,0.0536,0.0463,0.0564,0.0521
-patan,Patan,0.4706,0.4834,0.4738,0.4759
-pathanamthitta,Pathanamthitta,0.9356,0.9374,0.9355,0.9362
-pathankot,Pathankot,0.5832,0.573,0.5554,0.5706
-patiala,Patiala,0.7292,0.7067,0.716,0.7173
-patna,Patna,0.7065,0.7535,0.7339,0.7313
-peddapalli,Peddapalli,0.1185,0.1019,0.1135,0.1113
-perambalur,Perambalur,0.4393,0.4535,0.4259,0.4396
-peren,Peren,0.2677,0.2259,0.2888,0.2608
-phek,Phek,0.1462,0.1752,0.1871,0.1695
-pherzawl,Pherzawl,0.1015,0.1008,0.1071,0.1031
-pilibhit,Pilibhit,0.5995,0.6299,0.5962,0.6085
-pithoragarh,Pithoragarh,0.8435,0.8625,0.8506,0.8522
-porbandar,Porbandar,0.7108,0.6927,0.7022,0.7019
-prakasam,Prakasam,0.7135,0.7052,0.6997,0.7061
-pratapgarh,Pratapgarh,0.6588,0.6564,0.6768,0.664
-prayagraj,Prayagraj,0.7517,0.7743,0.7611,0.7624
-puducherry,Puducherry,0.0546,0.0501,0.0529,0.0525
-pudukkottai,Pudukkottai,0.6301,0.6225,0.6179,0.6235
-pulwama,Pulwama,0.8474,0.8541,0.8388,0.8468
-punch,Punch,0.0941,0.1043,0.1045,0.101
-pune,Pune,0.9021,0.8878,0.8775,0.8891
-purba bardhaman,Purba Bardhaman,0.2775,0.2582,0.2839,0.2732
-purba champaran,Purba Champaran,0.0402,0.0326,0.0412,0.038
-purba medinipur,Purba Medinipur,0.5285,0.5838,0.5278,0.5467
-purbi singhbhum,Purbi Singhbhum,0.0868,0.0775,0.0756,0.08
-puri,Puri,0.7484,0.76,0.7426,0.7503
-purnia,Purnia,0.4969,0.5405,0.5451,0.5275
-puruliya,Puruliya,0.0699,0.0712,0.0842,0.0751
-rae bareli,Rae Bareli,0.4116,0.4507,0.45,0.4374
-raichur,Raichur,0.8155,0.8396,0.8201,0.8251
-raigarh,Raigarh,0.9193,0.9224,0.9201,0.9206
-raipur,Raipur,0.6925,0.7036,0.7067,0.701
-raisen,Raisen,0.7032,0.7399,0.7303,0.7245
-rajanna sircilla,Rajanna Sircilla,0.3705,0.3807,0.3857,0.379
-rajgarh,Rajgarh,0.5446,0.5331,0.531,0.5362
-rajkot,Rajkot,0.792,0.8168,0.7924,0.8004
-rajnandgaon,Rajnandgaon,0.5992,0.5679,0.5696,0.5789
-rajouri,Rajouri,0.8821,0.8963,0.9008,0.8931
-rajsamand,Rajsamand,0.4026,0.4086,0.4305,0.4139
-ramaa,Ramanagara,0.542,0.5736,0.5204,0.5454
-ramanathapuram,Ramanathapuram,0.4762,0.4995,0.4751,0.4836
-ramban,Ramban,0.7502,0.7851,0.7907,0.7753
-ramgarh,Ramgarh,0.4273,0.3327,0.3749,0.3783
-rampur,Rampur,0.4447,0.47,0.4804,0.465
-ranchi,Ranchi,0.5127,0.5723,0.5358,0.5403
-ranga reddy,Ranga Reddy,0.3712,0.3789,0.4045,0.3849
-ranipet,Ranipet,0.5042,0.5294,0.5129,0.5155
-ratlam,Ratlam,0.3616,0.4154,0.3834,0.3868
-ratnagiri,Ratnagiri,0.9331,0.9334,0.9298,0.9321
-rayagada,Rayagada,0.3556,0.3873,0.4045,0.3824
-reasi,Reasi,0.6961,0.6712,0.6724,0.6799
-rewa,Rewa,0.5192,0.5243,0.5095,0.5177
-rewari,Rewari,0.2447,0.2639,0.2592,0.2559
-ribhoi,Ribhoi,0.1074,0.0857,0.1094,0.1008
-rohtak,Rohtak,0.4385,0.4735,0.4458,0.4526
-rohtas,Rohtas,0.4701,0.4992,0.5014,0.4902
-rudraprayag,Rudraprayag,0.0587,0.0545,0.0662,0.0598
-rup,Rupnagar,0.7299,0.6712,0.6798,0.6936
-sabar kantha,Sabar Kantha,0.5589,0.5551,0.5557,0.5566
-sagar,Sagar,0.5377,0.5737,0.5577,0.5564
-saharanpur,Saharanpur,0.5741,0.5964,0.5778,0.5828
-saharsa,Saharsa,0.6887,0.672,0.6671,0.6759
-sahibganj,Sahibganj,0.0468,0.0384,0.0437,0.043
-sahibzada ajit singh nag*,Sahibzada Ajit Singh Nag*,0.0397,0.04,0.0462,0.042
-saiha,Saiha,0.1062,0.0876,0.1072,0.1003
-salem,Salem,0.5783,0.582,0.5754,0.5785
-samastipur,Samastipur,0.7038,0.7316,0.7265,0.7206
-samba,Samba,0.4797,0.4773,0.4752,0.4774
-sambalpur,Sambalpur,0.7023,0.725,0.718,0.7151
-sambhal,Sambhal,0.5082,0.5342,0.5057,0.516
-sangareddy,Sangareddy,0.3884,0.3714,0.3695,0.3764
-sangli,Sangli,0.8133,0.7999,0.808,0.8071
-sangrur,Sangrur,0.6194,0.5727,0.5919,0.5947
-sant kabir,Sant Kabir Nagar,0.451,0.4912,0.5011,0.4811
-saraikela-kharsawan,Saraikela-kharsawan,0.0428,0.0407,0.0428,0.0421
-saran,Saran,0.715,0.7482,0.733,0.732
-satara,Satara,0.7692,0.7408,0.7485,0.7528
-satna,Satna,0.4929,0.4854,0.4618,0.48
-sawai madhopur,Sawai Madhopur,0.5841,0.6151,0.5818,0.5937
-sehore,Sehore,0.6451,0.6517,0.6493,0.6487
-senapati,Senapati,0.1202,0.1106,0.13,0.1203
-seoni,Seoni,0.5946,0.6311,0.6105,0.6121
-serchhip,Serchhip,0.1908,0.1755,0.2038,0.1901
-shahdara,Shahdara,0.1692,0.1878,0.1841,0.1804
-shahdol,Shahdol,0.3774,0.3497,0.3838,0.3703
-shahid bhagat singh,Shahid Bhagat Singh Nagar,0.5293,0.5285,0.538,0.5319
-shahjahanpur,Shahjahanpur,0.5484,0.5464,0.5583,0.5511
-shajapur,Shajapur,0.3094,0.3529,0.3485,0.3369
-shamli,Shamli,0.4583,0.453,0.4849,0.4654
-sheikhpura,Sheikhpura,0.5027,0.5281,0.523,0.5179
-sheohar,Sheohar,0.6145,0.6588,0.6338,0.6357
-sheopur,Sheopur,0.3355,0.3538,0.333,0.3408
-shi yomi,Shi Yomi,0.4491,0.3988,0.4356,0.4279
-shimla,Shimla,0.9125,0.9112,0.9113,0.9117
-shivamogga,Shivamogga,0.8884,0.9008,0.8977,0.8957
-shivpuri,Shivpuri,0.5256,0.5366,0.5297,0.5307
-shrawasti,Shrawasti,0.2447,0.3106,0.2692,0.2749
-shupiyan,Shupiyan,0.0752,0.0711,0.0863,0.0775
-siang,Siang,0.478,0.4176,0.4453,0.447
-siddharth,Siddharthnagar,0.4265,0.4082,0.4299,0.4215
-siddipet,Siddipet,0.6063,0.563,0.6259,0.5984
-sidhi,Sidhi,0.218,0.2055,0.2031,0.2089
-sikar,Sikar,0.4785,0.5212,0.4981,0.4993
-simdega,Simdega,0.0655,0.0648,0.0708,0.067
-sindhudurg,Sindhudurg,0.8619,0.844,0.8411,0.849
-singrauli,Singrauli,0.4282,0.4541,0.428,0.4368
-sipahijala,Sipahijala,0.0727,0.0606,0.0837,0.0723
-sirmaur,Sirmaur,0.9216,0.9205,0.9226,0.9216
-sirohi,Sirohi,0.558,0.5229,0.5466,0.5425
-sirsa,Sirsa,0.3789,0.386,0.3997,0.3882
-sitamarhi,Sitamarhi,0.6267,0.6577,0.6458,0.6434
-sitapur,Sitapur,0.824,0.8086,0.8136,0.8154
-sivaganga,Sivaganga,0.4096,0.4654,0.4135,0.4295
-sivasagar,Sivasagar,0.9137,0.9003,0.9035,0.9058
-siwan,Siwan,0.59,0.6018,0.5986,0.5968
-solan,Solan,0.7844,0.7305,0.7601,0.7583
-solapur,Solapur,0.6759,0.6755,0.6743,0.6752
-sonbhadra,Sonbhadra,0.5416,0.5608,0.5713,0.5579
-sonipat,Sonipat,0.3805,0.4106,0.4005,0.3972
-sonitpur,Sonitpur,0.9381,0.9381,0.9343,0.9368
-south,South,0.1399,0.1625,0.1603,0.1542
-south andaman,South Andaman,0.0635,0.0574,0.068,0.063
-south district,South District,0.0565,0.0629,0.0663,0.0619
-south east,South East,0.1849,0.2003,0.1966,0.1939
-south garo hills,South Garo Hills,0.483,0.4363,0.4711,0.4635
-south goa,South Goa,0.4463,0.4834,0.4799,0.4699
-south salmara mancachar,South Salmara Mancachar,0.7806,0.8205,0.7945,0.7986
-south tripura,South Tripura,0.2624,0.3105,0.2808,0.2846
-south twenty four pargan*,South Twenty Four Pargan*,0.023,0.0255,0.0317,0.0267
-south west,South West,0.2786,0.3017,0.2685,0.2829
-south west garo hills,South West Garo Hills,0.5476,0.475,0.5374,0.52
-south west khasi hills,South West Khasi Hills,0.3757,0.4036,0.4284,0.4026
-sri,Srinagar,0.7078,0.7099,0.7039,0.7072
-sri muktsar sahib,Sri Muktsar Sahib,0.1271,0.0892,0.1224,0.1129
-sri potti sriramulu nell*,Sri Potti Sriramulu Nell*,0.083,0.0821,0.0795,0.0815
-srikakulam,Srikakulam,0.5985,0.5851,0.6115,0.5983
-subarnapur,Subarnapur,0.4095,0.455,0.4322,0.4322
-sukma,Sukma,0.1829,0.2121,0.2265,0.2072
-sultanpur,Sultanpur,0.6652,0.6722,0.6753,0.6709
-sundargarh,Sundargarh,0.3313,0.3855,0.3936,0.3701
-supaul,Supaul,0.6536,0.7089,0.6761,0.6795
-surajpur,Surajpur,0.0519,0.0442,0.0554,0.0505
-surat,Surat,0.7388,0.7589,0.763,0.7536
-surendra,Surendranagar,0.6511,0.6649,0.6455,0.6539
-surguja,Surguja,0.1758,0.224,0.2129,0.2042
-suryapet,Suryapet,0.136,0.1177,0.1396,0.1311
-tamenglong,Tamenglong,0.2169,0.2921,0.2585,0.2559
-tapi,Tapi,0.6808,0.7283,0.7216,0.7103
-tarn taran,Tarn Taran,0.4479,0.4318,0.3956,0.4251
-tawang,Tawang,0.566,0.5543,0.5686,0.5629
-tehri garhwal,Tehri Garhwal,0.7288,0.7235,0.7191,0.7238
-tengnoupal,Tengnoupal,0.1067,0.1121,0.1261,0.115
-tenkasi,Tenkasi,0.3668,0.3434,0.36,0.3567
-thane,Thane,0.9202,0.9198,0.9052,0.9151
-thanjavur,Thanjavur,0.6487,0.671,0.6687,0.6628
-the dangs,The Dangs,0.3734,0.3716,0.3976,0.3809
-the nilgiris,The Nilgiris,0.4504,0.4574,0.4675,0.4584
-theni,Theni,0.3696,0.3658,0.3527,0.3627
-thiruvallur,Thiruvallur,0.5242,0.538,0.5318,0.5313
-thiruvananthapuram,Thiruvananthapuram,0.9495,0.9472,0.9422,0.9463
-thiruvarur,Thiruvarur,0.3709,0.4234,0.3856,0.3933
-thoothukkudi,Thoothukkudi,0.4534,0.4373,0.4401,0.4436
-thoubal,Thoubal,0.2313,0.2245,0.2462,0.234
-thrissur,Thrissur,0.9256,0.9351,0.9253,0.9287
-tikamgarh,Tikamgarh,0.4762,0.4879,0.4743,0.4795
-tinsukia,Tinsukia,0.8656,0.8771,0.8743,0.8723
-tirap,Tirap,0.2867,0.2728,0.2954,0.285
-tiruchirappalli,Tiruchirappalli,0.5141,0.5503,0.4911,0.5185
-tirunelveli,Tirunelveli,0.3479,0.3765,0.3533,0.3592
-tirupathur,Tirupathur,0.2473,0.2582,0.2725,0.2593
-tiruppur,Tiruppur,0.4356,0.4477,0.4346,0.4393
-tiruvannamalai,Tiruvannamalai,0.6401,0.6452,0.6274,0.6375
-tonk,Tonk,0.7457,0.754,0.7356,0.7451
-tuensang,Tuensang,0.0733,0.0624,0.0812,0.0723
-tumakuru,Tumakuru,0.5332,0.5532,0.523,0.5365
-udaipur,Udaipur,0.4969,0.4661,0.5029,0.4886
-udalguri,Udalguri,0.8154,0.8348,0.8422,0.8308
-udham singh,Udham Singh Nagar,0.0575,0.0478,0.0519,0.0524
-udhampur,Udhampur,0.8193,0.7971,0.8151,0.8105
-udupi,Udupi,0.8374,0.8585,0.8491,0.8483
-ujjain,Ujjain,0.6021,0.5964,0.583,0.5938
-ukhrul,Ukhrul,0.1094,0.1135,0.1253,0.116
-umaria,Umaria,0.3899,0.3736,0.4336,0.399
-una,Una,0.8758,0.8855,0.879,0.8801
-unnao,Unnao,0.6054,0.5974,0.6205,0.6078
-unokoti,Unokoti,0.1222,0.122,0.1477,0.1307
-upper dibang valley,Upper Dibang Valley,0.0689,0.0618,0.0745,0.0684
-upper siang,Upper Siang,0.688,0.6894,0.6797,0.6857
-upper subansiri,Upper Subansiri,0.0701,0.0638,0.08,0.0713
-uttar bastar kanker,Uttar Bastar Kanker,0.0743,0.0634,0.0764,0.0714
-uttar dinajpur,Uttar Dinajpur,0.0655,0.0509,0.058,0.0581
-uttara kannada,Uttara Kannada,0.1752,0.1122,0.1454,0.1443
-uttarkashi,Uttarkashi,0.0672,0.0589,0.0688,0.065
-vadodara,Vadodara,0.6504,0.6507,0.6583,0.6532
-vaishali,Vaishali,0.5309,0.5775,0.5933,0.5673
-valsad,Valsad,0.723,0.7246,0.7151,0.7209
-varanasi,Varanasi,0.6984,0.7029,0.6904,0.6973
-vellore,Vellore,0.3904,0.3821,0.4036,0.3921
-vidisha,Vidisha,0.6381,0.6105,0.584,0.6108
-vijayapura,Vijayapura,0.5503,0.5511,0.5478,0.5497
-vikarabad,Vikarabad,0.4524,0.411,0.4576,0.4404
-viluppuram,Viluppuram,0.7161,0.7335,0.7302,0.7266
-virudhu,Virudhunagar,0.4664,0.4515,0.4257,0.4479
-visakhapatnam,Visakhapatnam,0.73,0.7407,0.724,0.7316
-viziaam,Vizianagaram,0.5139,0.5297,0.5319,0.5252
-wanaparthy,Wanaparthy,0.1225,0.0928,0.1181,0.1111
-warangal rural,Warangal Rural,0.0772,0.074,0.0764,0.0759
-warangal urban,Warangal Urban,0.1094,0.1044,0.1043,0.106
-wardha,Wardha,0.9031,0.9026,0.8984,0.9014
-washim,Washim,0.8276,0.8403,0.8611,0.843
-wayanad,Wayanad,0.9226,0.9221,0.9261,0.9236
-west,West,0.1601,0.1673,0.151,0.1594
-west district,West District,0.0802,0.0735,0.0902,0.0813
-west garo hills,West Garo Hills,0.4108,0.4158,0.4081,0.4116
-west godavari,West Godavari,0.8784,0.8861,0.8799,0.8815
-west jaintia hills,West Jaintia Hills,0.0607,0.0563,0.0682,0.0617
-west kameng,West Kameng,0.6389,0.6314,0.64,0.6367
-west karbi anglong,West Karbi Anglong,0.5383,0.5441,0.5293,0.5372
-west khasi hills,West Khasi Hills,0.501,0.49,0.4982,0.4964
-west nimar,West Nimar,0.0528,0.0505,0.0532,0.0522
-west siang,West Siang,0.5675,0.5497,0.5682,0.5618
-west tripura,West Tripura,0.5863,0.6027,0.5755,0.5882
-wokha,Wokha,0.0909,0.081,0.0897,0.0872
-y.s.r.,Y.S.R.,0.6677,0.6679,0.6636,0.6664
-yadadri bhuvanagiri,Yadadri Bhuvanagiri,0.2007,0.22,0.2496,0.2234
-yadgir,Yadgir,0.7197,0.7466,0.7495,0.7386
-yamuna,Yamunanagar,0.3643,0.381,0.3696,0.3716
-yanam,Yanam,0.0762,0.0875,0.0972,0.087
-yavatmal,Yavatmal,0.8808,0.8632,0.8652,0.8697
-zunheboto,Zunheboto,0.1538,0.145,0.1339,0.1442
+",0.397,0.3798,0.3808,0.3858
+alwar,Alwar,0.6714,0.6259,0.6833,0.6602
+ambala,Ambala,0.3805,0.417,0.4231,0.4069
+ambedkar,Ambedkar Nagar,0.4901,0.5555,0.5258,0.5238
+amethi,Amethi,0.4856,0.4785,0.485,0.483
+amravati,Amravati,0.9367,0.9232,0.926,0.9286
+amreli,Amreli,0.9003,0.8949,0.8928,0.896
+amritsar,Amritsar,0.795,0.8008,0.787,0.7943
+amroha,Amroha,0.4583,0.4758,0.4783,0.4708
+anand,Anand,0.4808,0.4856,0.4918,0.4861
+anantapur,Anantapur,0.0957,0.1125,0.0917,0.1
+anantnag,Anantnag,0.8482,0.8367,0.8317,0.8388
+anjaw,Anjaw,0.4578,0.3918,0.4411,0.4302
+anugul,Anugul,0.4373,0.5101,0.4756,0.4743
+anuppur,Anuppur,0.2708,0.2888,0.2945,0.2847
+araria,Araria,0.4605,0.5056,0.4889,0.485
+aravalli,Aravalli,0.1115,0.1215,0.1213,0.1181
+ariyalur,Ariyalur,0.474,0.4524,0.4548,0.4604
+arwal,Arwal,0.4471,0.502,0.4873,0.4788
+ashok,Ashoknagar,0.5779,0.5434,0.5633,0.5616
+auraiya,Auraiya,0.3349,0.3846,0.3707,0.3634
+aurangabad,Aurangabad,0.8582,0.8153,0.8212,0.8316
+azamgarh,Azamgarh,0.7046,0.6983,0.6906,0.6978
+badgam,Badgam,0.1779,0.1625,0.1615,0.1673
+bagalkote,Bagalkote,0.47,0.445,0.4511,0.4553
+bageshwar,Bageshwar,0.6363,0.6182,0.6406,0.6317
+baghpat,Baghpat,0.5179,0.509,0.4974,0.5081
+bahraich,Bahraich,0.7619,0.7821,0.7471,0.7637
+baksa,Baksa,0.7873,0.7766,0.7581,0.774
+balaghat,Balaghat,0.576,0.5403,0.5758,0.5641
+balangir,Balangir,0.4025,0.4392,0.4095,0.4171
+baleshwar,Baleshwar,0.7612,0.7661,0.7667,0.7647
+ballari,Ballari,0.8473,0.8479,0.8204,0.8385
+ballia,Ballia,0.8001,0.8138,0.8,0.8046
+balod,Balod,0.1054,0.1189,0.1293,0.1179
+baloda bazar,Baloda Bazar,0.0502,0.0452,0.0482,0.0479
+balrampur,Balrampur,0.7345,0.7105,0.7289,0.7246
+bametara,Bametara,0.0507,0.0474,0.0489,0.049
+banas kantha,Banas Kantha,0.6414,0.6262,0.6308,0.6328
+banda,Banda,0.5893,0.5761,0.5886,0.5846
+bandipore,Bandipore,0.063,0.0717,0.0715,0.0687
+bangalore,Bangalore,0.0533,0.0488,0.0707,0.0576
+banka,Banka,0.5633,0.5655,0.5638,0.5642
+bankura,Bankura,0.4592,0.5403,0.4698,0.4898
+banswara,Banswara,0.7022,0.6656,0.6838,0.6839
+bara banki,Bara Banki,0.8993,0.8818,0.8848,0.8886
+baramula,Baramula,0.0807,0.0822,0.0912,0.0847
+baran,Baran,0.5307,0.4595,0.5106,0.5003
+bareilly,Bareilly,0.5976,0.5583,0.5918,0.5825
+bargarh,Bargarh,0.6847,0.66,0.6506,0.6651
+barmer,Barmer,0.6071,0.5523,0.5776,0.579
+barnala,Barnala,0.4097,0.4148,0.4006,0.4083
+barpeta,Barpeta,0.9627,0.9554,0.9565,0.9582
+barwani,Barwani,0.4993,0.5132,0.5161,0.5095
+bastar,Bastar,0.4026,0.3643,0.4071,0.3913
+basti,Basti,0.8232,0.7945,0.7995,0.8057
+bathinda,Bathinda,0.6128,0.6151,0.5917,0.6066
+baudh,Baudh,0.0958,0.1233,0.1001,0.1064
+begusarai,Begusarai,0.621,0.6443,0.6461,0.6371
+belagavi,Belagavi,0.8916,0.8871,0.8875,0.8887
+bengaluru rural,Bengaluru Rural,0.7809,0.7754,0.7784,0.7783
+betul,Betul,0.6097,0.5635,0.5743,0.5825
+bhadohi,Bhadohi,0.4381,0.4697,0.4616,0.4564
+bhadradri kothagudem,Bhadradri Kothagudem,0.1667,0.1678,0.1828,0.1724
+bhadrak,Bhadrak,0.5884,0.5755,0.5768,0.5802
+bhagalpur,Bhagalpur,0.6923,0.7053,0.7088,0.7021
+bhandara,Bhandara,0.8937,0.8934,0.8938,0.8936
+bharatpur,Bharatpur,0.6185,0.5991,0.6244,0.614
+bharuch,Bharuch,0.9042,0.9034,0.8946,0.9007
+bhav,Bhavnagar,0.8112,0.7976,0.7774,0.7954
+bhilwara,Bhilwara,0.6502,0.6154,0.6271,0.6309
+bhind,Bhind,0.4953,0.4848,0.4806,0.4869
+bhiwani,Bhiwani,0.3989,0.4393,0.4176,0.4186
+bhojpur,Bhojpur,0.6206,0.6296,0.6171,0.6224
+bhopal,Bhopal,0.693,0.676,0.6796,0.6829
+bid,Bid,0.1169,0.1302,0.1091,0.1187
+bidar,Bidar,0.0934,0.1089,0.095,0.0991
+bijapur,Bijapur,0.7506,0.7416,0.7472,0.7465
+bijnor,Bijnor,0.4625,0.4793,0.4722,0.4713
+bikaner,Bikaner,0.656,0.6124,0.6435,0.6373
+bilaspur,Bilaspur,0.9201,0.9233,0.921,0.9215
+birbhum,Birbhum,0.4467,0.5238,0.4676,0.4794
+bishnupur,Bishnupur,0.2316,0.2695,0.2613,0.2541
+biswanath,Biswanath,0.9202,0.9235,0.9205,0.9214
+bokaro,Bokaro,0.4482,0.4338,0.4437,0.4419
+bongaigaon,Bongaigaon,0.9538,0.9491,0.9505,0.9511
+botad,Botad,0.6055,0.5454,0.5522,0.5677
+budaun,Budaun,0.5654,0.5605,0.5504,0.5588
+bulandshahr,Bulandshahr,0.5405,0.5335,0.5352,0.5364
+buldana,Buldana,0.1332,0.1242,0.1141,0.1238
+bundi,Bundi,0.6678,0.6693,0.6755,0.6709
+burhanpur,Burhanpur,0.6313,0.6267,0.6285,0.6288
+buxar,Buxar,0.4883,0.5372,0.4984,0.508
+cachar,Cachar,0.9492,0.9428,0.9407,0.9442
+central,Central,0.4065,0.3883,0.4381,0.411
+chamarajaa,Chamarajanagara,0.1979,0.2764,0.2579,0.2441
+chamba,Chamba,0.9463,0.9426,0.9404,0.9431
+chamoli,Chamoli,0.8086,0.8381,0.8188,0.8218
+champawat,Champawat,0.4755,0.456,0.4788,0.4701
+champhai,Champhai,0.2061,0.2071,0.2167,0.21
+chandauli,Chandauli,0.4081,0.4133,0.4074,0.4096
+chandel,Chandel,0.1026,0.1113,0.1166,0.1102
+chandigarh,Chandigarh,0.2321,0.2634,0.2631,0.2528
+chandrapur,Chandrapur,0.9471,0.9395,0.9389,0.9419
+changlang,Changlang,0.4247,0.3704,0.4383,0.4112
+charaideo,Charaideo,0.5901,0.5372,0.5817,0.5697
+charki dadri,Charki Dadri,0.2375,0.2542,0.2454,0.2457
+chatra,Chatra,0.342,0.2889,0.3161,0.3157
+chengalpattu,Chengalpattu,0.3216,0.3156,0.3189,0.3187
+chennai,Chennai,0.8641,0.8606,0.8617,0.8621
+chhatarpur,Chhatarpur,0.5514,0.5876,0.5786,0.5725
+chhindwara,Chhindwara,0.7115,0.6825,0.7147,0.7029
+chikkaballapura,Chikkaballapura,0.6803,0.6763,0.6879,0.6815
+chikkamagaluru,Chikkamagaluru,0.5422,0.538,0.5824,0.5542
+chirang,Chirang,0.9002,0.9054,0.8983,0.9013
+chitradurga,Chitradurga,0.8122,0.8321,0.8345,0.8262
+chitrakoot,Chitrakoot,0.5361,0.5523,0.5393,0.5426
+chittaurgarh,Chittaurgarh,0.0486,0.0538,0.0546,0.0523
+chittoor,Chittoor,0.672,0.651,0.6575,0.6602
+chota udaipur,Chota Udaipur,0.4617,0.4618,0.4797,0.4677
+churachandpur,Churachandpur,0.0704,0.0806,0.0798,0.0769
+churu,Churu,0.546,0.5348,0.5504,0.5437
+coimbatore,Coimbatore,0.7303,0.7575,0.7278,0.7385
+cooch behar,Cooch Behar,0.7006,0.7232,0.7109,0.7116
+cuddalore,Cuddalore,0.5952,0.6629,0.6416,0.6332
+cuttack,Cuttack,0.7749,0.7811,0.7659,0.774
+dadra & haveli,Dadra & Nagar Haveli,0.0833,0.0705,0.0708,0.0749
+dakshin bastar dantewada,Dakshin Bastar Dantewada,0.1432,0.1311,0.1383,0.1376
+dakshin dinajpur,Dakshin Dinajpur,0.4725,0.5345,0.478,0.495
+dakshina kannada,Dakshina Kannada,0.9546,0.9494,0.9481,0.9507
+daman,Daman,0.0504,0.047,0.0481,0.0485
+damoh,Damoh,0.3729,0.4106,0.4149,0.3995
+darbhanga,Darbhanga,0.7773,0.7678,0.7545,0.7665
+darjiling,Darjiling,0.0715,0.0668,0.0651,0.0678
+darrang,Darrang,0.9593,0.952,0.9531,0.9548
+datia,Datia,0.4603,0.4662,0.4593,0.4619
+dausa,Dausa,0.4893,0.4831,0.4991,0.4905
+davanagere,Davanagere,0.1083,0.1164,0.1079,0.1109
+debagarh,Debagarh,0.0661,0.121,0.1167,0.1012
+dehradun,Dehradun,0.7417,0.7703,0.7691,0.7604
+deoghar,Deoghar,0.3512,0.2551,0.3163,0.3075
+deoria,Deoria,0.7098,0.6975,0.6883,0.6985
+devbhumi dwarka,Devbhumi Dwarka,0.2666,0.2866,0.2727,0.2753
+dewas,Dewas,0.4662,0.4763,0.4842,0.4756
+dhalai,Dhalai,0.3964,0.4295,0.4229,0.4163
+dhamtari,Dhamtari,0.2219,0.2224,0.237,0.2271
+dhanbad,Dhanbad,0.2752,0.2789,0.295,0.283
+dhar,Dhar,0.4615,0.4846,0.4919,0.4793
+dharmapuri,Dharmapuri,0.4222,0.3961,0.4107,0.4096
+dharwad,Dharwad,0.916,0.9037,0.9079,0.9092
+dhaulpur,Dhaulpur,0.1708,0.1628,0.1468,0.1602
+dhemaji,Dhemaji,0.966,0.9597,0.9593,0.9617
+dhenkanal,Dhenkanal,0.5397,0.6127,0.5809,0.5778
+dhubri,Dhubri,0.9543,0.9457,0.9471,0.9491
+dhule,Dhule,0.7097,0.6456,0.6544,0.6699
+dibrugarh,Dibrugarh,0.9449,0.9327,0.9382,0.9386
+dima hasao,Dima Hasao,0.5697,0.548,0.585,0.5676
+dimapur,Dimapur,0.1329,0.1309,0.1405,0.1347
+dindigul,Dindigul,0.5462,0.5216,0.5266,0.5315
+dindori,Dindori,0.5299,0.5165,0.5449,0.5304
+diu,Diu,0.0342,0.0352,0.0339,0.0345
+doda,Doda,0.7696,0.7857,0.7582,0.7712
+dohad,Dohad,0.0576,0.0686,0.066,0.0641
+dumka,Dumka,0.1369,0.1182,0.1348,0.13
+dungarpur,Dungarpur,0.3664,0.3725,0.4014,0.3801
+durg,Durg,0.5091,0.5093,0.512,0.5101
+east,East ,0.1837,0.2326,0.2192,0.2118
+east district,East District,0.1144,0.1496,0.1345,0.1328
+east garo hills,East Garo Hills,0.3326,0.3454,0.3484,0.3421
+east godavari,East Godavari,0.8321,0.8213,0.8285,0.8273
+east jaintia hills,East Jaintia Hills,0.1469,0.1204,0.1403,0.1359
+east kameng,East Kameng,0.4075,0.3588,0.4128,0.3931
+east khasi hills,East Khasi Hills,0.4847,0.447,0.4787,0.4701
+east nimar,East Nimar,0.4174,0.3908,0.4084,0.4055
+east siang,East Siang,0.7095,0.7006,0.6976,0.7026
+ernakulam,Ernakulam,0.9438,0.9284,0.9332,0.9351
+erode,Erode,0.6417,0.6162,0.6401,0.6327
+etah,Etah,0.6116,0.5872,0.5931,0.5973
+etawah,Etawah,0.7404,0.7189,0.7277,0.729
+faizabad,Faizabad,0.0786,0.0727,0.0713,0.0742
+faridabad,Faridabad,0.3139,0.3494,0.3337,0.3323
+faridkot,Faridkot,0.5629,0.5417,0.5548,0.5531
+farrukhabad,Farrukhabad,0.5615,0.5402,0.562,0.5546
+fatehabad,Fatehabad,0.3475,0.3365,0.3594,0.3478
+fatehgarh sahib,Fatehgarh Sahib,0.5528,0.5279,0.5472,0.5426
+fatehpur,Fatehpur,0.7192,0.6997,0.7071,0.7087
+fazilka,Fazilka,0.4579,0.4363,0.4314,0.4419
+firozabad,Firozabad,0.5298,0.51,0.5247,0.5215
+firozpur,Firozpur,0.1176,0.0837,0.1151,0.1055
+gadag,Gadag,0.7991,0.7693,0.7641,0.7775
+gadchiroli,Gadchiroli,0.8787,0.8796,0.8728,0.877
+gajapati,Gajapati,0.3821,0.4673,0.4257,0.425
+ganderbal,Ganderbal,0.7065,0.7074,0.7184,0.7108
+gandhi,Gandhinagar,0.5032,0.5008,0.5113,0.5051
+ganga,Ganganagar,0.4133,0.4412,0.4076,0.4207
+ganjam,Ganjam,0.4687,0.5473,0.4819,0.4993
+garhwa,Garhwa,0.2982,0.3046,0.3427,0.3152
+garhwal,Garhwal,0.7182,0.6898,0.7102,0.7061
+gariaband,Gariaband,0.0803,0.0656,0.0754,0.0737
+gautam buddha,Gautam Buddha Nagar,0.483,0.4853,0.4785,0.4823
+gaya,Gaya,0.5776,0.5829,0.5726,0.5777
+ghaziabad,Ghaziabad,0.5521,0.5453,0.5354,0.5443
+ghazipur,Ghazipur,0.0533,0.0534,0.053,0.0532
+gir somnath,Gir Somnath,0.7596,0.7551,0.7732,0.7626
+giridih,Giridih,0.1162,0.1045,0.1145,0.1117
+goalpara,Goalpara,0.9473,0.9372,0.9416,0.9421
+godda,Godda,0.2118,0.1632,0.2066,0.1939
+golaghat,Golaghat,0.9462,0.9411,0.9434,0.9436
+gomati,Gomati,0.3217,0.3386,0.323,0.3278
+gonda,Gonda,0.9069,0.8928,0.8914,0.897
+gondiya,Gondiya,0.0684,0.0674,0.0659,0.0672
+gopalganj,Gopalganj,0.6842,0.7216,0.677,0.6943
+gorakhpur,Gorakhpur,0.7114,0.6928,0.6926,0.6989
+gumla,Gumla,0.5307,0.4817,0.5102,0.5075
+guna,Guna,0.6416,0.5987,0.6254,0.6219
+guntur,Guntur,0.7327,0.7318,0.7491,0.7378
+gurdaspur,Gurdaspur,0.7417,0.7085,0.7151,0.7218
+gurugram,Gurugram,0.3184,0.3456,0.3319,0.332
+gwalior,Gwalior,0.4729,0.4728,0.4923,0.4793
+hailakandi,Hailakandi,0.7147,0.7075,0.7398,0.7207
+hamirpur,Hamirpur,0.9469,0.9344,0.9319,0.9377
+hanumangarh,Hanumangarh,0.3847,0.4016,0.3767,0.3877
+hapur,Hapur,0.4845,0.4972,0.4844,0.4887
+harda,Harda,0.6411,0.6102,0.659,0.6368
+hardoi,Hardoi,0.6015,0.5943,0.5996,0.5985
+hardwar,Hardwar,0.0533,0.0507,0.0522,0.0521
+hassan,Hassan,0.8001,0.7915,0.8112,0.8009
+hathras,Hathras,0.564,0.5453,0.5501,0.5531
+haveri,Haveri,0.7395,0.7183,0.7196,0.7258
+hazaribagh,Hazaribagh,0.4952,0.4143,0.4663,0.4586
+hingoli,Hingoli,0.8064,0.792,0.7969,0.7984
+hisar,Hisar,0.3138,0.366,0.3562,0.3453
+hojai,Hojai,0.81,0.8131,0.8021,0.8084
+hooghly,Hooghly,0.6304,0.6345,0.654,0.6396
+hoshangabad,Hoshangabad,0.0849,0.0878,0.077,0.0832
+hoshiarpur,Hoshiarpur,0.6789,0.6663,0.6885,0.6779
+howrah,Howrah,0.6886,0.7195,0.751,0.7197
+hyderabad,Hyderabad,0.7685,0.7301,0.745,0.7479
+idukki,Idukki,0.9589,0.9489,0.9473,0.9517
+imphal east,Imphal East,0.2296,0.2557,0.2657,0.2503
+imphal west,Imphal West,0.1922,0.237,0.2189,0.2161
+indore,Indore,0.7012,0.6583,0.6882,0.6825
+jabalpur,Jabalpur,0.623,0.6001,0.6281,0.6171
+jagatsinghapur,Jagatsinghapur,0.5885,0.616,0.5966,0.6004
+jagitial,Jagitial,0.0649,0.0673,0.069,0.0671
+jaipur,Jaipur,0.8323,0.7959,0.8043,0.8108
+jaisalmer,Jaisalmer,0.4439,0.4588,0.4713,0.458
+jajapur,Jajapur,0.355,0.391,0.3711,0.3724
+jalandhar,Jalandhar,0.7544,0.7608,0.7541,0.7564
+jalaun,Jalaun,0.6009,0.656,0.6149,0.6239
+jalgaon,Jalgaon,0.8563,0.8496,0.8442,0.8501
+jalna,Jalna,0.8385,0.8082,0.8181,0.8216
+jalor,Jalor,0.0937,0.1172,0.1095,0.1068
+jalpaiguri,Jalpaiguri,0.6797,0.6894,0.6702,0.6798
+jam,Jamnagar,0.7915,0.7799,0.779,0.7835
+jammu,Jammu,0.6312,0.6779,0.6469,0.652
+jamtara,Jamtara,0.0761,0.0708,0.072,0.073
+jamui,Jamui,0.5315,0.53,0.5317,0.5311
+jangoan,Jangoan,0.0949,0.094,0.0924,0.0938
+janjgir - champa,Janjgir - Champa,0.0675,0.0576,0.0639,0.063
+jashpur,Jashpur,0.0749,0.0628,0.0791,0.0723
+jaunpur,Jaunpur,0.6577,0.6496,0.6395,0.6489
+jayashankar,Jayashankar,0.0531,0.0524,0.0514,0.0523
+jehanabad,Jehanabad,0.3465,0.4238,0.395,0.3884
+jhabua,Jhabua,0.2942,0.3119,0.3218,0.3093
+jhajjar,Jhajjar,0.2141,0.2485,0.243,0.2352
+jhalawar,Jhalawar,0.6761,0.6255,0.6628,0.6548
+jhansi,Jhansi,0.509,0.5561,0.5092,0.5248
+jhargram,Jhargram,0.0592,0.0515,0.0578,0.0562
+jharsuguda,Jharsuguda,0.5498,0.568,0.5612,0.5596
+jhunjhunun,Jhunjhunun,0.1755,0.1637,0.175,0.1714
+jind,Jind,0.3935,0.4192,0.4257,0.4128
+jiribam,Jiribam,0.1846,0.1672,0.171,0.1743
+jodhpur,Jodhpur,0.7138,0.6863,0.7079,0.7026
+jogulamba gadwal,Jogulamba Gadwal,0.1411,0.1156,0.1405,0.1324
+jorhat,Jorhat,0.9506,0.9421,0.9409,0.9445
+junagadh,Junagadh,0.9374,0.9326,0.9292,0.9331
+kabeerdham,Kabeerdham,0.0735,0.077,0.0799,0.0768
+kachchh,Kachchh,0.6945,0.7128,0.7081,0.7051
+kaimur,Kaimur (bhabua),0.4872,0.5344,0.4899,0.5038
+kaithal,Kaithal,0.4494,0.4855,0.4606,0.4652
+kakching,Kakching,0.1058,0.0989,0.1001,0.1016
+kalaburagi,Kalaburagi,0.8214,0.8025,0.8021,0.8087
+kalahandi,Kalahandi,0.7761,0.7653,0.761,0.7675
+kalimpong,Kalimpong,0.3372,0.2787,0.3247,0.3135
+kallakurichi,Kallakurichi,0.3162,0.3785,0.3517,0.3488
+kamareddy,Kamareddy,0.266,0.2696,0.2417,0.2591
+kamjong,Kamjong,0.0987,0.1027,0.107,0.1028
+kamle,Kamle,0.3962,0.3763,0.4106,0.3944
+kamrup,Kamrup,0.9396,0.9306,0.9307,0.9336
+kamrup metropolitan,Kamrup Metropolitan,0.0624,0.0523,0.0556,0.0568
+kancheepuram,Kancheepuram,0.4274,0.422,0.4199,0.4231
+kandhamal,Kandhamal,0.548,0.5708,0.5455,0.5548
+kangpokpi,Kangpokpi,0.0938,0.0918,0.0992,0.0949
+kangra,Kangra,0.9607,0.9543,0.953,0.956
+kannauj,Kannauj,0.4876,0.5258,0.4914,0.5016
+kanniyakumari,Kanniyakumari,0.2168,0.1779,0.1972,0.1973
+kannur,Kannur,0.9589,0.949,0.9501,0.9527
+kanpur,Kanpur Nagar,0.5633,0.5601,0.5856,0.5697
+kanpur dehat,Kanpur Dehat,0.5911,0.573,0.5884,0.5842
+kapurthala,Kapurthala,0.7535,0.7513,0.7643,0.7564
+karaikal,Karaikal,0.1063,0.132,0.1251,0.1211
+karauli,Karauli,0.4158,0.4713,0.4558,0.4476
+karbi anglong,Karbi Anglong,0.877,0.8791,0.8727,0.8762
+kargil,Kargil,0.3975,0.3449,0.379,0.3738
+karim,Karimnagar,0.6997,0.6623,0.6587,0.6736
+karimganj,Karimganj,0.7038,0.7085,0.7347,0.7157
+karnal,Karnal,0.3679,0.4061,0.3972,0.3904
+karur,Karur,0.4471,0.4259,0.4332,0.4354
+kasaragod,Kasaragod,0.9494,0.9444,0.943,0.9456
+kasganj,Kasganj,0.2689,0.3168,0.3159,0.3006
+kathua,Kathua,0.7177,0.6999,0.7103,0.7093
+katihar,Katihar,0.7171,0.7114,0.7022,0.7102
+katni,Katni,0.4084,0.4408,0.4231,0.4241
+kaushambi,Kaushambi,0.5529,0.5767,0.5605,0.5633
+kendrapara,Kendrapara,0.6918,0.7213,0.7148,0.7093
+kendujhar,Kendujhar,0.6904,0.6622,0.6842,0.6789
+khagaria,Khagaria,0.7465,0.7621,0.7373,0.7486
+khammam,Khammam,0.7885,0.7398,0.7662,0.7648
+kheda,Kheda,0.6324,0.6101,0.6203,0.6209
+kheri,Kheri,0.6999,0.6906,0.699,0.6965
+khordha,Khordha,0.423,0.4821,0.4467,0.4506
+khowai,Khowai,0.2111,0.2648,0.2201,0.232
+khunti,Khunti,0.1952,0.2095,0.2299,0.2115
+kinnaur,Kinnaur,0.9041,0.8759,0.8771,0.8857
+kiphire,Kiphire,0.199,0.1897,0.1742,0.1876
+kishanganj,Kishanganj,0.7295,0.774,0.7367,0.7468
+kishtwar,Kishtwar,0.6501,0.7114,0.688,0.6832
+kodagu,Kodagu,0.9254,0.9328,0.9239,0.9274
+kodarma,Kodarma,0.0638,0.0618,0.0608,0.0621
+kohima,Kohima,0.2978,0.2835,0.2745,0.2853
+kokrajhar,Kokrajhar,0.8578,0.866,0.8676,0.8638
+kolar,Kolar,0.6435,0.6142,0.6404,0.6327
+kolasib,Kolasib,0.2676,0.2351,0.2586,0.2538
+kolhapur,Kolhapur,0.9049,0.9032,0.8982,0.9021
+kolkata,Kolkata,0.7827,0.7993,0.781,0.7876
+kollam,Kollam,0.9374,0.9096,0.9118,0.9196
+kondagaon,Kondagaon,0.0697,0.0626,0.0716,0.068
+koppal,Koppal,0.6583,0.6576,0.6767,0.6642
+koraput,Koraput,0.9266,0.9138,0.9104,0.9169
+korba,Korba,0.323,0.2861,0.2887,0.2993
+koriya,Koriya,0.0745,0.0645,0.0718,0.0702
+kota,Kota,0.6549,0.6483,0.6413,0.6482
+kottayam,Kottayam,0.9601,0.9523,0.9505,0.9543
+kozhikode,Kozhikode,0.9573,0.9448,0.9442,0.9488
+kra daadi,Kra Daadi,0.4148,0.3647,0.4001,0.3932
+krishna,Krishna,0.7978,0.7965,0.7869,0.7938
+krishnagiri,Krishnagiri,0.5556,0.4918,0.5285,0.5253
+kulgam,Kulgam,0.4083,0.4057,0.4011,0.4051
+kullu,Kullu,0.9573,0.9519,0.949,0.9527
+kumuram bheem asifabad,Kumuram Bheem Asifabad,0.532,0.5004,0.5637,0.5321
+kupwara,Kupwara,0.5344,0.5165,0.5252,0.5254
+kurnool,Kurnool,0.8464,0.7991,0.8085,0.818
+kurukshetra,Kurukshetra,0.3658,0.398,0.3936,0.3858
+kurung kumey,Kurung Kumey,0.4934,0.4374,0.4971,0.4759
+kushi,Kushinagar,0.4205,0.4805,0.4543,0.4518
+lahul & spiti,Lahul & Spiti,0.0864,0.0957,0.0889,0.0903
+lakhimpur,Lakhimpur,0.943,0.9389,0.9324,0.9381
+lakhisarai,Lakhisarai,0.5462,0.5573,0.5378,0.5471
+lakshadweep,Lakshadweep,0.0297,0.0333,0.0362,0.0331
+lalitpur,Lalitpur,0.5453,0.5302,0.5307,0.5354
+latehar,Latehar,0.1006,0.0909,0.1005,0.0973
+latur,Latur,0.8269,0.7858,0.7975,0.8034
+lawngtlai,Lawngtlai,0.2832,0.2869,0.2874,0.2859
+leh,Leh,0.079,0.0859,0.0771,0.0806
+lepa rada,Lepa Rada,0.0843,0.0756,0.0864,0.0821
+lohardaga,Lohardaga,0.175,0.157,0.1755,0.1692
+lohit,Lohit,0.6103,0.5913,0.6247,0.6088
+longding,Longding,0.4326,0.3724,0.4272,0.4107
+longleng,Longleng,0.078,0.0684,0.0752,0.0739
+lower dibang valley,Lower Dibang Valley,0.3519,0.3601,0.3775,0.3631
+lower siang,Lower Siang,0.4787,0.4252,0.4739,0.4593
+lower subansiri,Lower Subansiri,0.1714,0.1514,0.1724,0.165
+lucknow,Lucknow,0.6815,0.6459,0.6834,0.6703
+ludhiana,Ludhiana,0.6103,0.6005,0.6098,0.6069
+lunglei,Lunglei,0.3198,0.3843,0.3353,0.3465
+madhepura,Madhepura,0.54,0.5954,0.5407,0.5587
+madhubani,Madhubani,0.6557,0.674,0.6446,0.6581
+madurai,Madurai,0.6216,0.6009,0.6089,0.6105
+mahabub,Mahabubnagar,0.5512,0.5149,0.554,0.54
+mahabubabad,Mahabubabad,0.289,0.3305,0.3586,0.326
+mahasamund,Mahasamund,0.2176,0.234,0.2301,0.2273
+mahe,Mahe,0.0516,0.0525,0.0514,0.0518
+mahendragarh,Mahendragarh,0.1774,0.2144,0.2044,0.1987
+mahesana,Mahesana,0.5728,0.5584,0.5635,0.5649
+mahisagar,Mahisagar,0.6313,0.5877,0.6075,0.6088
+mahoba,Mahoba,0.5144,0.501,0.5222,0.5125
+mahrajganj,Mahrajganj,0.4175,0.468,0.4413,0.4423
+mainpuri,Mainpuri,0.5107,0.5244,0.5075,0.5142
+majuli,Majuli,0.9153,0.9046,0.9075,0.9091
+malappuram,Malappuram,0.9313,0.9131,0.9126,0.919
+maldah,Maldah,0.4495,0.5508,0.5242,0.5082
+malkangiri,Malkangiri,0.482,0.4913,0.4925,0.4886
+mamit,Mamit,0.1491,0.1473,0.1585,0.1516
+mancherial,Mancherial,0.1522,0.156,0.1473,0.1519
+mandi,Mandi,0.9246,0.9276,0.9245,0.9256
+mandla,Mandla,0.3665,0.3828,0.3963,0.3819
+mandsaur,Mandsaur,0.4614,0.4657,0.4825,0.4699
+mandya,Mandya,0.6176,0.6162,0.625,0.6196
+mansa,Mansa,0.6102,0.6427,0.6295,0.6275
+mathura,Mathura,0.5581,0.5516,0.5561,0.5552
+mau,Mau,0.464,0.4948,0.4686,0.4758
+mayurbhanj,Mayurbhanj,0.54,0.55,0.5545,0.5482
+medak,Medak,0.528,0.4913,0.5288,0.516
+medchal malkajgiri,Medchal Malkajgiri,0.1755,0.1788,0.1879,0.1807
+medinipur west,Medinipur West,0.0479,0.0465,0.0516,0.0487
+meerut,Meerut,0.5464,0.5611,0.5539,0.5538
+mirpur,Mirpur,0.3302,0.3406,0.3505,0.3404
+mirzapur,Mirzapur,0.7133,0.7149,0.7013,0.7098
+moga,Moga,0.5214,0.5146,0.5115,0.5158
+mokokchung,Mokokchung,0.0865,0.079,0.0894,0.085
+mon,Mon,0.0664,0.0603,0.0658,0.0642
+moradabad,Moradabad,0.6552,0.6057,0.6405,0.6338
+morbi,Morbi,0.5937,0.5705,0.5894,0.5845
+morena,Morena,0.6728,0.6466,0.6565,0.6586
+morigaon,Morigaon,0.1282,0.1538,0.1361,0.1394
+mulugu,Mulugu,0.4362,0.4497,0.4736,0.4532
+mumbai,Mumbai,0.9576,0.9447,0.9433,0.9486
+mumbai suburban,Mumbai Suburban,0.7722,0.6921,0.7295,0.7313
+mungeli,Mungeli,0.2004,0.1735,0.184,0.186
+munger,Munger,0.6691,0.6583,0.6634,0.6636
+murshidabad,Murshidabad,0.5734,0.6245,0.5991,0.599
+muzaffar,Muzaffarnagar,0.647,0.6416,0.6322,0.6403
+muzaffarabad,Muzaffarabad,0.4104,0.4048,0.4177,0.411
+muzaffarpur,Muzaffarpur,0.68,0.6736,0.6819,0.6785
+mysuru,Mysuru,0.7915,0.7433,0.7806,0.7718
+nabarangapur,Nabarangapur,0.0493,0.0484,0.0493,0.049
+nadia,Nadia,0.5264,0.5858,0.538,0.5501
+nagaon,Nagaon,0.9226,0.919,0.9145,0.9187
+nagapattinam,Nagapattinam,0.4948,0.5342,0.542,0.5237
+nagaur,Nagaur,0.4946,0.4742,0.4948,0.4878
+nagpur,Nagpur,0.9569,0.938,0.9385,0.9445
+nainital,Nainital,0.6051,0.5591,0.5892,0.5845
+nalanda,Nalanda,0.357,0.4329,0.4504,0.4134
+nalbari,Nalbari,0.9417,0.9372,0.936,0.9383
+nalgonda,Nalgonda,0.6171,0.574,0.6034,0.5982
+namakkal,Namakkal,0.5149,0.4818,0.4841,0.4936
+namsai,Namsai,0.4333,0.3779,0.421,0.4107
+nanded,Nanded,0.9085,0.8932,0.8955,0.8991
+nandurbar,Nandurbar,0.7711,0.7722,0.7761,0.7731
+narayanpet,Narayanpet,0.369,0.3699,0.3831,0.374
+narayanpur,Narayanpur,0.215,0.2212,0.2416,0.2259
+narmada,Narmada,0.7349,0.771,0.7711,0.759
+narsimhapur,Narsimhapur,0.4454,0.4706,0.4449,0.4536
+nashik,Nashik,0.8595,0.8186,0.8422,0.8401
+navsari,Navsari,0.7222,0.7141,0.7204,0.7189
+nawada,Nawada,0.5384,0.5663,0.5495,0.5514
+nayagarh,Nayagarh,0.4086,0.4273,0.4164,0.4174
+neemuch,Neemuch,0.2982,0.3167,0.3386,0.3178
+new delhi,New Delhi,0.4882,0.4724,0.4964,0.4857
+nicobars,Nicobars,0.065,0.0634,0.0708,0.0664
+nirmal,Nirmal,0.1655,0.1574,0.1337,0.1522
+niwari,Niwari,0.1221,0.1368,0.1319,0.1303
+nizamabad,Nizamabad,0.7168,0.6786,0.6877,0.6944
+noney,Noney,0.443,0.4341,0.4832,0.4534
+north,North,0.385,0.4379,0.4218,0.4149
+north & middle andaman,North  & Middle Andaman,0.0544,0.0528,0.0572,0.0548
+north district,North  District,0.0838,0.101,0.0856,0.0902
+north east,North East,0.1541,0.1736,0.1662,0.1646
+north garo hills,North Garo Hills,0.3937,0.321,0.3705,0.3618
+north goa,North Goa,0.4187,0.4056,0.4068,0.4104
+north tripura,North Tripura,0.5666,0.603,0.5722,0.5806
+north twenty four pargan*,North Twenty Four Pargan*,0.0336,0.0438,0.0524,0.0433
+north west,North West,0.1908,0.2213,0.2147,0.2089
+nuapada,Nuapada,0.3515,0.4058,0.3637,0.3736
+nuh,Nuh,0.2292,0.2316,0.2292,0.23
+osmanabad,Osmanabad,0.1164,0.1296,0.1139,0.1199
+pakke kessang,Pakke Kessang,0.2938,0.2981,0.3111,0.301
+pakur,Pakur,0.1043,0.0848,0.0945,0.0945
+palakkad,Palakkad,0.9303,0.9013,0.9024,0.9113
+palamu,Palamu,0.5596,0.5808,0.5638,0.5681
+palghar,Palghar,0.8318,0.8096,0.8259,0.8224
+pali,Pali,0.6957,0.6445,0.6669,0.669
+palwal,Palwal,0.1955,0.205,0.1929,0.1978
+panch mahals,Panch Mahals,0.6711,0.6393,0.6522,0.6542
+panchkula,Panchkula,0.2838,0.33,0.3401,0.318
+panipat,Panipat,0.3682,0.4002,0.3891,0.3858
+panna,Panna,0.2168,0.2882,0.2722,0.2591
+papum pare,Papum Pare,0.8082,0.8309,0.8241,0.821
+parbhani,Parbhani,0.846,0.8359,0.8335,0.8384
+paschim bardhaman,Paschim Bardhaman,0.0722,0.0745,0.0676,0.0714
+pashchim champaran,Pashchim Champaran,0.6987,0.6907,0.6759,0.6884
+pashchimi singhbhum,Pashchimi Singhbhum,0.0593,0.0528,0.0593,0.0571
+patan,Patan,0.4865,0.48,0.4832,0.4832
+pathanamthitta,Pathanamthitta,0.946,0.9428,0.94,0.9429
+pathankot,Pathankot,0.5874,0.5943,0.5838,0.5885
+patiala,Patiala,0.7368,0.7014,0.7245,0.7209
+patna,Patna,0.687,0.7155,0.7168,0.7064
+peddapalli,Peddapalli,0.1145,0.1024,0.0972,0.1047
+perambalur,Perambalur,0.4591,0.4625,0.449,0.4569
+peren,Peren,0.2628,0.2296,0.27,0.2541
+phek,Phek,0.1497,0.1615,0.1672,0.1595
+pherzawl,Pherzawl,0.1097,0.1044,0.1085,0.1075
+pilibhit,Pilibhit,0.6279,0.6345,0.6127,0.625
+pithoragarh,Pithoragarh,0.8552,0.8699,0.8529,0.8593
+porbandar,Porbandar,0.6849,0.6823,0.672,0.6797
+prakasam,Prakasam,0.7466,0.7113,0.733,0.7303
+pratapgarh,Pratapgarh,0.6848,0.6606,0.6948,0.6801
+prayagraj,Prayagraj,0.7567,0.7547,0.7521,0.7545
+puducherry,Puducherry,0.0695,0.0613,0.0638,0.0649
+pudukkottai,Pudukkottai,0.6434,0.6277,0.6421,0.6377
+pulwama,Pulwama,0.8516,0.8557,0.8381,0.8485
+punch,Punch,0.104,0.1457,0.1301,0.1266
+pune,Pune,0.9269,0.8865,0.8945,0.9026
+purba bardhaman,Purba Bardhaman,0.2228,0.2114,0.2223,0.2188
+purba champaran,Purba Champaran,0.0319,0.0332,0.0388,0.0346
+purba medinipur,Purba Medinipur,0.4872,0.5718,0.5334,0.5308
+purbi singhbhum,Purbi Singhbhum,0.1044,0.1005,0.0925,0.0991
+puri,Puri,0.7558,0.7671,0.747,0.7566
+purnia,Purnia,0.4942,0.5435,0.5108,0.5161
+puruliya,Puruliya,0.0626,0.0893,0.0771,0.0763
+rae bareli,Rae Bareli,0.4001,0.4557,0.4228,0.4262
+raichur,Raichur,0.8392,0.8516,0.8289,0.8399
+raigarh,Raigarh,0.9227,0.9225,0.9139,0.9197
+raipur,Raipur,0.7133,0.7244,0.7196,0.7191
+raisen,Raisen,0.7075,0.7443,0.7357,0.7292
+rajanna sircilla,Rajanna Sircilla,0.3647,0.3819,0.3955,0.3807
+rajgarh,Rajgarh,0.5611,0.5388,0.5678,0.5559
+rajkot,Rajkot,0.7977,0.8226,0.7858,0.8021
+rajnandgaon,Rajnandgaon,0.6005,0.5928,0.5761,0.5898
+rajouri,Rajouri,0.8861,0.898,0.8993,0.8945
+rajsamand,Rajsamand,0.4232,0.4312,0.443,0.4325
+ramaa,Ramanagara,0.5501,0.5704,0.5403,0.5536
+ramanathapuram,Ramanathapuram,0.4823,0.501,0.4908,0.4914
+ramban,Ramban,0.767,0.7938,0.8035,0.7881
+ramgarh,Ramgarh,0.4132,0.3181,0.3575,0.3629
+rampur,Rampur,0.4609,0.4726,0.4786,0.4707
+ranchi,Ranchi,0.5385,0.5709,0.5693,0.5596
+ranga reddy,Ranga Reddy,0.3599,0.38,0.4088,0.3829
+ranipet,Ranipet,0.5205,0.543,0.5266,0.53
+ratlam,Ratlam,0.372,0.4149,0.3964,0.3945
+ratnagiri,Ratnagiri,0.9475,0.9395,0.9382,0.9417
+rayagada,Rayagada,0.3572,0.4051,0.3793,0.3805
+reasi,Reasi,0.6987,0.6843,0.6913,0.6914
+rewa,Rewa,0.5449,0.5231,0.5422,0.5367
+rewari,Rewari,0.2447,0.2592,0.2548,0.2529
+ribhoi,Ribhoi,0.1085,0.1034,0.1045,0.1055
+rohtak,Rohtak,0.4349,0.4742,0.4483,0.4525
+rohtas,Rohtas,0.4826,0.5012,0.502,0.4953
+rudraprayag,Rudraprayag,0.0416,0.0585,0.0577,0.0526
+rup,Rupnagar,0.705,0.6435,0.6669,0.6718
+sabar kantha,Sabar Kantha,0.5776,0.5581,0.5829,0.5729
+sagar,Sagar,0.5379,0.569,0.5691,0.5587
+saharanpur,Saharanpur,0.5879,0.5898,0.58,0.5859
+saharsa,Saharsa,0.6896,0.6653,0.6535,0.6695
+sahibganj,Sahibganj,0.0471,0.0401,0.0411,0.0428
+sahibzada ajit singh nag*,Sahibzada Ajit Singh Nag*,0.0454,0.0471,0.0504,0.0476
+saiha,Saiha,0.1114,0.1029,0.1072,0.1072
+salem,Salem,0.5947,0.5844,0.5935,0.5909
+samastipur,Samastipur,0.6847,0.6968,0.69,0.6905
+samba,Samba,0.5203,0.483,0.5283,0.5105
+sambalpur,Sambalpur,0.7199,0.7241,0.7211,0.7217
+sambhal,Sambhal,0.5325,0.5392,0.5227,0.5315
+sangareddy,Sangareddy,0.3925,0.3734,0.3892,0.385
+sangli,Sangli,0.8301,0.806,0.8192,0.8184
+sangrur,Sangrur,0.6314,0.5758,0.6108,0.606
+sant kabir,Sant Kabir Nagar,0.4767,0.4753,0.4826,0.4782
+saraikela-kharsawan,Saraikela-kharsawan,0.0481,0.0462,0.0471,0.0471
+saran,Saran,0.6916,0.7165,0.6926,0.7002
+satara,Satara,0.7847,0.7492,0.7592,0.7644
+satna,Satna,0.5076,0.497,0.4828,0.4958
+sawai madhopur,Sawai Madhopur,0.6185,0.6285,0.5968,0.6146
+sehore,Sehore,0.666,0.6612,0.6732,0.6668
+senapati,Senapati,0.1235,0.1163,0.1256,0.1218
+seoni,Seoni,0.6112,0.6402,0.6302,0.6272
+serchhip,Serchhip,0.201,0.1845,0.2033,0.1963
+shahdara,Shahdara,0.173,0.1867,0.1869,0.1822
+shahdol,Shahdol,0.408,0.374,0.4046,0.3955
+shahid bhagat singh,Shahid Bhagat Singh Nagar,0.5067,0.5349,0.5276,0.5231
+shahjahanpur,Shahjahanpur,0.5542,0.5351,0.5596,0.5496
+shajapur,Shajapur,0.3094,0.3429,0.353,0.3351
+shamli,Shamli,0.4731,0.4605,0.4831,0.4722
+sheikhpura,Sheikhpura,0.5107,0.5309,0.5293,0.5236
+sheohar,Sheohar,0.6167,0.6435,0.5966,0.6189
+sheopur,Sheopur,0.3185,0.3457,0.3255,0.3299
+shi yomi,Shi Yomi,0.4672,0.4036,0.4603,0.4437
+shimla,Shimla,0.9296,0.9237,0.9185,0.9239
+shivamogga,Shivamogga,0.9235,0.9171,0.9182,0.9196
+shivpuri,Shivpuri,0.5437,0.5434,0.5547,0.5473
+shrawasti,Shrawasti,0.2305,0.3222,0.2273,0.26
+shupiyan,Shupiyan,0.073,0.0813,0.0842,0.0795
+siang,Siang,0.4847,0.4204,0.4723,0.4591
+siddharth,Siddharthnagar,0.4259,0.4056,0.4166,0.416
+siddipet,Siddipet,0.5912,0.566,0.6309,0.596
+sidhi,Sidhi,0.2289,0.2113,0.2097,0.2166
+sikar,Sikar,0.5025,0.5416,0.5224,0.5222
+simdega,Simdega,0.0806,0.0738,0.0818,0.0787
+sindhudurg,Sindhudurg,0.8699,0.851,0.8443,0.8551
+singrauli,Singrauli,0.4227,0.4508,0.4304,0.4346
+sipahijala,Sipahijala,0.0708,0.067,0.0761,0.0713
+sirmaur,Sirmaur,0.9347,0.9297,0.9316,0.932
+sirohi,Sirohi,0.578,0.5337,0.5674,0.5597
+sirsa,Sirsa,0.3257,0.374,0.3701,0.3566
+sitamarhi,Sitamarhi,0.6349,0.6611,0.6318,0.6426
+sitapur,Sitapur,0.8535,0.81,0.8231,0.8289
+sivaganga,Sivaganga,0.4234,0.4655,0.4274,0.4388
+sivasagar,Sivasagar,0.9097,0.8948,0.9025,0.9023
+siwan,Siwan,0.5949,0.5992,0.588,0.5941
+solan,Solan,0.7945,0.7305,0.7626,0.7625
+solapur,Solapur,0.7162,0.6855,0.7077,0.7031
+sonbhadra,Sonbhadra,0.5592,0.5582,0.5627,0.56
+sonipat,Sonipat,0.3776,0.4073,0.406,0.397
+sonitpur,Sonitpur,0.9556,0.947,0.9485,0.9504
+south,South,0.1413,0.1592,0.157,0.1525
+south andaman,South Andaman,0.0683,0.061,0.0664,0.0652
+south district,South District,0.0607,0.0682,0.068,0.0656
+south east,South East,0.1982,0.1994,0.2044,0.2007
+south garo hills,South Garo Hills,0.4982,0.4421,0.4932,0.4778
+south goa,South Goa,0.4362,0.4905,0.4961,0.4743
+south salmara mancachar,South Salmara Mancachar,0.7818,0.8063,0.7916,0.7932
+south tripura,South Tripura,0.2642,0.32,0.2904,0.2915
+south twenty four pargan*,South Twenty Four Pargan*,0.0228,0.0247,0.0311,0.0262
+south west,South West,0.2667,0.2907,0.2756,0.2777
+south west garo hills,South West Garo Hills,0.5375,0.4783,0.5307,0.5155
+south west khasi hills,South West Khasi Hills,0.3816,0.4168,0.4351,0.4112
+sri,Srinagar,0.7166,0.7187,0.7148,0.7167
+sri muktsar sahib,Sri Muktsar Sahib,0.1281,0.1091,0.1199,0.119
+sri potti sriramulu nell*,Sri Potti Sriramulu Nell*,0.0827,0.1005,0.0829,0.0887
+srikakulam,Srikakulam,0.5977,0.5743,0.6156,0.5959
+subarnapur,Subarnapur,0.4165,0.4584,0.4269,0.4339
+sukma,Sukma,0.192,0.2077,0.221,0.2069
+sultanpur,Sultanpur,0.6934,0.6752,0.6695,0.6794
+sundargarh,Sundargarh,0.3402,0.3912,0.3767,0.3694
+supaul,Supaul,0.6515,0.6898,0.6465,0.6626
+surajpur,Surajpur,0.0562,0.05,0.0562,0.0541
+surat,Surat,0.7508,0.7402,0.7603,0.7504
+surendra,Surendranagar,0.6807,0.6808,0.6573,0.6729
+surguja,Surguja,0.1917,0.2283,0.2121,0.2107
+suryapet,Suryapet,0.1175,0.1157,0.1121,0.1151
+tamenglong,Tamenglong,0.2226,0.2805,0.2518,0.2516
+tapi,Tapi,0.6957,0.7427,0.7166,0.7183
+tarn taran,Tarn Taran,0.4315,0.4321,0.3887,0.4174
+tawang,Tawang,0.5667,0.5555,0.5803,0.5675
+tehri garhwal,Tehri Garhwal,0.7387,0.7397,0.7316,0.7367
+tengnoupal,Tengnoupal,0.1236,0.1247,0.1365,0.1283
+tenkasi,Tenkasi,0.417,0.3788,0.4054,0.4004
+thane,Thane,0.941,0.9215,0.9229,0.9284
+thanjavur,Thanjavur,0.6152,0.6587,0.6354,0.6364
+the dangs,The Dangs,0.3723,0.4209,0.3939,0.3957
+the nilgiris,The Nilgiris,0.4593,0.4715,0.4936,0.4748
+theni,Theni,0.4057,0.3667,0.3906,0.3877
+thiruvallur,Thiruvallur,0.5706,0.558,0.5734,0.5673
+thiruvananthapuram,Thiruvananthapuram,0.9618,0.9522,0.9512,0.9551
+thiruvarur,Thiruvarur,0.3616,0.4192,0.397,0.3926
+thoothukkudi,Thoothukkudi,0.468,0.4606,0.4625,0.4637
+thoubal,Thoubal,0.2112,0.2227,0.242,0.2253
+thrissur,Thrissur,0.9494,0.9442,0.9424,0.9453
+tikamgarh,Tikamgarh,0.4771,0.4873,0.4829,0.4824
+tinsukia,Tinsukia,0.8851,0.8854,0.8798,0.8834
+tirap,Tirap,0.2943,0.2679,0.3021,0.2881
+tiruchirappalli,Tiruchirappalli,0.5306,0.5453,0.5202,0.532
+tirunelveli,Tirunelveli,0.3419,0.3777,0.3592,0.3596
+tirupathur,Tirupathur,0.2736,0.2779,0.2932,0.2816
+tiruppur,Tiruppur,0.461,0.4551,0.4598,0.4586
+tiruvannamalai,Tiruvannamalai,0.6722,0.6636,0.6711,0.669
+tonk,Tonk,0.7671,0.755,0.7436,0.7552
+tuensang,Tuensang,0.0752,0.0695,0.0775,0.074
+tumakuru,Tumakuru,0.5629,0.5696,0.5546,0.5624
+udaipur,Udaipur,0.5371,0.4833,0.5335,0.518
+udalguri,Udalguri,0.8204,0.8383,0.8345,0.8311
+udham singh,Udham Singh Nagar,0.065,0.0575,0.0574,0.06
+udhampur,Udhampur,0.8165,0.8,0.8139,0.8101
+udupi,Udupi,0.879,0.8749,0.8769,0.8769
+ujjain,Ujjain,0.6253,0.6006,0.6243,0.6167
+ukhrul,Ukhrul,0.1206,0.1223,0.1299,0.1243
+umaria,Umaria,0.4132,0.4036,0.4499,0.4222
+una,Una,0.8996,0.901,0.8963,0.899
+unnao,Unnao,0.6312,0.6008,0.6214,0.6178
+unokoti,Unokoti,0.1009,0.0962,0.1234,0.1068
+upper dibang valley,Upper Dibang Valley,0.0782,0.0721,0.0787,0.0764
+upper siang,Upper Siang,0.6877,0.6904,0.6875,0.6885
+upper subansiri,Upper Subansiri,0.0787,0.0749,0.0827,0.0788
+uttar bastar kanker,Uttar Bastar Kanker,0.0867,0.0739,0.0817,0.0808
+uttar dinajpur,Uttar Dinajpur,0.0619,0.0486,0.0592,0.0566
+uttara kannada,Uttara Kannada,0.1679,0.1412,0.1345,0.1479
+uttarkashi,Uttarkashi,0.0606,0.0721,0.0703,0.0677
+vadodara,Vadodara,0.6664,0.6534,0.6627,0.6608
+vaishali,Vaishali,0.5204,0.5541,0.5582,0.5442
+valsad,Valsad,0.7696,0.7315,0.7296,0.7436
+varanasi,Varanasi,0.7058,0.7029,0.6866,0.6984
+vellore,Vellore,0.3991,0.3851,0.4217,0.402
+vidisha,Vidisha,0.6611,0.6189,0.6244,0.6348
+vijayapura,Vijayapura,0.5769,0.5644,0.5724,0.5712
+vikarabad,Vikarabad,0.4636,0.4234,0.4771,0.4547
+viluppuram,Viluppuram,0.7257,0.7342,0.7366,0.7322
+virudhu,Virudhunagar,0.5133,0.4638,0.4747,0.4839
+visakhapatnam,Visakhapatnam,0.7629,0.7385,0.7516,0.751
+viziaam,Vizianagaram,0.5392,0.5395,0.5573,0.5453
+wanaparthy,Wanaparthy,0.1296,0.0979,0.1124,0.1133
+warangal rural,Warangal Rural,0.0858,0.1051,0.0917,0.0942
+warangal urban,Warangal Urban,0.1241,0.1539,0.1358,0.1379
+wardha,Wardha,0.9237,0.9109,0.9125,0.9157
+washim,Washim,0.849,0.8459,0.8742,0.8564
+wayanad,Wayanad,0.9356,0.9324,0.9299,0.9327
+west,West,0.1649,0.1571,0.1678,0.1633
+west district,West District,0.083,0.0826,0.0886,0.0847
+west garo hills,West Garo Hills,0.4001,0.4138,0.4146,0.4095
+west godavari,West Godavari,0.899,0.8924,0.8933,0.8949
+west jaintia hills,West Jaintia Hills,0.0673,0.0609,0.0688,0.0657
+west kameng,West Kameng,0.6364,0.6413,0.6466,0.6414
+west karbi anglong,West Karbi Anglong,0.5747,0.5479,0.565,0.5625
+west khasi hills,West Khasi Hills,0.4977,0.484,0.5001,0.494
+west nimar,West Nimar,0.0554,0.0591,0.0576,0.0574
+west siang,West Siang,0.5509,0.542,0.5658,0.5529
+west tripura,West Tripura,0.602,0.6219,0.5874,0.6038
+wokha,Wokha,0.1039,0.0925,0.0979,0.0981
+y.s.r.,Y.S.R.,0.6975,0.6702,0.6923,0.6866
+yadadri bhuvanagiri,Yadadri Bhuvanagiri,0.1918,0.2555,0.2541,0.2338
+yadgir,Yadgir,0.7241,0.7407,0.7334,0.7327
+yamuna,Yamunanagar,0.3544,0.3685,0.376,0.3663
+yanam,Yanam,0.0685,0.0578,0.0883,0.0715
+yavatmal,Yavatmal,0.8962,0.865,0.8734,0.8782
+zunheboto,Zunheboto,0.174,0.1601,0.1492,0.1611

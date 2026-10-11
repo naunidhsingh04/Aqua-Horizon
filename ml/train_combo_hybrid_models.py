@@ -14,10 +14,10 @@ The 3 single models are re-scored under the SAME protocol, so singles and combos
 Protocol (no information from test data is ever used for training or tuning):
   1. 80:20 chronological split (windows ending <= 2012 train, later years test)  AND
      10-fold stratified cross-validation.
-  2. Inside every training part: scale features (mean/std from training data only), set aside 10%
-     as a threshold-validation slice, then balance the rest to 50:50 with SMOTE (synthetic flood rows).
-  3. The decision threshold for each model / combo is the cut-off with the best F1 on the
-     validation slice - never on the test data.
+  2. Inside every training part: scale features (mean/std from training data only), then balance the WHOLE
+     training part to 50:50 with SMOTE (synthetic flood rows). The test part is never balanced.
+  3. Because the networks are trained on 50:50 data, a window is called flood when P(flood) >= 0.5 (fixed,
+     nothing is tuned on any held-out data).
   4. Accuracy, recall, precision, F1, ROC-AUC, PR-AUC are measured on the untouched, real test data.
 
 Outputs: ml/models/combo_hybrid_benchmarks.json, web/data/combo_hybrid_benchmarks.json,
@@ -37,7 +37,7 @@ import pandas as pd
 import torch
 import torch.nn.functional as F
 from imblearn.over_sampling import SMOTE
-from sklearn.model_selection import StratifiedKFold, train_test_split
+from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import (accuracy_score, recall_score, precision_score, f1_score,
                              roc_auc_score, average_precision_score)
@@ -46,6 +46,7 @@ from ml.models_hybrid import CNNLSTM, CNNTransformer, ResNetBiLSTM
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 SEQ_LEN, N_FEATS, SEED = 5, 15, 42
+THRESHOLD = 0.5   # models are trained on 50:50 data, so 0.5 is the natural flood cut-off
 
 FEATURE_COLS = [
     'prior_cum_events', 'prior_3yr_events', 'prior_5yr_events', 'prior_10yr_events',
@@ -128,16 +129,6 @@ def predict(model, X, batch_size=1024):
     return np.concatenate(out)
 
 
-def best_threshold(y, p):
-    """Cut-off (0.20-0.80) with the highest F1 on the validation slice."""
-    best_t, best_f = 0.5, -1.0
-    for t in np.arange(0.20, 0.801, 0.01):
-        f = f1_score(y, (p >= t).astype(int), zero_division=0)
-        if f > best_f:
-            best_f, best_t = f, float(t)
-    return best_t
-
-
 def score(y, p, thr):
     pred = (p >= thr).astype(int)
     return {
@@ -160,27 +151,23 @@ def run_split(X_tr, y_tr, X_te, y_te, seed, district_X=None):
     scaler = StandardScaler().fit(X_tr.reshape(-1, N_FEATS))
     X_tr, X_te = scale(scaler, X_tr), scale(scaler, X_te)
 
-    # keep 10% of the training windows (real class ratio) to choose the decision threshold
-    X_fit, X_thr, y_fit, y_thr = train_test_split(X_tr, y_tr, test_size=0.10, stratify=y_tr, random_state=seed)
-
-    # SMOTE: add synthetic flood windows until flood : non-flood is 50 : 50 (training part only)
-    n = len(X_fit)
-    X_bal, y_bal = SMOTE(k_neighbors=5, random_state=seed).fit_resample(X_fit.reshape(n, -1), y_fit)
+    # SMOTE: add synthetic flood windows to the WHOLE training part until flood : non-flood is 50 : 50
+    n = len(X_tr)
+    X_bal, y_bal = SMOTE(k_neighbors=5, random_state=seed).fit_resample(X_tr.reshape(n, -1), y_tr)
     X_bal = X_bal.reshape(-1, SEQ_LEN, N_FEATS).astype(np.float32)
     y_bal = y_bal.astype(np.float32)
 
-    p_thr, p_te, p_dist = {}, {}, {}
+    p_te, p_dist = {}, {}
     for key, (_, cls, lr, epochs) in TOP3.items():
         model = train_one(cls, lr, epochs, X_bal, y_bal, seed)
-        p_thr[key], p_te[key] = predict(model, X_thr), predict(model, X_te)
+        p_te[key] = predict(model, X_te)
         if district_X is not None:
             p_dist[key] = predict(model, scale(scaler, district_X))
 
     results = {}
     for ckey, (_, _, members) in CANDIDATES.items():
-        pv = np.mean([p_thr[m] for m in members], axis=0)   # soft voting on the validation slice
-        pt = np.mean([p_te[m] for m in members], axis=0)    # soft voting on the test data
-        results[ckey] = score(y_te, pt, best_threshold(y_thr, pv))
+        pt = np.mean([p_te[m] for m in members], axis=0)    # soft voting on the real test data
+        results[ckey] = score(y_te, pt, THRESHOLD)
     return results, p_dist
 
 
@@ -251,8 +238,8 @@ def main(quick=False):
         'protocol': {
             'holdout': '80:20 chronological split (train: windows ending <=2012, test: 2013-2023)',
             'cross_validation': f'{n_splits}-fold stratified',
-            'balancing': 'SMOTE (k=5) applied to the training part of every split only; test data is real',
-            'threshold': 'cut-off with best F1 on a 10% validation slice of the training part (never on test data)',
+            'balancing': 'SMOTE (k=5) applied to the whole training part (80% in the holdout, 90% in each CV fold); test data is real and never balanced',
+            'threshold': 'fixed 0.5 (training data is balanced 50:50); nothing is tuned on held-out data',
             'combination': 'soft voting (average of member probabilities)',
         },
         'total_windows': int(len(X)),

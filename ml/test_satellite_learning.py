@@ -18,9 +18,9 @@ def main():
     print("=" * 70)
     
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    csv_path = os.path.join(base_dir, 'data', 'processed', 'district_year_dataset_balanced_smote.csv')
+    csv_path = os.path.join(base_dir, 'data', 'processed', 'district_year_dataset.csv')
     df = pd.read_csv(csv_path)
-    print(f"Dataset Loaded: {len(df):,} balanced observations across 726 districts.")
+    print(f"Dataset Loaded: {len(df):,} real observations across 726 districts.")
     
     # Input columns (history, severity, water, rain features)
     features = [

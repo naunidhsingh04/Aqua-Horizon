@@ -1,4 +1,6 @@
 """
+NOT USED FOR TRAINING OR TESTING. Kept only as a standalone demo of what SMOTE does to the whole dataset.
+Every benchmark in the project balances inside the training split only (see ml/verify_protocol.py).
 Balances the dataset with SMOTE: floods are rarer than non-floods, so SMOTE creates synthetic
 flood rows (interpolating between a real flood row and one of its 5 nearest flood neighbours)
 until flood / non-flood is 50:50. Each synthetic row is labelled with its nearest real

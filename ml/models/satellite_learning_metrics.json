@@ -1,17 +1,17 @@
 {
-  "cv_r2_mean": 0.9994723643986931,
-  "cv_r2_std": 5.4545546772667826e-05,
-  "cv_mae_mean": 0.04682277458912637,
+  "cv_r2_mean": 0.9993660706664829,
+  "cv_r2_std": 0.00014310592475941282,
+  "cv_mae_mean": 0.04515798047991822,
   "top_features": {
-    "hydro_rain_stress": 0.8761893510818481,
-    "exposure_severity_index": 0.07273588329553604,
-    "rainfall_anomaly_pct": 0.018469898030161858,
-    "Population": 0.013371831737458706,
-    "dfsi_score": 0.006722761783748865,
-    "drainage_stress_ratio": 0.005665847100317478
+    "hydro_rain_stress": 0.8864315152168274,
+    "exposure_severity_index": 0.06105828657746315,
+    "rainfall_anomaly_pct": 0.0216626338660717,
+    "Population": 0.016376586630940437,
+    "dfsi_score": 0.006249093916267157,
+    "drainage_stress_ratio": 0.004714513663202524
   },
-  "avg_predicted_probability_pct": 50.00000762939453,
-  "avg_predicted_flooded_area_pct": 2.9632623195648193,
+  "avg_predicted_probability_pct": 28.79737091064453,
+  "avg_predicted_flooded_area_pct": 2.7154219150543213,
   "severity_index_min": 0.0,
-  "severity_index_max": 3.202821731567383
+  "severity_index_max": 3.201462745666504
 }

@@ -979,7 +979,7 @@ window.toggleKfoldDetail = function(rowId) {
 
 // 13. Sentinel-1 India SAR Image Benchmark Modal Population
 // Table of the top-3 models and their 4 combinations (probabilities averaged), all scored the same way:
-// SMOTE only on training data, threshold chosen on a validation slice, accuracy measured on real test data.
+// SMOTE only on the whole training part, fixed 0.5 threshold, accuracy measured on real test data.
 // The best 10-fold accuracy row is highlighted. Data: combo_hybrid_benchmarks.json
 function populateComboBenchmarkModal() {
     const tbody = document.getElementById('combo-hybrid-tbody');

@@ -1,5 +1,5 @@
 """
-10-fold cross-validation benchmark for two XGBoost models:
+10-fold cross-validation benchmark for two XGBoost models (SMOTE only on each fold's training rows):
   1. Classifier: will the district flood this year?  -> accuracy, recall, precision, F1, ROC-AUC
   2. Regressor : how much % of the district area floods? -> R2, MAE
 and the combined Inundation Risk Score (IRS = P(flood) * ln(1 + predicted flooded area %)).
@@ -15,6 +15,7 @@ from sklearn.metrics import (
     r2_score, mean_absolute_error, mean_squared_error,
     accuracy_score, recall_score, precision_score, f1_score, roc_auc_score
 )
+from imblearn.over_sampling import SMOTE
 from scipy.stats import spearmanr, pearsonr
 
 def main():
@@ -23,9 +24,10 @@ def main():
     print("=" * 80)
     
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-    csv_path = os.path.join(base_dir, 'data', 'processed', 'district_year_dataset_balanced_smote.csv')
+    # Real, never-balanced dataset: SMOTE is applied below inside each training fold only
+    csv_path = os.path.join(base_dir, 'data', 'processed', 'district_year_dataset.csv')
     df = pd.read_csv(csv_path)
-    print(f"Dataset: {len(df):,} balanced observations across 726 Indian districts.")
+    print(f"Dataset: {len(df):,} real observations across 726 Indian districts (unbalanced).")
     
     # Input columns for the flood yes/no classifier (history, severity, water, rain features)
     cls_features = [
@@ -94,7 +96,9 @@ def main():
             subsample=0.85, colsample_bytree=0.85,
             random_state=42 + fold, n_jobs=2, eval_metric='logloss'
         )
-        clf.fit(X_tr_c, y_tr_c)
+        # SMOTE on this fold's training rows only: the test fold stays real and unbalanced
+        X_tr_bal, y_tr_bal = SMOTE(random_state=42 + fold).fit_resample(X_tr_c, y_tr_c)
+        clf.fit(X_tr_bal, y_tr_bal)
         probs = clf.predict_proba(X_val_c)[:, 1]   # P(flood) for each test row
         preds = (probs >= 0.50).astype(int)        # flood if probability >= 50%
 
@@ -156,7 +160,8 @@ def main():
     # Save results as JSON (also copied to web/data/ so the website can display them)
     out_json = {
         'evaluation_mode': '10-Fold Stratified Cross-Validation',
-        'dataset': 'data/processed/district_year_dataset_balanced_smote.csv',
+        'dataset': 'data/processed/district_year_dataset.csv',
+        'balancing': 'SMOTE inside each training fold only; test folds are real and unbalanced',
         'total_samples': len(df),
         'zero_leakage_verified': True,
         'summary': {

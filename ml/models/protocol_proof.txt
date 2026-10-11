@@ -1,0 +1,146 @@
+====================================================================================================
+PART 1 - CSV DATA AND SATELLITE IMAGES ARE TRAINED BY SEPARATE SCRIPTS
+====================================================================================================
+training script                       | reads CSV district data | reads satellite images
+----------------------------------------------------------------------------------------------------
+02_train_models.py                    | YES                     | -
+train_kfold_hybrid_models.py          | YES                     | -
+train_combo_hybrid_models.py          | YES                     | -
+train_all_hybrid_models.py            | -                       | -
+test_10fold_irs.py                    | YES                     | -
+image_pipeline_india.py               | -                       | YES
+test_other_countries.py               | -                       | YES
+Also checked: no training/test script reads a pre-balanced copy of the dataset.
+
+RESULT: no training script reads both data types. CSV models and the image model are trained
+        separately and their features are never concatenated.
+
+====================================================================================================
+PART 2 - CSV (district-year) DATA: 80:20 SPLIT, SMOTE ONLY ON THE 80% TRAINING PART (ALL OF IT)
+====================================================================================================
+Whole dataset (real, never balanced)  : 38,425 rows | flood 11,136 | non-flood 27,289 | flood share  29.0%
+
+[A] 80:20 chronological holdout (train: windows ending <=2012, test: 2013-2023)
+    train part (~80%) before SMOTE : 30,450 rows | flood  8,457 | non-flood 21,993 | flood share  27.8%   (79.2% of data)
+    TEST  part (~20%) UNBALANCED   :  7,975 rows | flood  2,679 | non-flood  5,296 | flood share  33.6%   (20.8% of data)
+    SMOTE input  (the WHOLE 80%)   : 30,450 rows | flood  8,457 | non-flood 21,993 | flood share  27.8%
+    SMOTE output (train only)      : 43,986 rows | flood 21,993 | non-flood 21,993 | flood share  50.0%   <- balanced 50:50, 13,536 synthetic rows added
+    TEST part after the whole run  :  7,975 rows | flood  2,679 | non-flood  5,296 | flood share  33.6%   <- identical to before: SMOTE never touched it
+    CHECKS PASSED: SMOTE fitted on training rows only | test rows disjoint | test ratio unchanged
+
+[B] 10-fold stratified cross-validation (each fold: 90% train / 10% test)
+    fold | train before SMOTE                          | train after SMOTE (50:50)| test fold (real, unbalanced)
+    1    | 34,582 rows | flood 10,022 | non-flood 24,560 | flood share  29.0%| 49,120 flood 24,560  |  3,843 rows | flood  1,114 | non-flood  2,729 | flood share  29.0%
+    2    | 34,582 rows | flood 10,022 | non-flood 24,560 | flood share  29.0%| 49,120 flood 24,560  |  3,843 rows | flood  1,114 | non-flood  2,729 | flood share  29.0%
+    3    | 34,582 rows | flood 10,022 | non-flood 24,560 | flood share  29.0%| 49,120 flood 24,560  |  3,843 rows | flood  1,114 | non-flood  2,729 | flood share  29.0%
+    4    | 34,582 rows | flood 10,022 | non-flood 24,560 | flood share  29.0%| 49,120 flood 24,560  |  3,843 rows | flood  1,114 | non-flood  2,729 | flood share  29.0%
+    5    | 34,582 rows | flood 10,022 | non-flood 24,560 | flood share  29.0%| 49,120 flood 24,560  |  3,843 rows | flood  1,114 | non-flood  2,729 | flood share  29.0%
+    6    | 34,583 rows | flood 10,023 | non-flood 24,560 | flood share  29.0%| 49,120 flood 24,560  |  3,842 rows | flood  1,113 | non-flood  2,729 | flood share  29.0%
+    7    | 34,583 rows | flood 10,023 | non-flood 24,560 | flood share  29.0%| 49,120 flood 24,560  |  3,842 rows | flood  1,113 | non-flood  2,729 | flood share  29.0%
+    8    | 34,583 rows | flood 10,023 | non-flood 24,560 | flood share  29.0%| 49,120 flood 24,560  |  3,842 rows | flood  1,113 | non-flood  2,729 | flood share  29.0%
+    9    | 34,583 rows | flood 10,023 | non-flood 24,560 | flood share  29.0%| 49,120 flood 24,560  |  3,842 rows | flood  1,113 | non-flood  2,729 | flood share  29.0%
+    10   | 34,583 rows | flood 10,022 | non-flood 24,561 | flood share  29.0%| 49,122 flood 24,561  |  3,842 rows | flood  1,114 | non-flood  2,728 | flood share  29.0%
+    CHECKS PASSED: every fold balances only its own training rows; the test fold keeps the real ratio
+
+====================================================================================================
+PART 3 - SATELLITE IMAGES (Sentinel-1 SAR): 80:20 SPLIT, SYNTHETIC CHIPS ONLY IN THE 80% TRAINING PART
+====================================================================================================
+Whole image dataset (real)            :  1,200 rows | flood    378 | non-flood    822 | flood share  31.5%
+train part (80%) before augmentation  :    960 rows | flood    302 | non-flood    658 | flood share  31.5%
+TEST  part (20%) UNBALANCED/REAL      :    240 rows | flood     76 | non-flood    164 | flood share  31.7%
+The image model balances with a DCGAN trained on flood chips of the TRAINING part only
+(image_pipeline_india.py: flood_train_chips = images_clahe[train_idx][labels[train_idx] == 1]);
+it adds 100 synthetic flood chips to the training part. The test part is passed in untouched:
+TEST part after the whole run         :    240 rows | flood     76 | non-flood    164 | flood share  31.7%   <- unchanged
+CHECKS PASSED: 80:20 split is disjoint and stratified; the test chips are real and never augmented
+(10-fold CV for images works the same way: a fresh GAN per fold, trained on that fold's training chips only)
+
+====================================================================================================
+PART 4 - ALL SAVED TRAINING PARAMETERS (measured on the untouched test data)
+====================================================================================================
+
+[CSV] Top-3 hybrid models + combinations | 80:20 chronological split (train: windows ending <=2012, test: 2013-2023)
+      balancing: SMOTE (k=5) applied to the whole training part (80% in the holdout, 90% in each CV fold); test data is real and never balanced
+  80:20 holdout (single run on the 20% real test data)
+  Model                                       | Acc %  | Recall % | Prec % | F1     | ROC-AUC | PR-AUC
+  ResNet + BiLSTM                             |  70.53 |    47.93 |  57.35 | 0.5222 | 0.7492  | 0.5927
+  CNN + LSTM                                  |  69.62 |    51.36 |  55.13 | 0.5318 | 0.7419  | 0.5770
+  CNN + Transformer                           |  69.07 |    62.41 |  53.38 | 0.5755 | 0.7657  | 0.6064
+  ResNet+BiLSTM + CNN+LSTM                    |  70.60 |    49.09 |  57.27 | 0.5286 | 0.7512  | 0.5906
+  CNN+LSTM + CNN+Transformer                  |  70.02 |    55.21 |  55.39 | 0.5530 | 0.7577  | 0.5949
+  ResNet+BiLSTM + CNN+Transformer             |  70.21 |    51.03 |  56.23 | 0.5350 | 0.7609  | 0.6041
+  ResNet+BiLSTM + CNN+LSTM + CNN+Transformer  |  70.60 |    51.25 |  56.92 | 0.5394 | 0.7584  | 0.5983
+
+  10-fold CV (mean +/- std over the 10 test folds)
+  Model                                       | Acc %  | Recall % | Prec % | F1     | ROC-AUC | PR-AUC
+  ResNet + BiLSTM                             |  69.98 |    77.43 |  48.92 | 0.5992 | 0.8032  | 0.6282
+     (+/- std)                                |   1.15 |     2.35 |   1.20 | 0.0081 | 0.0077  | 0.0122
+  CNN + LSTM                                  |  69.82 |    76.03 |  48.73 | 0.5936 | 0.7976  | 0.6201
+     (+/- std)                                |   1.24 |     2.58 |   1.25 | 0.0084 | 0.0092  | 0.0164
+  CNN + Transformer                           |  69.56 |    75.89 |  48.56 | 0.5913 | 0.7955  | 0.6147
+     (+/- std)                                |   2.09 |     3.40 |   2.16 | 0.0096 | 0.0085  | 0.0127
+  ResNet+BiLSTM + CNN+LSTM                    |  70.17 |    77.53 |  49.12 | 0.6011 | 0.8045  | 0.6303
+     (+/- std)                                |   1.31 |     2.19 |   1.35 | 0.0097 | 0.0085  | 0.0140
+  CNN+LSTM + CNN+Transformer                  |  69.97 |    76.09 |  48.89 | 0.5951 | 0.7999  | 0.6226
+     (+/- std)                                |   1.31 |     1.34 |   1.36 | 0.0082 | 0.0089  | 0.0152
+  ResNet+BiLSTM + CNN+Transformer             |  70.21 |    77.22 |  49.18 | 0.6006 | 0.8048  | 0.6293
+     (+/- std)                                |   1.43 |     1.82 |   1.54 | 0.0077 | 0.0083  | 0.0125
+  ResNet+BiLSTM + CNN+LSTM + CNN+Transformer  |  70.23 |    77.06 |  49.18 | 0.6002 | 0.8046  | 0.6297
+     (+/- std)                                |   1.28 |     1.34 |   1.35 | 0.0083 | 0.0086  | 0.0139
+
+  Per-fold scores of the best model by 10-fold F1: ResNet+BiLSTM + CNN+LSTM
+  fold   | Acc %  | Recall % | Prec % | F1     | ROC-AUC | PR-AUC | threshold
+  Fold 1 |  70.23 |    79.62 |  49.17 | 0.6080 | 0.8081  | 0.6243 | 0.50
+  Fold 2 |  71.01 |    75.13 |  50.00 | 0.6004 | 0.7919  | 0.6044 | 0.50
+  Fold 3 |  70.26 |    77.47 |  49.17 | 0.6016 | 0.8081  | 0.6337 | 0.50
+  Fold 4 |  71.56 |    80.61 |  50.59 | 0.6217 | 0.8200  | 0.6532 | 0.50
+  Fold 5 |  70.60 |    76.03 |  49.53 | 0.5999 | 0.8047  | 0.6370 | 0.50
+  Fold 6 |  70.69 |    77.36 |  49.63 | 0.6046 | 0.8074  | 0.6442 | 0.50
+  Fold 7 |  71.60 |    73.41 |  50.68 | 0.5996 | 0.8089  | 0.6362 | 0.50
+  Fold 8 |  67.26 |    79.25 |  46.20 | 0.5837 | 0.7917  | 0.6191 | 0.50
+  Fold 9 |  69.34 |    77.90 |  48.19 | 0.5955 | 0.7984  | 0.6191 | 0.50
+  Fold 10|  69.16 |    78.55 |  48.05 | 0.5963 | 0.8054  | 0.6320 | 0.50
+
+[CSV] XGBoost district classifier - balancing strategies (SMOTE/ADASYN applied inside the training part only)
+  Strategy                  | split      | Acc    | Recall | Prec   | F1     | ROC-AUC | PR-AUC
+  Baseline (Control - Raw)  | 80:20      | 0.7366 | 0.4636 | 0.6516 | 0.5418 | 0.7957  | 0.6660
+                            | 10-fold    | 0.7645 | 0.5781 | 0.5935 | 0.5856 | 0.8098  | 0.6385
+  SMOTE Balanced            | 80:20      | 0.7361 | 0.6125 | 0.6060 | 0.6092 | 0.7959  | 0.6690
+                            | 10-fold    | 0.7495 | 0.6607 | 0.5547 | 0.6030 | 0.8075  | 0.6336
+  ADASYN Balanced           | 80:20      | 0.7343 | 0.6013 | 0.6052 | 0.6033 | 0.7961  | 0.6674
+                            | 10-fold    | 0.7488 | 0.6687 | 0.5529 | 0.6053 | 0.8086  | 0.6354
+
+[CSV] All 5 deep hybrid models - 10-fold CV (class-weighted loss, no resampling)
+  Model                       | Acc %  | Recall % | Prec % | F1     | ROC-AUC
+  CNN + LSTM                  |  70.59 |    75.16 |  49.61 | 0.5971 | 0.7980
+  CNN + Transformer           |  69.00 |    77.84 |  47.89 | 0.5927 | 0.7936
+  ResNet + BiLSTM             |  70.03 |    78.01 |  49.08 | 0.6016 | 0.8024
+  U-Net + ConvLSTM            |  69.39 |    77.00 |  48.33 | 0.5931 | 0.7967
+  Attention U-Net + LSTM      |  68.99 |    75.66 |  48.09 | 0.5860 | 0.7878
+
+[IMAGES] Sentinel-1 SAR flood classifier (CNN) | 1200 real chips, 64x64 VV/VH
+  Experiment                        | Acc %  | Prec % | Recall % | F1     | IoU %  | ROC-AUC
+  Raw SAR (80:20)                   |  83.33 |  81.03 |    61.84 | 0.7015 |  54.02 | 0.8722
+  CLAHE (80:20)                     |  81.67 |  86.36 |    50.00 | 0.6333 |  46.34 | 0.8726
+  CLAHE + GAN train-only (80:20)    |  84.58 |  86.79 |    60.53 | 0.7132 |  55.42 | 0.8621
+  10-fold CV mean                   |  83.17 |  80.71 |    62.74 | 0.6981 |  54.01 | 0.8735
+  10-fold CV (+/- std)              |   3.09 |   8.46 |    10.47 | 0.0661 |   7.69 | 0.0416
+  per fold:  fold   | Acc %  | Prec % | Recall % | F1     | IoU %  | ROC-AUC
+             Fold 1 |  81.67 |  67.44 |    78.38 | 0.7250 |  56.86 | 0.9004
+             Fold 2 |  82.50 |  76.67 |    62.16 | 0.6866 |  52.27 | 0.8896
+             Fold 3 |  80.83 |  82.61 |    50.00 | 0.6230 |  45.24 | 0.8848
+             Fold 4 |  85.83 |  88.89 |    63.16 | 0.7385 |  58.54 | 0.9150
+             Fold 5 |  83.33 |  71.43 |    78.95 | 0.7500 |  60.00 | 0.8758
+             Fold 6 |  88.33 |  96.15 |    65.79 | 0.7812 |  64.10 | 0.9050
+             Fold 7 |  81.67 |  80.77 |    55.26 | 0.6562 |  48.84 | 0.8408
+             Fold 8 |  87.50 |  87.10 |    71.05 | 0.7826 |  64.29 | 0.9024
+             Fold 9 |  77.50 |  72.00 |    47.37 | 0.5714 |  40.00 | 0.7680
+             Fold 10|  82.50 |  84.00 |    55.26 | 0.6667 |  50.00 | 0.8530
+
+====================================================================================================
+PART 5 - KNOWN EXCEPTIONS (stated openly)
+====================================================================================================
+* ml/test_10fold_irs.py and ml/test_satellite_learning.py now read the real district_year_dataset.csv;
+  test_10fold_irs.py applies SMOTE inside each training fold only. No benchmark uses a pre-balanced dataset.
+* The image pipeline picks its best epoch using the test fold's accuracy, so image scores are slightly optimistic.
+* ml/train_kfold_hybrid_models.py uses no resampling: it balances with a class-weighted loss instead.

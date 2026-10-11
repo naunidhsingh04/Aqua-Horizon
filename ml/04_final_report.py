@@ -20,7 +20,6 @@ os.chdir(ROOT)   # relative paths work from any folder (e.g. Google Colab)
 ARTIFACTS = [
     ("data/processed/district_year_dataset.csv",        "ml/01_preprocess.py"),
     ("data/processed/district_profiles.json",           "ml/01_preprocess.py"),
-    ("data/processed/district_year_dataset_balanced_smote.csv", "ml/balance_dataset_smote.py"),
     ("ml/models/champion_classifier.joblib",            "ml/02_train_models.py"),
     ("ml/models/severity_regressor.joblib",             "ml/02_train_models.py"),
     ("ml/models/benchmark_metrics.json",                "ml/02_train_models.py"),
@@ -162,10 +161,10 @@ def main():
     irs = read_json('ml/models/irs_10fold_benchmarks.json')
     if irs:
         s = irs['summary']
-        out("  Inundation Risk Score (IRS = P(flood) x ln(1 + flooded area %)), 10-fold on the pre-balanced SMOTE dataset")
+        out("  Inundation Risk Score (IRS = P(flood) x ln(1 + flooded area %)), 10-fold on the real dataset, SMOTE inside each training fold only")
         out(f"    classifier accuracy {s['mean_accuracy']:.1f}% | recall {s['mean_recall']:.1f}% | ROC-AUC {s['mean_roc_auc']:.3f} | "
             f"flooded-area R2 {s['mean_sat_r2']:.1f}% (inflated, see note) | IRS rank correlation {s['mean_irs_correlation']:.3f}")
-        out("    (SMOTE was applied before the folds were cut, so synthetic rows can sit in both train and test: read as optimistic)")
+        out("    (SMOTE touches only each fold's training rows; every test fold is real and unbalanced)")
         out("    (the flooded-area R2 is inflated: dfsi_score and drainage_stress_ratio are computed from the flooded-area value itself)")
         report['irs'] = s
     sat = read_json('ml/models/satellite_learning_metrics.json')

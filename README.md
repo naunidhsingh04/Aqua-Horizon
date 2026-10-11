@@ -69,17 +69,17 @@ python ml/train_kfold_hybrid_models.py
 
 #### Top-3 models and their combinations
 
-The three best single models (ResNet + BiLSTM, CNN + LSTM, CNN + Transformer) are combined by averaging their flood probabilities: first two, last two, first + last, and all three. All seven rows are scored the same way: SMOTE on the training data only, the decision threshold chosen on a validation slice, and the 80:20 split by year and the 10-fold cross-validation both measured on real (unbalanced) test data.
+The three best single models (ResNet + BiLSTM, CNN + LSTM, CNN + Transformer) are combined by averaging their flood probabilities: first two, last two, first + last, and all three. All seven rows are scored the same way: SMOTE on the whole training part only (80% in the holdout), a fixed 0.5 flood cut-off, and the 80:20 split by year and the 10-fold cross-validation both measured on real (unbalanced) test data.
 
 | Model / Combination | 80:20 Accuracy | 10-Fold Accuracy (±Std) | Recall | Precision | F1-Score | ROC-AUC |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **ResNet + BiLSTM** | 71.6% | 71.5% (±1.8%) | 72.2% | 50.8% | 0.595 | 0.800 |
-| **CNN + LSTM** | 71.7% | 69.8% (±1.9%) | 75.4% | 48.8% | 0.591 | 0.798 |
-| **CNN + Transformer** | 72.4% | 69.9% (±1.6%) | 74.5% | 48.9% | 0.589 | 0.794 |
-| **ResNet+BiLSTM + CNN+LSTM** | 70.2% | 71.2% (±1.5%) | 73.7% | 50.3% | 0.597 | 0.803 |
-| **CNN+LSTM + CNN+Transformer** | 72.2% | 70.0% (±1.4%) | 76.0% | 48.9% | 0.595 | 0.799 |
-| **ResNet+BiLSTM + CNN+Transformer** | 72.4% | 71.0% (±1.7%) | 74.4% | 50.1% | 0.598 | 0.803 |
-| **ResNet+BiLSTM + CNN+LSTM + CNN+Transformer** | 72.6% | 70.8% (±2.1%) | 75.0% | 49.9% | 0.598 | 0.803 |
+| **ResNet + BiLSTM** | 70.5% | 70.0% (±1.1%) | 77.4% | 48.9% | 0.599 | 0.803 |
+| **CNN + LSTM** | 69.6% | 69.8% (±1.2%) | 76.0% | 48.7% | 0.594 | 0.798 |
+| **CNN + Transformer** | 69.1% | 69.6% (±2.1%) | 75.9% | 48.6% | 0.591 | 0.795 |
+| **ResNet+BiLSTM + CNN+LSTM** | 70.6% | 70.2% (±1.3%) | 77.5% | 49.1% | 0.601 | 0.804 |
+| **CNN+LSTM + CNN+Transformer** | 70.0% | 70.0% (±1.3%) | 76.1% | 48.9% | 0.595 | 0.800 |
+| **ResNet+BiLSTM + CNN+Transformer** | 70.2% | 70.2% (±1.4%) | 77.2% | 49.2% | 0.601 | 0.805 |
+| **ResNet+BiLSTM + CNN+LSTM + CNN+Transformer** | 70.6% | 70.2% (±1.3%) | 77.1% | 49.2% | 0.600 | 0.805 |
 
 The combinations rank flood risk slightly better (ROC-AUC) than any single model, but the accuracy differences are 1 to 2 points, which is within the fold-to-fold spread (the ± value). *Run:*
 ```bash
@@ -100,20 +100,20 @@ To ensure scientific rigor and prevent single-split variance, AQUA HORIZON was a
 
 ### C. 10-Fold Inundation Risk & Satellite Severity Benchmarks
 
-> **Note:** this benchmark uses the already-balanced SMOTE dataset, so synthetic rows can appear in both the training and test folds. Treat these figures as an upper bound; the stricter results (SMOTE on training data only) are in `ml/train_combo_hybrid_models.py`.
+> **Note:** this benchmark runs on the real, never-balanced dataset. SMOTE is applied inside each training fold only, so every test fold keeps the real flood / non-flood ratio.
 
-To maximize output fidelity and eliminate single-split bias, our 58,850-row balanced dataset was benchmarked using a rigorous **10-Fold Stratified Cross-Validation** process testing both flood classification and continuous satellite inundation extent (MODIS Global Flood Database):
+To eliminate single-split bias, the 41,325-row district-year dataset was benchmarked using a rigorous **10-Fold Stratified Cross-Validation** process testing both flood classification and continuous satellite inundation extent (MODIS Global Flood Database):
 
 | Metric | 10-Fold Mean | Standard Deviation (±Std) | Note |
 | :--- | :---: | :---: | :--- |
-| **Classification Accuracy** | 83.10% | ±0.46% | Optimistic: SMOTE rows can sit in both train and test folds |
-| **Recall** | 77.88% | ±0.70% | Share of real floods detected |
-| **Precision** | 86.96% | ±0.72% | Share of flood alerts that were correct |
-| **F1-Score** | 0.8217 | ±0.0049 | Balance of recall and precision |
-| **ROC-AUC** | 0.9146 | ±0.0020 | Separates flood from non-flood |
-| **Satellite Extent R²** | 99.19% | ±0.06% | Inflated: dfsi_score and drainage_stress_ratio are computed from the flooded-area value itself |
-| **Satellite Extent MAE** | 0.2180% | | Inflated for the same reason |
-| **IRS Rank Correlation (ρ)** | 0.7717 | ±0.0063 | Inundation Risk Score (P × severity) vs the real flooded area |
+| **Classification Accuracy** | 76.97% | ±0.66% | SMOTE on training folds only; test folds are real |
+| **Recall** | 48.72% | ±1.98% | Share of real floods detected (50% threshold) |
+| **Precision** | 62.94% | ±1.38% | Share of flood alerts that were correct |
+| **F1-Score** | 0.5491 | ±0.0167 | Balance of recall and precision |
+| **ROC-AUC** | 0.8051 | ±0.0064 | Separates flood from non-flood |
+| **Satellite Extent R²** | 99.22% | ±0.05% | Inflated: dfsi_score and drainage_stress_ratio are computed from the flooded-area value itself |
+| **Satellite Extent MAE** | 0.2094% | | Inflated for the same reason |
+| **IRS Rank Correlation (ρ)** | 0.7752 | ±0.0084 | Inundation Risk Score (P × severity) vs the real flooded area |
 
 *Run 10-Fold IRS Suite:*
 ```bash
@@ -170,7 +170,6 @@ Outputs: `ml/models/other_countries_metrics.json`, `ml/models/other_countries_pr
 │   ├── 02_train_models.py               # XGBoost district model: SMOTE / ADASYN, 10-fold + split by year
 │   ├── 03_export_web_data.py            # Live Open-Meteo rain forecast + model outputs -> web/data/*.json
 │   ├── 04_final_report.py               # One consolidated report of every file's output
-│   ├── balance_dataset_smote.py         # 50:50 SMOTE dataset balancing pipeline
 │   ├── test_satellite_learning.py       # District features vs flooded-area % (10-fold)
 │   ├── test_10fold_irs.py               # 10-Fold Inundation Risk Score (IRS) cross-validation
 │   ├── models_hybrid.py                 # The 5 PyTorch hybrid deep-learning architectures (self-test inside)
@@ -187,6 +186,10 @@ Outputs: `ml/models/other_countries_metrics.json`, `ml/models/other_countries_pr
 │   ├── download_sen1floods11_india.py   # Downloads the real Sentinel-1 flood scenes
 │   ├── image_pipeline_india.py          # Satellite images: checks, CLAHE, GAN, 10-fold CV
 │   ├── test_other_countries.py          # India-trained satellite model tested on USA, Pakistan, Sri Lanka
+│   ├── verify_protocol.py               # Proof: CSV and images trained separately, 80:20 splits, all metrics
+│   ├── proof_2_smote_rows.py            # Proof: SMOTE only ever receives training rows (80% holdout)
+│   ├── proof_3_test_rows.py             # Proof: the 20% test part reaches the metrics unchanged and unbalanced
+│   ├── proof_4_gan_inputs.py            # Proof: the GAN sees only flood chips of the 80% image training part
 │   └── models/                          # Saved weights (.pt), model files and JSON / CSV results
 ├── web/
 │   ├── index.html                       # Command center interface
@@ -218,7 +221,6 @@ pip install -r requirements.txt
 ### 2. Run the whole pipeline in order
 ```bash
 python ml/01_preprocess.py                 # dataset
-python ml/balance_dataset_smote.py         # 50:50 balanced copy
 python ml/02_train_models.py               # XGBoost district model
 python ml/train_all_hybrid_models.py       # the 5 deep-learning models (runs train_01 to train_05)
 python ml/train_kfold_hybrid_models.py     # 10-fold validation of the 5 models
@@ -230,6 +232,10 @@ python ml/image_pipeline_india.py
 python ml/test_other_countries.py       # India-trained satellite model on USA, Pakistan, Sri Lanka
 python ml/03_export_web_data.py            # website data (needs internet for the rain forecast)
 python ml/04_final_report.py               # consolidated report
+python ml/verify_protocol.py               # proof of the training protocol (separate data, 80:20, metrics)
+python ml/proof_2_smote_rows.py            # proof: SMOTE input is the training part only
+python ml/proof_3_test_rows.py             # proof: the 20% test part is untouched and unbalanced
+python ml/proof_4_gan_inputs.py            # proof: the GAN is trained on the 80% image training part only
 ```
 Or train one architecture on its own, for example `python ml/train_02_cnn_lstm.py`.
 
