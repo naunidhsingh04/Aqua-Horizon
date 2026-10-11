@@ -12,6 +12,7 @@ from sklearn.preprocessing import StandardScaler
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 
+# the 15 columns of district_year_dataset.csv that the deep-learning models read for each year
 FEATURE_COLS = [
     'prior_cum_events',
     'prior_3yr_events',
@@ -30,7 +31,7 @@ FEATURE_COLS = [
     'rainfall_anomaly_pct'
 ]
 
-TARGET_COL = 'flood_occurred'
+TARGET_COL = 'flood_occurred'   # what the models predict: 1 = a flood happened that year
 
 def load_sequence_data(csv_path=None, seq_len=5, cutoff_year=2012, spatial=False, batch_size=128, balance_smote=False):
     # Returns train/test loaders. Each sample = 5 consecutive years of 15 features for one district,
@@ -52,6 +53,7 @@ def load_sequence_data(csv_path=None, seq_len=5, cutoff_year=2012, spatial=False
     df_scaled = df.copy()
     df_scaled[FEATURE_COLS] = scaler.transform(df[FEATURE_COLS].values)
     
+    # build the windows district by district, so a window never mixes years of two different districts
     X_train_list, y_train_list = [], []
     X_test_list, y_test_list = [], []
     
@@ -99,6 +101,7 @@ def load_sequence_data(csv_path=None, seq_len=5, cutoff_year=2012, spatial=False
         X_test_padded = np.concatenate([X_test, pad_test], axis=-1)
         X_test = X_test_padded.reshape(-1, seq_len, 1, 4, 4)
 
+    # wrap the arrays as PyTorch tensors / loaders; training batches are shuffled, test batches keep their order
     t_X_train = torch.tensor(X_train)
     t_y_train = torch.tensor(y_train)
     t_X_test = torch.tensor(X_test)
@@ -115,6 +118,7 @@ def load_sequence_data(csv_path=None, seq_len=5, cutoff_year=2012, spatial=False
     num_pos = (y_train == 1).sum()
     pos_weight = float(num_neg / max(num_pos, 1))
     
+    # everything a training script needs, in one dictionary
     return {
         'train_loader': train_loader,
         'test_loader': test_loader,

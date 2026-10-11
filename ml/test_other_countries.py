@@ -39,10 +39,12 @@ os.chdir(ROOT)
 sys.path.insert(0, os.path.join(ROOT, 'ml'))
 import image_pipeline_india as ip   # reuses the loader, CLAHE, DCGAN and the classifier network
 
+# fixed seeds: the same split, GAN noise and weights initialisation every run
 SEED = 42
 np.random.seed(SEED)
 torch.manual_seed(SEED)
 device = ip.device
+# countries that are NEVER used for training: they only test how the India-trained model generalises
 TEST_COUNTRIES = ['USA', 'Pakistan', 'Sri-Lanka']
 OUT_DIR = os.path.join(ROOT, 'ml', 'models')
 SAMPLE_DIR = os.path.join(OUT_DIR, 'other_countries_samples')
@@ -84,9 +86,10 @@ def predict_proba(model, X):
 
 
 def score(y, probs):
+    """All metrics for one test set. A chip is called flood when P(flood) >= 0.5."""
     pred = (probs >= 0.5).astype(int)
     tn, fp, fn, tp = confusion_matrix(y, pred, labels=[0, 1]).ravel()
-    both = len(set(y.tolist())) == 2
+    both = len(set(y.tolist())) == 2   # ROC-AUC needs both classes present, otherwise it is undefined
     return {
         'chips': int(len(y)),
         'flood_chips': int(y.sum()),
@@ -108,15 +111,16 @@ def score(y, probs):
 def save_samples(country, raw, masks, y, probs, n_each=4):
     os.makedirs(SAMPLE_DIR, exist_ok=True)
     rng = np.random.RandomState(SEED)
-    pick = []
+    pick = []   # a few flood chips and a few non-flood chips, chosen at random but reproducibly
     for cls in (1, 0):
         idx = np.where(y == cls)[0]
         if len(idx):
             pick += list(rng.choice(idx, size=min(n_each, len(idx)), replace=False))
-    scale, pad = 3, 6
+    scale, pad = 3, 6   # enlarge each 64x64 chip 3x; pad = white gap in pixels between pictures
     tiles = []
     for i in pick:
         def gray(ch):
+            # one radar band (0 = VV, 1 = VH) stretched to 0-255 so it can be shown as a grey picture
             c = raw[i][:, :, ch]
             c = ((c - c.min()) / max(c.max() - c.min(), 1e-5) * 255).astype(np.uint8)
             return cv2.cvtColor(cv2.resize(c, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST), cv2.COLOR_GRAY2BGR)
@@ -130,7 +134,7 @@ def save_samples(country, raw, masks, y, probs, n_each=4):
         text = f"truth: {'FLOOD' if y[i] else 'no flood'} | model: {'FLOOD' if pred else 'no flood'} ({probs[i] * 100:.0f}%)"
         cv2.putText(banner, text, (4, 22), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 120, 0) if ok else (0, 0, 220), 1, cv2.LINE_AA)
         tiles.append(np.vstack([row, banner]))
-    cols = 2
+    cols = 2   # arrange the sample tiles in two columns; fill an odd leftover cell with white
     while len(tiles) % cols:
         tiles.append(np.full_like(tiles[0], 255))
     rows = [np.hstack([tiles[r * cols + c] if c == 0 else np.hstack([np.full((tiles[0].shape[0], 12, 3), 255, np.uint8), tiles[r * cols + c]]) for c in range(cols)])
@@ -165,7 +169,7 @@ def main():
     results = {'India (held-out 20%, same country)': score(labels[va], predict_proba(model, clahe[va]))}
     rows = []
 
-    # ---- test on the other countries ----
+    # ---- test on the other countries: each is loaded, enhanced with CLAHE, and only PREDICTED on (no training, no tuning) ----
     for country in TEST_COUNTRIES:
         folder = os.path.join(ROOT, 'data', 'raw', 'sen1floods11_' + country.lower().replace('-', '_'), 'LabelHand')
         if not os.path.isdir(folder) or not os.listdir(folder):

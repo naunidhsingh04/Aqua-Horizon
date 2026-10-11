@@ -1,7 +1,9 @@
 """
 NOT USED FOR TRAINING OR TESTING. Kept only as a standalone demo of what SMOTE does to the whole dataset.
-Every benchmark in the project balances inside the training split only (see ml/verify_protocol.py).
-Balances the dataset with SMOTE: floods are rarer than non-floods, so SMOTE creates synthetic
+Every benchmark in the project balances inside the training split only (see ml/verify_protocol.py);
+balancing a whole dataset before splitting it would let synthetic rows leak into the test data.
+
+What the demo does: balances the dataset with SMOTE: floods are rarer than non-floods, so SMOTE creates synthetic
 flood rows (interpolating between a real flood row and one of its 5 nearest flood neighbours)
 until flood / non-flood is 50:50. Each synthetic row is labelled with its nearest real
 district so it carries a district name.
@@ -14,6 +16,7 @@ import pandas as pd
 from imblearn.over_sampling import SMOTE
 from sklearn.neighbors import NearestNeighbors
 
+# the numeric columns SMOTE interpolates between (it cannot work on text such as district names)
 NUMERIC_FEATURE_COLS = [
     'event_count', 'max_duration', 'monsoon_peak_flag', 'cyclonic_flag',
     'y_lag1', 'prior_cum_events', 'prior_3yr_events', 'prior_5yr_events',
@@ -23,7 +26,7 @@ NUMERIC_FEATURE_COLS = [
     'rainfall_anomaly_pct', 'hydro_rain_stress'
 ]
 
-TARGET_COL = 'flood_occurred'
+TARGET_COL = 'flood_occurred'   # 1 = a flood happened in that district-year, 0 = not
 
 def balance_dataset_with_smote(
     input_csv='data/processed/district_year_dataset.csv',
@@ -54,7 +57,7 @@ def balance_dataset_with_smote(
     print(f"  Class 1 (Flood Event): {orig_n1:,} ({orig_n1/n_orig*100:.2f}%)")
     print(f"  Imbalance Ratio:       {orig_n0 / max(orig_n1, 1):.2f} : 1")
     
-    # Clean numeric features
+    # replace missing / infinite values with 0 so SMOTE never sees NaN
     features_present = [col for col in NUMERIC_FEATURE_COLS if col in df.columns]
     df[features_present] = df[features_present].fillna(0).replace([np.inf, -np.inf], 0)
     
@@ -71,8 +74,8 @@ def balance_dataset_with_smote(
     print(f"  Synthesized Flood Samples: +{n_synth:,}")
     print(f"  Total Balanced Records:     {n_total:,}")
     
-    # SMOTE appends synthetic rows after the original n_orig rows (numbers only, no names).
-    # Nearest neighbor mapping for synthesized points to inherit metadata
+    # SMOTE appends its synthetic rows after the original n_orig rows and they hold numbers only (no names).
+    # To give each synthetic row a district name and year, copy them from its nearest real flood row.
     minority_mask = (y == 1).values
     minority_indices = np.where(minority_mask)[0]
     X_minority = X.iloc[minority_indices].values
@@ -90,7 +93,7 @@ def balance_dataset_with_smote(
     df_synth = pd.concat([synth_meta, X_res.iloc[n_orig:].reset_index(drop=True)], axis=1)
     df_synth[TARGET_COL] = 1
     
-    # Assemble full balanced dataframe matching original column order
+    # original rows + synthetic rows, in the original column order
     df_balanced = pd.concat([df, df_synth[df.columns]], ignore_index=True)
     
     bal_counts = df_balanced[TARGET_COL].value_counts().to_dict()

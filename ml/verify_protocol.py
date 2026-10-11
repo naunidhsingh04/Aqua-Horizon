@@ -19,16 +19,18 @@ from imblearn.over_sampling import SMOTE
 from sklearn.model_selection import StratifiedKFold, train_test_split
 
 BASE = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-SEED = 42
-LOG = io.StringIO()
+SEED = 42                 # the seed every split in the project uses, so the splits here match the real runs
+LOG = io.StringIO()       # everything printed is also kept here and saved to ml/models/protocol_proof.txt
 
 
 def out(s=""):
+    """Print a line and keep a copy for the saved proof file."""
     print(s)
     LOG.write(s + "\n")
 
 
 def counts(y):
+    """One-line class summary of a label array: rows, flood, non-flood and the flood share."""
     y = np.asarray(y).astype(int)
     n1, n0 = int(y.sum()), int((y == 0).sum())
     return f"{len(y):>6,} rows | flood {n1:>6,} | non-flood {n0:>6,} | flood share {n1 / len(y) * 100:5.1f}%"
@@ -39,6 +41,8 @@ def part1_separation():
     out("=" * 100)
     out("PART 1 - CSV DATA AND SATELLITE IMAGES ARE TRAINED BY SEPARATE SCRIPTS")
     out("=" * 100)
+    # a script "reads CSV data" if its source mentions the district CSV (or its loader), and "reads images" if it
+    # mentions the Sentinel-1 files / loader. A script matching BOTH would be mixing the two datasets.
     csv_markers = ['district_year_dataset', 'load_all_sequences']
     img_markers = ['sen1floods11', 'tifffile', 'load_sen1floods11_india_chips']
     out(f"{'training script':<38}| reads CSV district data | reads satellite images")
@@ -56,6 +60,7 @@ def part1_separation():
         if c and i:
             mixed.append(f)
     assert not mixed, f"scripts mixing both data types: {mixed}"
+    # no training/test script may read a CSV that was balanced on the whole dataset (the demo script and this file are exempt)
     for f in sorted(os.listdir(os.path.join(BASE, 'ml'))):
         if f.endswith('.py') and f not in ('verify_protocol.py', 'balance_dataset_smote.py'):
             assert 'balanced_smote' not in open(os.path.join(BASE, 'ml', f), encoding='utf-8').read(), f
@@ -66,6 +71,7 @@ def part1_separation():
 
 # ------------------------------------------------------------------ 2. CSV data protocol
 def part2_csv():
+    # reuse the real functions of the combined-models script, so the split here is the split the models really use
     from ml.train_combo_hybrid_models import load_windows, FEATURE_COLS, N_FEATS, SEQ_LEN, scale
     from sklearn.preprocessing import StandardScaler
 
@@ -77,12 +83,14 @@ def part2_csv():
     X, y, years = load_windows(df)
     out(f"Whole dataset (real, never balanced)  : {counts(y)}")
 
+    # chronological split: windows whose last year is <= 2012 train, later ones test (the test part is never resampled)
     tr, te = years <= 2012, years > 2012
     X_tr, y_tr, X_te, y_te = X[tr], y[tr], X[te], y[te]
     out(f"\n[A] 80:20 chronological holdout (train: windows ending <=2012, test: 2013-2023)")
     out(f"    train part (~80%) before SMOTE : {counts(y_tr)}   ({tr.sum() / len(y) * 100:.1f}% of data)")
     out(f"    TEST  part (~20%) UNBALANCED   : {counts(y_te)}   ({te.sum() / len(y) * 100:.1f}% of data)")
 
+    # scale with training statistics only, then run SMOTE on the WHOLE training part (the same call the real script makes)
     scaler = StandardScaler().fit(X_tr.reshape(-1, N_FEATS))
     X_trs = scale(scaler, X_tr)
     n = len(X_trs)
@@ -91,7 +99,7 @@ def part2_csv():
     out(f"    SMOTE output (train only)      : {counts(y_bal)}   <- balanced 50:50, "
         f"{len(y_bal) - len(y_tr):,} synthetic rows added")
     out(f"    TEST part after the whole run  : {counts(y_te)}   <- identical to before: SMOTE never touched it")
-    # hard guarantees
+    # hard guarantees: if any of these is false the script stops with an error instead of printing a result
     assert n == len(y_tr) < len(y), "SMOTE saw more than the training part"
     assert abs(y_bal.mean() - 0.5) < 1e-6, "training part is not balanced"
     assert abs(y_te.mean() - y.mean()) < 0.15 and y_te.mean() < 0.5, "test part must keep the natural ratio"
@@ -99,10 +107,12 @@ def part2_csv():
     out("    CHECKS PASSED: SMOTE fitted on training rows only | test rows disjoint | test ratio unchanged")
 
     out(f"\n[B] 10-fold stratified cross-validation (each fold: 90% train / 10% test)")
+    # each fold: a (training rows) is balanced with SMOTE, b (test fold) is only counted, never resampled
     skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=SEED)
     out(f"    {'fold':<5}| {'train before SMOTE':<44}| {'train after SMOTE (50:50)':<22}| test fold (real, unbalanced)")
     for k, (a, b) in enumerate(skf.split(X, y), 1):
         Xa = X[a].reshape(len(a), -1)
+        # only the labels are needed here: the count of rows SMOTE produces from this fold's training part
         _, y_b = SMOTE(k_neighbors=5, random_state=SEED + k).fit_resample(Xa, y[a])
         assert not set(a) & set(b)
         out(f"    {k:<5}| {counts(y[a]):<44}| {len(y_b):>6,} flood {int(y_b.sum()):>6,}  | {counts(y[b])}")

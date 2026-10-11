@@ -42,6 +42,7 @@ ARTIFACTS = [
     ("web/data/india_districts.geojson",                "ml/03_export_web_data.py"),
 ]
 
+# the 5 single deep models: (architecture name used inside the result JSON files, name shown in the report)
 SINGLE_KEYS = [  # (key in kfold json architecture, label)
     ("CNNTransformer", "CNN + Transformer"), ("UNetConvLSTM", "U-Net + ConvLSTM"), ("CNNLSTM", "CNN + LSTM"),
     ("ResNetBiLSTM", "ResNet + BiLSTM"), ("AttentionUNetLSTM", "Attention U-Net + LSTM"),
@@ -49,6 +50,7 @@ SINGLE_KEYS = [  # (key in kfold json architecture, label)
 
 
 def read_json(path):
+    """Load a result file; returns None when the earlier step that writes it has not been run yet."""
     full = os.path.join(ROOT, path)
     if not os.path.exists(full):
         return None
@@ -57,6 +59,7 @@ def read_json(path):
 
 
 def pct(v, nd=1):
+    """Format a number as a percentage with nd decimals, or N/A when it is missing."""
     return "N/A" if v is None else f"{v:.{nd}f}%"
 
 
@@ -110,6 +113,7 @@ def main():
     hyb = read_json('ml/models/hybrid_benchmarks.json')
     kf = read_json('ml/models/kfold_hybrid_benchmarks.json')
     combo = read_json('ml/models/combo_hybrid_benchmarks.json')
+    # index each result file by model name so the 80:20 and 10-fold numbers of one model can be put on one row
     hold = {m['architecture']: m for m in (hyb or {}).get('models', [])}
     kfm = {m['architecture']: m for m in (kf or {}).get('models', [])}
     head = f"  {'Model':<46} | {'80:20 acc':>9} | {'10-fold acc':>13} | {'Recall':>7} | {'Prec.':>6} | {'F1':>6} | {'ROC-AUC':>7}"

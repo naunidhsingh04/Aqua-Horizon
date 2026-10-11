@@ -45,9 +45,11 @@ from sklearn.metrics import (accuracy_score, recall_score, precision_score, f1_s
 from ml.models_hybrid import CNNLSTM, CNNTransformer, ResNetBiLSTM
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# SEQ_LEN = years per window, N_FEATS = features per year, SEED = fixed random seed (same results every run)
 SEQ_LEN, N_FEATS, SEED = 5, 15, 42
 THRESHOLD = 0.5   # models are trained on 50:50 data, so 0.5 is the natural flood cut-off
 
+# the 15 district-year columns each model reads (one row of 15 numbers per year, 5 years per window)
 FEATURE_COLS = [
     'prior_cum_events', 'prior_3yr_events', 'prior_5yr_events', 'prior_10yr_events',
     'flood_acceleration_rate', 'dfsi_score', 'dfsi_rank', 'Corrected_Percent_Flooded_Area',
@@ -121,7 +123,8 @@ def train_one(model_cls, lr, epochs, X, y, seed, batch_size=256):
 
 
 def predict(model, X, batch_size=1024):
-    model.eval()
+    """P(flood) for every window, computed in batches so large test sets fit in memory."""
+    model.eval()   # switch off dropout etc.: predictions must be deterministic
     out = []
     with torch.no_grad():
         for i in range(0, len(X), batch_size):
@@ -130,6 +133,8 @@ def predict(model, X, batch_size=1024):
 
 
 def score(y, p, thr):
+    """All metrics of one model on real test data. A window is called flood when P(flood) >= thr.
+    ROC-AUC and PR-AUC use the raw probabilities, so they do not depend on the threshold."""
     pred = (p >= thr).astype(int)
     return {
         'accuracy': accuracy_score(y, pred) * 100,   # (TP+TN)/all
@@ -147,7 +152,7 @@ def run_split(X_tr, y_tr, X_te, y_te, seed, district_X=None):
     Train the 3 base models on one train/test split and score all 7 candidates.
     Returns {candidate key: metrics} (+ per-district probabilities of each base model if district_X given).
     """
-    # scale with training-data statistics only
+    # scale with training-data statistics only (the test data is scaled with the training mean / std: no leakage)
     scaler = StandardScaler().fit(X_tr.reshape(-1, N_FEATS))
     X_tr, X_te = scale(scaler, X_tr), scale(scaler, X_te)
 
@@ -157,6 +162,7 @@ def run_split(X_tr, y_tr, X_te, y_te, seed, district_X=None):
     X_bal = X_bal.reshape(-1, SEQ_LEN, N_FEATS).astype(np.float32)
     y_bal = y_bal.astype(np.float32)
 
+    # p_te: each base model's P(flood) on the real test data; p_dist: its P(flood) for every district's latest 5 years
     p_te, p_dist = {}, {}
     for key, (_, cls, lr, epochs) in TOP3.items():
         model = train_one(cls, lr, epochs, X_bal, y_bal, seed)
@@ -164,6 +170,7 @@ def run_split(X_tr, y_tr, X_te, y_te, seed, district_X=None):
         if district_X is not None:
             p_dist[key] = predict(model, scale(scaler, district_X))
 
+    # score the 3 single models and the 4 combinations; a combination is the average of its members' probabilities
     results = {}
     for ckey, (_, _, members) in CANDIDATES.items():
         pt = np.mean([p_te[m] for m in members], axis=0)    # soft voting on the real test data
@@ -172,6 +179,7 @@ def run_split(X_tr, y_tr, X_te, y_te, seed, district_X=None):
 
 
 def summarise(fold_rows):
+    """Mean and standard deviation of every metric over the cross-validation folds (std = how stable the model is)."""
     df = pd.DataFrame(fold_rows)
     out = {}
     for m in ['accuracy', 'recall', 'precision', 'f1_score', 'roc_auc', 'pr_auc']:
