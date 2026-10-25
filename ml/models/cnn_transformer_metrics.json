@@ -1,15 +1,15 @@
 {
   "model_name": "CNN + Transformer",
   "architecture": "CNNTransformer",
-  "parameters": 70849,
-  "epochs_trained": 1,
-  "optimal_threshold": 0.5,
-  "recall": 78.91,
-  "precision": 53.51,
-  "f1_score": 0.6377,
-  "roc_auc": 0.7963,
-  "pr_auc": 0.6404,
-  "accuracy": 69.88,
-  "training_time_sec": 5.2,
-  "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\cnn_transformer.pt"
+  "parameters": 75137,
+  "epochs_trained": 2,
+  "optimal_threshold": 0.4,
+  "recall": 83.02,
+  "precision": 52.08,
+  "f1_score": 0.6401,
+  "roc_auc": 0.7961,
+  "pr_auc": 0.6504,
+  "accuracy": 68.64,
+  "training_time_sec": 40.68,
+  "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\cnn_transformer.pt"
 }

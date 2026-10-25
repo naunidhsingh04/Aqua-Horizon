@@ -10,6 +10,6 @@
   "roc_auc": 0.7979,
   "pr_auc": 0.6689,
   "accuracy": 69.25,
-  "training_time_sec": 4.71,
-  "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\resnet_bilstm.pt"
+  "training_time_sec": 6.03,
+  "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\resnet_bilstm.pt"
 }

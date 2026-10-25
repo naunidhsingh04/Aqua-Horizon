@@ -4,12 +4,12 @@
   "parameters": 85729,
   "epochs_trained": 3,
   "optimal_threshold": 0.5,
-  "recall": 79.99,
-  "precision": 52.87,
-  "f1_score": 0.6367,
-  "roc_auc": 0.7946,
-  "pr_auc": 0.649,
-  "accuracy": 69.33,
-  "training_time_sec": 35.74,
-  "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\unet_convlstm.pt"
+  "recall": 84.66,
+  "precision": 51.21,
+  "f1_score": 0.6382,
+  "roc_auc": 0.796,
+  "pr_auc": 0.647,
+  "accuracy": 67.75,
+  "training_time_sec": 38.62,
+  "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\unet_convlstm.pt"
 }

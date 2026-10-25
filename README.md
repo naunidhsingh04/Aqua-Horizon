@@ -27,22 +27,22 @@ In compliance with the official **Disaster Management AI Challenge**, AQUA HORIZ
 
 ## 🧠 5 Hybrid Deep Learning Architectures (Hackathon Mandate)
 
-All 5 hybrid architectures are implemented in modular PyTorch files in `ml/` and can be trained individually or via the master benchmark orchestrator:
+All 5 hybrid architectures are implemented in modular PyTorch files in `ml/` and can be trained individually or via the master benchmark orchestrator. Each hybrid is built from two separate models: a first-half model (CNN, ResNet, U-Net or Attention U-Net) and a second-half model (LSTM, BiLSTM, Transformer or ConvLSTM). The second-half model takes the first-half model as an argument (`frontend`) and calls it inside its own `forward()`, so the work is split half and half (see `ml/models_hybrid.py`):
 
 | Model Architecture | Parameters | Test Accuracy | Test Recall | Test Precision | F1-Score | ROC-AUC | PR-AUC | Dedicated Training Script | Weights Path |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
-| **CNN + Transformer** | 70,849 | 69.88% | 78.91% | 53.51% | 0.6377 | 0.7963 | 0.6404 | `ml/train_03_cnn_transformer.py` | `ml/models/cnn_transformer.pt` |
-| **U-Net + ConvLSTM** | 85,729 | 69.33% | 79.99% | 52.87% | 0.6367 | 0.7946 | 0.6490 | `ml/train_01_unet_convlstm.py` | `ml/models/unet_convlstm.pt` |
 | **ResNet + BiLSTM** | 81,121 | 69.25% | 79.10% | 52.83% | 0.6335 | 0.7979 | 0.6689 | `ml/train_04_resnet_bilstm.py` | `ml/models/resnet_bilstm.pt` |
 | **Attention U-Net + LSTM** | 26,196 | 68.88% | 83.17% | 52.31% | 0.6423 | 0.7995 | 0.6475 | `ml/train_05_attention_unet_lstm.py` | `ml/models/attention_unet_lstm.pt` |
+| **CNN + Transformer** | 75,137 | 68.64% | 83.02% | 52.08% | 0.6401 | 0.7961 | 0.6504 | `ml/train_03_cnn_transformer.py` | `ml/models/cnn_transformer.pt` |
+| **U-Net + ConvLSTM** | 85,729 | 67.75% | 84.66% | 51.21% | 0.6382 | 0.7960 | 0.6470 | `ml/train_01_unet_convlstm.py` | `ml/models/unet_convlstm.pt` |
 | **CNN + LSTM** | 67,889 | 67.15% | 84.14% | 50.66% | 0.6324 | 0.7956 | 0.6625 | `ml/train_02_cnn_lstm.py` | `ml/models/cnn_lstm.pt` |
 
 ### Architecture Details:
-* **`UNetConvLSTM`**: Integrates a 2D spatial U-Net encoder-decoder with skip connections and a `ConvLSTMCell` at the bottleneck. Converts $15$ hydrological features into a $4\times 4$ spatial latent grid over $T=5$ temporal sequence steps to model inundation propagation.
-* **`CNNLSTM`**: Employs 1D temporal convolutions for feature projection and local pattern detection, fed into a 2-layer LSTM sequential memory network.
-* **`CNNTransformer`**: Projects multi-year sequence features and feeds them into a 4-head Transformer Encoder with GELU activations and positional encodings to capture long-range historical climate cycles.
-* **`ResNetBiLSTM`**: Features 1D residual blocks with identity skip connections to prevent vanishing gradients, coupled with a bidirectional LSTM processing forward hydrological trends and backward baseline context.
-* **`AttentionUNetLSTM`**: Incorporates additive attention gates ($\psi, \theta_x, \phi_g$) to selectively focus on low-lying drainage basins and flash flood zones before LSTM sequence prediction.
+* **`UNetConvLSTM`**: `ConvLSTMModel` that calls a `UNet` inside itself (`encode()` for every year, `decode()` once at the end). It integrates a 2D spatial U-Net encoder-decoder with skip connections and a `ConvLSTMCell` at the bottleneck. Converts $15$ hydrological features into a $4\times 4$ spatial latent grid over $T=5$ temporal sequence steps to model inundation propagation.
+* **`CNNLSTM`**: `LSTMModel` that calls a `CNNFeatureExtractor` inside itself. The CNN mixes the 15 features of each year; the 2-layer LSTM then reads the 5 years in order.
+* **`CNNTransformer`**: `TransformerModel` that calls a `CNNFeatureExtractor` inside itself. The CNN mixes the features of each year; the 4-head Transformer encoder (GELU, learned positional encodings) then lets every year attend to every other year to capture long-range historical climate cycles.
+* **`ResNetBiLSTM`**: `LSTMModel(bidirectional=True)` that calls a `ResNetFeatureExtractor` inside itself. The 1D residual blocks with identity skip connections extract deep features of each year; the bidirectional LSTM then processes forward hydrological trends and backward baseline context.
+* **`AttentionUNetLSTM`**: `LSTMModel` that calls an `AttentionUNetEncoder` inside itself. It incorporates additive attention gates ($\psi, \theta_x, \phi_g$) to selectively focus on low-lying drainage basins and flash flood zones before LSTM sequence prediction.
 
 ---
 
@@ -55,9 +55,9 @@ To verify cross-geographical stability and eliminate fold-specific bias, all 5 h
 | Hybrid Model Architecture | 10-Fold Accuracy (±Std) | 10-Fold Mean Recall (±Std) | 10-Fold Mean Precision (±Std) | Mean F1-Score | Mean ROC-AUC |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **CNN + LSTM** | 70.59% (±1.56%) | 75.16% (±2.63%) | 49.61% (±1.83%) | 0.5971 | 0.7980 |
+| **CNN + Transformer** | 70.40% (±1.87%) | 75.18% (±4.82%) | 49.48% (±2.27%) | 0.5954 | 0.7983 |
 | **ResNet + BiLSTM** | 70.03% (±1.95%) | 78.01% (±3.88%) | 49.08% (±2.09%) | 0.6016 | 0.8024 |
-| **U-Net + ConvLSTM** | 69.39% (±1.59%) | 77.00% (±4.17%) | 48.33% (±1.57%) | 0.5931 | 0.7967 |
-| **CNN + Transformer** | 69.00% (±1.04%) | 77.84% (±2.68%) | 47.89% (±1.03%) | 0.5927 | 0.7936 |
+| **U-Net + ConvLSTM** | 69.39% (±2.44%) | 76.73% (±5.22%) | 48.46% (±2.43%) | 0.5924 | 0.7960 |
 | **Attention U-Net + LSTM** | 68.99% (±2.76%) | 75.66% (±5.47%) | 48.09% (±2.66%) | 0.5860 | 0.7878 |
 
 *Run 10-Fold Hybrid Suite:*
@@ -75,13 +75,13 @@ The three best single models (ResNet + BiLSTM, CNN + LSTM, CNN + Transformer) ar
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
 | **ResNet + BiLSTM** | 70.5% | 70.0% (±1.1%) | 77.4% | 48.9% | 0.599 | 0.803 |
 | **CNN + LSTM** | 69.6% | 69.8% (±1.2%) | 76.0% | 48.7% | 0.594 | 0.798 |
-| **CNN + Transformer** | 69.1% | 69.6% (±2.1%) | 75.9% | 48.6% | 0.591 | 0.795 |
+| **CNN + Transformer** | 69.7% | 69.7% (±1.8%) | 75.9% | 48.7% | 0.592 | 0.796 |
 | **ResNet+BiLSTM + CNN+LSTM** | 70.6% | 70.2% (±1.3%) | 77.5% | 49.1% | 0.601 | 0.804 |
-| **CNN+LSTM + CNN+Transformer** | 70.0% | 70.0% (±1.3%) | 76.1% | 48.9% | 0.595 | 0.800 |
-| **ResNet+BiLSTM + CNN+Transformer** | 70.2% | 70.2% (±1.4%) | 77.2% | 49.2% | 0.601 | 0.805 |
-| **ResNet+BiLSTM + CNN+LSTM + CNN+Transformer** | 70.6% | 70.2% (±1.3%) | 77.1% | 49.2% | 0.600 | 0.805 |
+| **CNN+LSTM + CNN+Transformer** | 70.1% | 70.0% (±1.3%) | 76.6% | 48.9% | 0.597 | 0.801 |
+| **ResNet+BiLSTM + CNN+Transformer** | 70.5% | 70.2% (±1.2%) | 77.6% | 49.1% | 0.602 | 0.805 |
+| **ResNet+BiLSTM + CNN+LSTM + CNN+Transformer** | 70.6% | 70.2% (±1.3%) | 77.5% | 49.1% | 0.601 | 0.805 |
 
-The combinations rank flood risk slightly better (ROC-AUC) than any single model, but the accuracy differences are 1 to 2 points, which is within the fold-to-fold spread (the ± value). *Run:*
+The combinations rank flood risk slightly better (ROC-AUC) than any single model, but the accuracy differences are only about 0.2 to 0.5 points, which is well within the fold-to-fold spread (the ± value). *Run:*
 ```bash
 python ml/train_combo_hybrid_models.py
 ```
@@ -172,7 +172,7 @@ Outputs: `ml/models/other_countries_metrics.json`, `ml/models/other_countries_pr
 │   ├── 04_final_report.py               # One consolidated report of every file's output
 │   ├── test_satellite_learning.py       # District features vs flooded-area % (10-fold)
 │   ├── test_10fold_irs.py               # 10-Fold Inundation Risk Score (IRS) cross-validation
-│   ├── models_hybrid.py                 # The 5 PyTorch hybrid deep-learning architectures (self-test inside)
+│   ├── models_hybrid.py                 # The 5 hybrids, built as second-half model + first-half model inside it (self-test inside)
 │   ├── data_loader.py                   # Multi-year sequence builder (T=5) (self-test inside)
 │   ├── ensemble.py                      # K-Fold soft-voting ensemble classifier (self-test inside)
 │   ├── train_01_unet_convlstm.py        # Model 1: U-Net + ConvLSTM

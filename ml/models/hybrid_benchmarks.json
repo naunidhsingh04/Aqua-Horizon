@@ -4,7 +4,7 @@
   "evaluation_split": "Chronological 80:20 Split (1967-2012 Train vs 2013-2023 Test)",
   "sequence_length_years": 5,
   "total_districts": 725,
-  "total_training_time_sec": 375.75,
+  "total_training_time_sec": 613.1,
   "models": [
     {
       "model_name": "U-Net + ConvLSTM",
@@ -12,14 +12,14 @@
       "parameters": 85729,
       "epochs_trained": 3,
       "optimal_threshold": 0.5,
-      "recall": 79.99,
-      "precision": 52.87,
-      "f1_score": 0.6367,
-      "roc_auc": 0.7946,
-      "pr_auc": 0.649,
-      "accuracy": 69.33,
-      "training_time_sec": 35.74,
-      "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\unet_convlstm.pt"
+      "recall": 84.66,
+      "precision": 51.21,
+      "f1_score": 0.6382,
+      "roc_auc": 0.796,
+      "pr_auc": 0.647,
+      "accuracy": 67.75,
+      "training_time_sec": 38.62,
+      "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\unet_convlstm.pt"
     },
     {
       "model_name": "CNN + LSTM",
@@ -33,23 +33,23 @@
       "roc_auc": 0.7956,
       "pr_auc": 0.6625,
       "accuracy": 67.15,
-      "training_time_sec": 15.23,
-      "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\cnn_lstm.pt"
+      "training_time_sec": 52.21,
+      "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\cnn_lstm.pt"
     },
     {
       "model_name": "CNN + Transformer",
       "architecture": "CNNTransformer",
-      "parameters": 70849,
-      "epochs_trained": 1,
-      "optimal_threshold": 0.5,
-      "recall": 78.91,
-      "precision": 53.51,
-      "f1_score": 0.6377,
-      "roc_auc": 0.7963,
-      "pr_auc": 0.6404,
-      "accuracy": 69.88,
-      "training_time_sec": 5.2,
-      "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\cnn_transformer.pt"
+      "parameters": 75137,
+      "epochs_trained": 2,
+      "optimal_threshold": 0.4,
+      "recall": 83.02,
+      "precision": 52.08,
+      "f1_score": 0.6401,
+      "roc_auc": 0.7961,
+      "pr_auc": 0.6504,
+      "accuracy": 68.64,
+      "training_time_sec": 40.68,
+      "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\cnn_transformer.pt"
     },
     {
       "model_name": "ResNet + BiLSTM",
@@ -63,8 +63,8 @@
       "roc_auc": 0.7979,
       "pr_auc": 0.6689,
       "accuracy": 69.25,
-      "training_time_sec": 4.71,
-      "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\resnet_bilstm.pt"
+      "training_time_sec": 6.03,
+      "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\resnet_bilstm.pt"
     },
     {
       "model_name": "Attention U-Net + LSTM",
@@ -78,8 +78,8 @@
       "roc_auc": 0.7995,
       "pr_auc": 0.6475,
       "accuracy": 68.88,
-      "training_time_sec": 8.25,
-      "weights_path": "C:\\Users\\Lenovo\\AppData\\Local\\Temp\\claude\\c--Users-Lenovo-Documents-AI-Hackathon\\7d9fdabd-2d0a-4854-8024-1c417892fa0d\\scratchpad\\colab_sim\\AquaHorizon\\ml\\models\\attention_unet_lstm.pt"
+      "training_time_sec": 11.05,
+      "weights_path": "C:\\Users\\Lenovo\\Documents\\AI Hackathon\\ml\\models\\attention_unet_lstm.pt"
     }
   ]
 }
